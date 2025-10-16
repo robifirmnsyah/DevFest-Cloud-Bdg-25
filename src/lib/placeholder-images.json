@@ -1,3 +1,76 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "hero-bg",
+      "description": "Abstract background for hero section",
+      "imageUrl": "https://picsum.photos/seed/devfestbg/1920/1080",
+      "imageHint": "conference stage"
+    },
+    {
+      "id": "speaker-1",
+      "description": "Photo of Aria Wijaya",
+      "imageUrl": "https://picsum.photos/seed/speaker1/500/500",
+      "imageHint": "woman portrait"
+    },
+    {
+      "id": "speaker-2",
+      "description": "Photo of Bima Satria",
+      "imageUrl": "https://picsum.photos/seed/speaker2/500/500",
+      "imageHint": "man portrait"
+    },
+    {
+      "id": "speaker-3",
+      "description": "Photo of Citra Kirana",
+      "imageUrl": "https://picsum.photos/seed/speaker3/500/500",
+      "imageHint": "woman professional"
+    },
+    {
+      "id": "speaker-4",
+      "description": "Photo of Dharma Putra",
+      "imageUrl": "https://picsum.photos/seed/speaker4/500/500",
+      "imageHint": "man professional"
+    },
+    {
+      "id": "speaker-5",
+      "description": "Photo of Eka Lestari",
+      "imageUrl": "https://picsum.photos/seed/speaker5/500/500",
+      "imageHint": "woman smiling"
+    },
+    {
+      "id": "speaker-6",
+      "description": "Photo of Fajar Nugroho",
+      "imageUrl": "https://picsum.photos/seed/speaker6/500/500",
+      "imageHint": "man smiling"
+    },
+    {
+      "id": "sponsor-1",
+      "description": "Logo of TechGiant Inc.",
+      "imageUrl": "https://picsum.photos/seed/sponsor1/300/150",
+      "imageHint": "abstract logo"
+    },
+    {
+      "id": "sponsor-2",
+      "description": "Logo of Innovate Solutions",
+      "imageUrl": "https://picsum.photos/seed/sponsor2/300/150",
+      "imageHint": "abstract logo"
+    },
+    {
+      "id": "sponsor-3",
+      "description": "Logo of CodeCrafters",
+      "imageUrl": "https://picsum.photos/seed/sponsor3/300/150",
+      "imageHint": "abstract logo"
+    },
+    {
+      "id": "sponsor-4",
+      "description": "Logo of DevTools Co.",
+      "imageUrl": "https://picsum.photos/seed/sponsor4/300/150",
+      "imageHint": "abstract logo"
+    },
+    {
+      "id": "venue-map",
+      "description": "Map of the venue location",
+      "imageUrl": "https://picsum.photos/seed/venuemap/1200/800",
+      "imageHint": "city map"
+    }
+  ]
 }
