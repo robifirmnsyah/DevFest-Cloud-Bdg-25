@@ -38,7 +38,7 @@ export default function Hero() {
           </div>
         </div>
         <Button size="lg" className="mt-8" asChild>
-          <Link href="#">
+          <Link href="#sponsorship-form">
             <Ticket className="mr-2 h-5 w-5" />
             Register Now
           </Link>

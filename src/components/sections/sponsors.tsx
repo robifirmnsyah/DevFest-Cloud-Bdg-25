@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { sponsors } from "@/lib/data";
+import { Button } from "../ui/button";
 
 const SponsorTier = ({ title, items, size }: { title: string, items: typeof sponsors.platinum, size: {width: number, height: number, className: string} }) => (
   <div className="mb-12">
@@ -39,6 +40,24 @@ export default function Sponsors() {
         <SponsorTier title="Gold" items={sponsors.gold} size={{width: 250, height: 125, className: "max-w-2xl mx-auto"}} />
         <SponsorTier title="Silver" items={sponsors.silver} size={{width: 200, height: 100, className: "max-w-3xl mx-auto"}} />
         
+        <div className="text-center mt-16">
+          <h3 className="text-xl font-bold font-headline">Want to join us as a partner?</h3>
+          <p className="mt-2 text-muted-foreground">
+            Check out our partnership proposal for more details on sponsorship opportunities.
+          </p>
+          <div className="mt-4 flex flex-col sm:flex-row justify-center items-center gap-4">
+            <Button asChild size="lg">
+              <Link href="https://bit.ly/CloudBandungPartnership" target="_blank">
+                View Proposal
+              </Link>
+            </Button>
+            <Button asChild size="lg" variant="outline">
+              <Link href="#sponsorship-form">
+                Become a Sponsor
+              </Link>
+            </Button>
+          </div>
+        </div>
       </div>
     </section>
   );

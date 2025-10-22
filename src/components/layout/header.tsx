@@ -40,7 +40,7 @@ export default function Header() {
         </div>
         <div className="flex flex-1 items-center justify-end space-x-4">
           <Button className="hidden sm:inline-flex" asChild>
-            <Link href="#">
+            <Link href="#sponsorship-form">
               <Ticket className="mr-2 h-4 w-4" />
               Register Now
             </Link>
@@ -71,7 +71,7 @@ export default function Header() {
                   </Link>
                 ))}
                 <Button onClick={() => setSheetOpen(false)} asChild>
-                  <Link href="#">
+                  <Link href="#sponsorship-form">
                     <Ticket className="mr-2 h-4 w-4" />
                     Register Now
                   </Link>
