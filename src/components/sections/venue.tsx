@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Building, Navigation } from "lucide-react";
+import { MapPin, Building, Navigation, School, Wind, Users } from "lucide-react";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import Link from "next/link";
 
@@ -50,10 +50,21 @@ export default function Venue() {
               </div>
 
               <div className="mt-8 border-t pt-6">
-                  <h4 className="font-semibold mb-2">Accommodation</h4>
-                  <p className="text-muted-foreground">
-                    Bandung offers a wide range of hotels and guesthouses near the venue. We recommend booking in advance through your favorite travel apps.
-                  </p>
+                <h4 className="font-semibold mb-4">Venue Facilities</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-muted-foreground">
+                    <div className="flex items-center gap-3">
+                        <Users className="h-5 w-5 text-primary" />
+                        <span>Main Hall</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <Wind className="h-5 w-5 text-primary" />
+                        <span>Upper Hall</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <School className="h-5 w-5 text-primary" />
+                        <span>3 Classrooms</span>
+                    </div>
+                </div>
               </div>
             </div>
             {mapImage && (
