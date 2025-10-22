@@ -85,7 +85,7 @@ export default function SponsorshipForm() {
               Become a Sponsor
             </CardTitle>
             <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-              Fill out the form below to express your interest in sponsoring Bandung DevFest 2025.
+              Fill out the form below to express your interest in sponsoring Cloud DevFest Bandung 2025.
             </p>
           </CardHeader>
           <CardContent>
@@ -290,7 +290,7 @@ export default function SponsorshipForm() {
                           Saya setuju dengan syarat dan ketentuan yang berlaku.
                         </FormLabel>
                         <FormDescription>
-                          Dengan mengirimkan form ini, Anda menyetujui untuk dihubungi oleh tim Bandung DevFest.
+                          Dengan mengirimkan form ini, Anda menyetujui untuk dihubungi oleh tim Cloud DevFest Bandung.
                         </FormDescription>
                          <FormMessage />
                       </div>
@@ -308,4 +308,3 @@ export default function SponsorshipForm() {
     </section>
   );
 }
-

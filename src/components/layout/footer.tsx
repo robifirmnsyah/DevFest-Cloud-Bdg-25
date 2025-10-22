@@ -9,7 +9,7 @@ export default function Footer() {
         <div className="flex items-center gap-2">
           <Code2 className="h-6 w-6 text-primary" />
           <p className="text-sm font-medium font-headline">
-            Bandung DevFest 2025
+            Cloud DevFest Bandung 2025
           </p>
         </div>
         <div className="flex items-center gap-2">

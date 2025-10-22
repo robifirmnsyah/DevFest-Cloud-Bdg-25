@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Bandung DevFest 2025',
+  title: 'CLOUD DEVFEST BANDUNG 2025',
   description: 'Join us for an in-person event with a conference, hands-on workshops, and an exhibition.',
 };
 

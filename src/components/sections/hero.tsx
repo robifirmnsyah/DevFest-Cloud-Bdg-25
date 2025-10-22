@@ -22,7 +22,7 @@ export default function Hero() {
       <div className="absolute inset-0 bg-black/60" />
       <div className="relative z-10 flex flex-col items-center text-center p-4">
         <h1 className="text-4xl md:text-6xl font-bold font-headline tracking-tight">
-          Bandung DevFest 2025
+          Cloud DevFest Bandung 2025
         </h1>
         <p className="mt-4 max-w-2xl text-lg md:text-xl text-primary-foreground/80">
           In person event - Conference, hands on workshop, exhibition
