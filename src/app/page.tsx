@@ -5,6 +5,7 @@ import Speakers from '@/components/sections/speakers';
 import Schedule from '@/components/sections/schedule';
 import Venue from '@/components/sections/venue';
 import Sponsors from '@/components/sections/sponsors';
+import Exhibition from '@/components/sections/exhibition';
 import SponsorshipForm from '@/components/sections/sponsorship-form';
 
 export default function Home() {
@@ -17,6 +18,7 @@ export default function Home() {
         <Schedule />
         <Venue />
         <Sponsors />
+        <Exhibition />
         <SponsorshipForm />
       </main>
       <Footer />
