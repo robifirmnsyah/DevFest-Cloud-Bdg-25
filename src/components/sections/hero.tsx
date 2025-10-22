@@ -25,16 +25,16 @@ export default function Hero() {
           Bandung DevFest 2025
         </h1>
         <p className="mt-4 max-w-2xl text-lg md:text-xl text-primary-foreground/80">
-          The biggest developer conference in West Java. Join us for two days of learning, networking, and innovation.
+          In person event - Conference, hands on workshop, exhibition
         </p>
         <div className="mt-6 flex flex-wrap justify-center items-center gap-4 text-sm md:text-base">
           <div className="flex items-center gap-2">
             <Calendar className="h-5 w-5 text-accent" />
-            <span>October 25-26, 2025</span>
+            <span>Saturday, 06 December 2025</span>
           </div>
           <div className="flex items-center gap-2">
             <MapPin className="h-5 w-5 text-accent" />
-            <span>Gedung Sate, Bandung</span>
+            <span>Selah Hall, Piset Square</span>
           </div>
         </div>
         <Button size="lg" className="mt-8" asChild>

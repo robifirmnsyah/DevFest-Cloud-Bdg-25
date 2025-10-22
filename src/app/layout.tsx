@@ -4,7 +4,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'Bandung DevFest 2025',
-  description: 'The premier developer conference in Bandung for 2025.',
+  description: 'Join us for an in-person event with a conference, hands-on workshops, and an exhibition.',
 };
 
 export default function RootLayout({

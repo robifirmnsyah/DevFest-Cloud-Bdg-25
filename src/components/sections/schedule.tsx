@@ -86,25 +86,17 @@ export default function Schedule() {
             Event Schedule
           </h2>
           <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-            Plan your days at DevFest. Don't miss out on your favorite talks and workshops!
+            Plan your day at DevFest. Don't miss out on your favorite talks and workshops!
           </p>
         </div>
 
         <Tabs defaultValue="day1" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 max-w-sm mx-auto h-auto">
-            <TabsTrigger value="day1" className="py-2">Day 1 (Oct 25)</TabsTrigger>
-            <TabsTrigger value="day2" className="py-2">Day 2 (Oct 26)</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-1 max-w-sm mx-auto h-auto">
+            <TabsTrigger value="day1" className="py-2">Dec 06</TabsTrigger>
           </TabsList>
           <TabsContent value="day1">
             <div className="space-y-4 mt-8">
               {schedule.day1.map((session) => (
-                <SessionItem key={session.id} session={session} />
-              ))}
-            </div>
-          </TabsContent>
-          <TabsContent value="day2">
-            <div className="space-y-4 mt-8">
-              {schedule.day2.map((session) => (
                 <SessionItem key={session.id} session={session} />
               ))}
             </div>

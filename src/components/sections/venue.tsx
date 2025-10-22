@@ -7,7 +7,7 @@ import Link from "next/link";
 
 export default function Venue() {
   const mapImage = PlaceHolderImages.find(p => p.id === 'venue-map');
-  const venueAddress = "Jl. Diponegoro No.22, Citarum, Kec. Bandung Wetan, Kota Bandung, Jawa Barat 40115";
+  const venueAddress = "Selah Hall, Piset Square, Bandung";
   const googleMapsLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(venueAddress)}`;
 
   return (
@@ -29,7 +29,7 @@ export default function Venue() {
                 <div className="bg-primary/10 text-primary p-3 rounded-lg">
                   <Building className="h-6 w-6" />
                 </div>
-                <h3 className="text-2xl font-bold font-headline">Gedung Sate</h3>
+                <h3 className="text-2xl font-bold font-headline">Selah Hall, Piset Square</h3>
               </div>
               <div className="mt-6 flex items-start gap-3">
                 <div className="bg-primary/10 text-primary p-3 rounded-lg mt-1">
