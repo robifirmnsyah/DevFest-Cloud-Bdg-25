@@ -1,3 +1,4 @@
+
 import type { ImagePlaceholder } from './placeholder-images';
 import { PlaceHolderImages } from './placeholder-images';
 
@@ -101,14 +102,14 @@ export const schedule = {
 
 export const sponsors = {
   platinum: [
-    { id: 'p1', name: 'TechGiant Inc.', logo: findImage('sponsor-1') },
+    { id: 'p1', name: 'TechGiant Inc.', logo: { id: 'sponsor-1', imageUrl: 'https://picsum.photos/seed/sponsor1/300/150', imageHint: 'abstract logo', description: 'Logo of TechGiant Inc.' } },
   ],
   gold: [
-    { id: 'g1', name: 'Innovate Solutions', logo: findImage('sponsor-2') },
-    { id: 'g2', name: 'CodeCrafters', logo: findImage('sponsor-3') },
+    { id: 'g1', name: 'Innovate Solutions', logo: { id: 'sponsor-2', imageUrl: 'https://picsum.photos/seed/sponsor2/250/125', imageHint: 'abstract logo', description: 'Logo of Innovate Solutions' } },
+    { id: 'g2', name: 'CodeCrafters', logo: { id: 'sponsor-3', imageUrl: 'https://picsum.photos/seed/sponsor3/250/125', imageHint: 'abstract logo', description: 'Logo of CodeCrafters' } },
   ],
   silver: [
-    { id: 's1', name: 'DevTools Co.', logo: findImage('sponsor-4') },
+    { id: 's1', name: 'DevTools Co.', logo: { id: 'sponsor-4', imageUrl: 'https://picsum.photos/seed/sponsor4/200/100', imageHint: 'abstract logo', description: 'Logo of DevTools Co.' } },
   ]
 };
 
