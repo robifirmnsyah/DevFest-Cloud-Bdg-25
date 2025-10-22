@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { MapPin, Building, Navigation, School, Wind, Users } from "lucide-react";
+import { MapPin, Building, Navigation, School, Wind, Users, ParkingCircle, ShowerHead, ShoppingCart, Landmark } from "lucide-react";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import Link from "next/link";
 
@@ -63,6 +63,22 @@ export default function Venue() {
                     <div className="flex items-center gap-3">
                         <School className="h-5 w-5 text-primary" />
                         <span>3 Classrooms</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <ShowerHead className="h-5 w-5 text-primary" />
+                        <span>Toilet</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <Landmark className="h-5 w-5 text-primary" />
+                        <span>Mushola</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <ParkingCircle className="h-5 w-5 text-primary" />
+                        <span>Parking Area</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <ShoppingCart className="h-5 w-5 text-primary" />
+                        <span>Supermarket</span>
                     </div>
                 </div>
               </div>
