@@ -1,6 +1,7 @@
 import Header from '@/components/layout/header';
 import Footer from '@/components/layout/footer';
 import Hero from '@/components/sections/hero';
+import About from '@/components/sections/about';
 import Speakers from '@/components/sections/speakers';
 import Schedule from '@/components/sections/schedule';
 import Venue from '@/components/sections/venue';
@@ -11,6 +12,7 @@ export default function Home() {
     <div className="flex min-h-screen flex-col bg-background font-body">
       <main className="flex-1">
         <Hero />
+        <About />
         <Speakers />
         <Schedule />
         <Sponsors />
