@@ -8,7 +8,7 @@ const SponsorTier = ({ title, items, size }: { title: string, items: typeof spon
     <h3 className="text-2xl font-bold font-headline text-center text-primary mb-6">{title}</h3>
     <div className={`flex justify-center items-center gap-8 flex-wrap ${size.className}`}>
       {items.map((sponsor) => (
-        <Link href="#" key={sponsor.id} className="grayscale hover:grayscale-0 transition-all duration-300">
+        <Link href={sponsor.website} target="_blank" key={sponsor.id} className="grayscale hover:grayscale-0 transition-all duration-300">
           <Image
             src={sponsor.logo.imageUrl}
             alt={`${sponsor.name} logo`}
@@ -25,14 +25,14 @@ const SponsorTier = ({ title, items, size }: { title: string, items: typeof spon
 
 export default function Sponsors() {
   return (
-    <section id="sponsors" className="py-16 md:py-24">
+    <section id="sponsors" className="py-16 md:py-24 bg-secondary">
       <div className="container">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold font-headline">
-            Our Awesome Sponsors
+            Sponsors
           </h2>
           <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-            We are grateful for the support of our partners who make this event possible.
+            This event is supported by our amazing sponsors.
           </p>
         </div>
 
@@ -40,24 +40,6 @@ export default function Sponsors() {
         <SponsorTier title="Gold" items={sponsors.gold} size={{width: 250, height: 125, className: "max-w-2xl mx-auto"}} />
         <SponsorTier title="Silver" items={sponsors.silver} size={{width: 200, height: 100, className: "max-w-3xl mx-auto"}} />
         
-        <div className="text-center mt-16">
-          <h3 className="text-xl font-bold font-headline">Want to join us as a partner?</h3>
-          <p className="mt-2 text-muted-foreground">
-            Check out our partnership proposal for more details on sponsorship opportunities.
-          </p>
-          <div className="mt-4 flex flex-col sm:flex-row justify-center items-center gap-4">
-            <Button asChild size="lg">
-              <Link href="https://bit.ly/CloudBandungPartnership" target="_blank">
-                View Proposal
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="outline">
-              <Link href="#sponsorship-form">
-                Become a Sponsor
-              </Link>
-            </Button>
-          </div>
-        </div>
       </div>
     </section>
   );

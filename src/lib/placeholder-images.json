@@ -3,8 +3,8 @@
     {
       "id": "hero-bg",
       "description": "Abstract background for hero section",
-      "imageUrl": "https://images.unsplash.com/photo-1560523159-fbe43c0b465f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8Y29uZmVyZW5jZSUyMHN0YWdlfGVufDB8fHx8MTc2MTEzNTM2MXww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "conference stage"
+      "imageUrl": "https://images.unsplash.com/photo-1519681393784-d120267933ba?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxhYnN0cmFjdCUyMGRhcmslMjBtb3VudGFpbnxlbnwwfHx8fDE3NjExNTU0NTR8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "abstract mountain"
     },
     {
       "id": "speaker-1",
@@ -43,40 +43,28 @@
       "imageHint": "man smiling"
     },
     {
-      "id": "sponsor-1",
-      "description": "Logo of TechGiant Inc.",
-      "imageUrl": "https://images.unsplash.com/photo-1755586258247-67f5148d76c3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8YWJzdHJhY3QlMjBsb2dvfGVufDB8fHx8MTc2MTE0NDUxMHww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "abstract logo"
+      "id": "sponsor-google",
+      "description": "Logo of Google",
+      "imageUrl": "https://images.unsplash.com/photo-1619551734325-81aaf323686c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxjb21wYW55JTIwbG9nb3xlbnwwfHx8fDE3NjE0NDQxODh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "company logo"
     },
     {
-      "id": "sponsor-2",
-      "description": "Logo of Innovate Solutions",
-      "imageUrl": "https://images.unsplash.com/photo-1747862712521-e4a37b12a039?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxhYnN0cmFjdCUyMGxvZ298ZW58MHx8fHwxNzYxMTQ0NTEwfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "abstract logo"
+      "id": "sponsor-dicoding",
+      "description": "Logo of Dicoding",
+      "imageUrl": "https://images.unsplash.com/photo-1496200186974-4293800e2c20?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjb21wYW55JTIwbG9nb3xlbnwwfHx8fDE3NjE0NDQxODh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "company logo"
     },
     {
-      "id": "sponsor-3",
-      "description": "Logo of CodeCrafters",
-      "imageUrl": "https://images.unsplash.com/photo-1747862712508-e1290330085f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxhYnN0cmFjdCUyMGxvZ298ZW58MHx8fHwxNzYxMTQ0NTEwfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "abstract logo"
-    },
-    {
-      "id": "sponsor-4",
-      "description": "Logo of DevTools Co.",
-      "imageUrl": "https://images.unsplash.com/photo-1755435140567-3c9df5ceffa1?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxhYnN0cmFjdCUyMGxvZ298ZW58MHx8fHwxNzYxMTQ0NTEwfDA&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "abstract logo"
+      "id": "sponsor-dewaweb",
+      "description": "Logo of Dewaweb",
+      "imageUrl": "https://images.unsplash.com/photo-1562783912-21ad31ee2a83?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxjb21wYW55JTIwbG9nb3xlbnwwfHx8fDE3NjE0NDQxODh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "company logo"
     },
     {
       "id": "venue-map",
-      "description": "Map of the venue location",
-      "imageUrl": "https://images.unsplash.com/photo-1476385822777-70eabacbd41f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxjaXR5JTIwbWFwfGVufDB8fHx8MTc2MTA1NzE0OHww&ixlib=rb-4.1.0&q=80&w=1080",
-      "imageHint": "city map"
-    },
-    {
-      "id": "exhibition-floor",
-      "description": "Attendees at an exhibition booth during a tech conference.",
-      "imageUrl": "https://storage.googleapis.com/aip-dev-sandbox-public-eu/studio-playground-user-uploads/omitted.jpeg",
-      "imageHint": "conference exhibition"
+      "description": "Photo of Landmark Convention Hall Bandung",
+      "imageUrl": "https://images.unsplash.com/photo-1568750899429-a25376a92b23?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxsYW5kbWFyayUyMGJ1aWxkaW5nJTIwYmFuZHVuZ3xlbnwwfHx8fDE3NjExNTYxMDd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "building bandung"
     }
   ]
 }

@@ -9,9 +9,8 @@ import { useState } from "react";
 const navLinks = [
   { href: "#speakers", label: "Speakers" },
   { href: "#schedule", label: "Schedule" },
-  { href: "#venue", label: "Venue" },
   { href: "#sponsors", label: "Sponsors" },
-  { href: "#exhibition", label: "Exhibition" },
+  { href: "#venue", label: "Venue" },
 ];
 
 export default function Header() {
@@ -22,12 +21,13 @@ export default function Header() {
       <div className="container flex h-14 items-center">
         <div className="mr-4 flex items-center">
           <Link href="/" className="mr-6 flex items-center space-x-2">
-            <Code2 className="h-6 w-6 text-primary" />
             <span className="font-bold font-headline sm:inline-block">
-              Cloud DevFest Bandung
+              DevFest Bandung
             </span>
           </Link>
-          <nav className="hidden gap-6 text-sm md:flex">
+        </div>
+        <div className="flex flex-1 items-center justify-end space-x-4">
+           <nav className="hidden gap-6 text-sm md:flex">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -38,12 +38,9 @@ export default function Header() {
               </Link>
             ))}
           </nav>
-        </div>
-        <div className="flex flex-1 items-center justify-end space-x-4">
           <Button className="hidden sm:inline-flex" asChild>
-            <Link href="#sponsorship-form">
-              <Ticket className="mr-2 h-4 w-4" />
-              Register Now
+            <Link href="https://google.com" target="_blank">
+              Get Tickets
             </Link>
           </Button>
 
@@ -56,8 +53,7 @@ export default function Header() {
             </SheetTrigger>
             <SheetContent side="left" className="pr-0">
               <Link href="/" className="mr-6 flex items-center space-x-2">
-                <Code2 className="h-6 w-6 text-primary" />
-                <span className="font-bold font-headline">Cloud DevFest Bandung</span>
+                <span className="font-bold font-headline">DevFest Bandung</span>
               </Link>
               <div className="my-4 h-px w-full bg-border" />
               <div className="flex flex-col space-y-4">
@@ -72,9 +68,8 @@ export default function Header() {
                   </Link>
                 ))}
                 <Button onClick={() => setSheetOpen(false)} asChild>
-                  <Link href="#sponsorship-form">
-                    <Ticket className="mr-2 h-4 w-4" />
-                    Register Now
+                  <Link href="https://google.com" target="_blank">
+                    Get Tickets
                   </Link>
                 </Button>
               </div>
