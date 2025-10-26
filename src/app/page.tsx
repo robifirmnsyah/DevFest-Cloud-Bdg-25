@@ -7,6 +7,7 @@ import Speakers from '@/components/sections/speakers';
 import Schedule from '@/components/sections/schedule';
 import Venue from '@/components/sections/venue';
 import Sponsors from '@/components/sections/sponsors';
+import FollowUs from '@/components/sections/follow-us';
 
 export default function Home() {
   return (
@@ -18,6 +19,7 @@ export default function Home() {
         <Speakers />
         <Schedule />
         <Sponsors />
+        <FollowUs />
         <Venue />
       </main>
       <Footer />
