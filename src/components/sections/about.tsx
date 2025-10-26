@@ -1,4 +1,5 @@
-import { Card, CardContent } from "@/components/ui/card";
+
+import { Card } from "@/components/ui/card";
 import { Calendar, Wrench, Users } from "lucide-react";
 
 const features = [
@@ -45,18 +46,6 @@ export default function About() {
               <p className="text-muted-foreground">{feature.description}</p>
             </Card>
           ))}
-        </div>
-        
-        <div className="mt-24 text-center max-w-4xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold font-headline">
-            Google Developer Groups
-          </h2>
-          <p className="mt-4 text-lg text-muted-foreground">
-            When you join a Google Developer Group Cloud, you'll have the opportunity to learn new skills in a variety of
-            formats. You'll also meet local developers virtually or in-person with similar interests in technology. The
-            community prides itself on being an inclusive environment where everyone and anyone interested in tech - from
-            beginner developers to experienced professionals are welcome to join.
-          </p>
         </div>
       </div>
     </section>
