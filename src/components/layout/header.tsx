@@ -12,7 +12,7 @@ const navLinks = [
   { href: "#tickets", label: "Tickets" },
   { href: "#schedule", label: "Schedule" },
   { href: "#speakers", label: "Speakers" },
-  { href: "#partners", label: "Partners" },
+  { href: "#sponsors", label: "Sponsors" },
 ];
 
 export default function Header() {
