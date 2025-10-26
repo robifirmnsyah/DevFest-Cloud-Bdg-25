@@ -45,26 +45,50 @@
     {
       "id": "sponsor-google",
       "description": "Logo of Google",
-      "imageUrl": "https://images.unsplash.com/photo-1619551734325-81aaf323686c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxjb21wYW55JTIwbG9nb3xlbnwwfHx8fDE3NjE0NDQxODh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1622465911368-72162f8da3e2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxjb21wYW55JTIwbG9nb3xlbnwwfHx8fDE3NjE0NDQxODh8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "company logo"
     },
     {
       "id": "sponsor-dicoding",
       "description": "Logo of Dicoding",
-      "imageUrl": "https://images.unsplash.com/photo-1496200186974-4293800e2c20?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwyfHxjb21wYW55JTIwbG9nb3xlbnwwfHx8fDE3NjE0NDQxODh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1529612700005-e35377bf1415?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxjb21wYW55JTIwbG9nb3xlbnwwfHx8fDE3NjE0NDQxODh8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "company logo"
     },
     {
       "id": "sponsor-dewaweb",
       "description": "Logo of Dewaweb",
-      "imageUrl": "https://images.unsplash.com/photo-1562783912-21ad31ee2a83?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxjb21wYW55JTIwbG9nb3xlbnwwfHx8fDE3NjE0NDQxODh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageUrl": "https://images.unsplash.com/photo-1627843563095-f6e94676cfe0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8Y29tcGFueSUyMGxvZ298ZW58MHx8fHwxNzYxNDQ0MTg4fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "company logo"
+    },
+    {
+      "id": "sponsor-default-1",
+      "description": "Default Sponsor Logo 1",
+      "imageUrl": "https://images.unsplash.com/photo-1619551734325-81aaf323686c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxjb21wYW55JTIwbG9nb3xlbnwwfHx8fDE3NjE0NDQxODh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "company logo"
+    },
+    {
+      "id": "sponsor-default-2",
+      "description": "Default Sponsor Logo 2",
+      "imageUrl": "https://images.unsplash.com/photo-1620288627223-53302f4e8c74?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw5fHxjb21wYW55JTIwbG9nb3xlbnwwfHx8fDE3NjE0NDQxODh8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "company logo"
+    },
+    {
+      "id": "sponsor-default-3",
+      "description": "Default Sponsor Logo 3",
+      "imageUrl": "https://images.unsplash.com/photo-1627843563095-f6e94676cfe0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8Y29tcGFueSUyMGxvZ298ZW58MHx8fHwxNzYxNDQ0MTg4fDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "company logo"
     },
     {
       "id": "venue-map",
-      "description": "Photo of Landmark Convention Hall Bandung",
-      "imageUrl": "https://images.unsplash.com/photo-1568750899429-a25376a92b23?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxsYW5kbWFyayUyMGJ1aWxkaW5nJTIwYmFuZHVuZ3xlbnwwfHx8fDE3NjExNTYxMDd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "description": "Photo of Piset Square Bandung",
+      "imageUrl": "https://images.unsplash.com/photo-1695018796709-f2f9e4ace07f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw0fHxidWlsZGluZyUyMGJhbmR1bmd8ZW58MHx8fHwxNzYxNDkzMzY4fDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "building bandung"
+    },
+    {
+      "id": "exhibition-floor",
+      "description": "Photo of an exhibition floor",
+      "imageUrl": "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxjb25mZXJlbmNlJTIwaGFsbHxlbnwwfHx8fDE3NjE0MjcwOTJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "conference hall"
     }
   ]
 }
