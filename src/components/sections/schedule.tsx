@@ -1,34 +1,28 @@
 import { schedule, getSpeakerById } from "@/lib/data";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { Clock, MapPin, User, Info } from "lucide-react";
-import Image from "next/image";
+import { Clock, User } from "lucide-react";
 
-const SessionItem = ({ session }: { session: (typeof schedule.day1)[0] }) => {
+const SessionItem = ({ session }: { session: (typeof schedule.mainHall)[0] }) => {
   const speaker = getSpeakerById(session.speakerId);
 
   return (
     <Card className="hover:bg-muted/50 transition-colors">
-      <CardContent className="p-4 flex flex-col sm:flex-row gap-4">
-        <div className="w-full sm:w-28 text-left sm:text-right text-primary font-bold">{session.time}</div>
-        <div className="border-t sm:border-t-0 sm:border-l pt-4 sm:pt-0 sm:pl-4 flex-1">
+      <CardContent className="p-4 flex flex-col sm:flex-row gap-4 items-start">
+        <div className="flex-1">
+          <div className="flex items-center gap-2 text-sm text-primary mb-1">
+            <Clock className="h-4 w-4" />
+            <span>{session.time}</span>
+            {session.duration && <span className="text-muted-foreground">({session.duration})</span>}
+          </div>
           <h4 className="font-bold font-headline">{session.title}</h4>
-          {speaker ? (
-            <p className="text-sm text-muted-foreground flex items-center gap-2 mt-1">
-              <User className="h-4 w-4" />
-              {speaker.name}
-            </p>
-          ) : session.description ? (
-            <p className="text-sm text-muted-foreground flex items-center gap-2 mt-1">
-                <Info className="h-4 w-4" />
-                {session.description}
-            </p>
-          ) : null}
-          <p className="text-sm text-muted-foreground flex items-center gap-2 mt-1">
-            <MapPin className="h-4 w-4" />
-            {session.location}
-          </p>
         </div>
+        {speaker && (
+            <div className="flex items-center gap-2 text-sm bg-primary/10 text-primary px-3 py-1 rounded-full">
+              <User className="h-4 w-4" />
+              <span>{speaker.name}</span>
+            </div>
+          )}
       </CardContent>
     </Card>
   );
@@ -40,22 +34,30 @@ export default function Schedule() {
       <div className="container">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold font-headline">
-            Schedule
+            Event Schedule
           </h2>
           <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-            The DevFest Bandung 2024 schedule is packed with exciting sessions.
+            December 6, 2025 - Two parallel tracks for your learning journey
           </p>
         </div>
 
-        <Tabs defaultValue="day1" className="w-full">
-          <TabsList className="grid w-full grid-cols-1 max-w-sm mx-auto h-auto">
-            <TabsTrigger value="day1">Dec 12</TabsTrigger>
+        <Tabs defaultValue="main-hall" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 max-w-lg mx-auto">
+            <TabsTrigger value="main-hall">Main Hall: Techtalk</TabsTrigger>
+            <TabsTrigger value="upper-hall">Upper Hall: Workshop</TabsTrigger>
           </TabsList>
-          <TabsContent value="day1">
-            <div className="space-y-4 mt-8">
-              {schedule.day1.map((session) => (
+          <TabsContent value="main-hall">
+            <div className="space-y-4 mt-8 max-w-4xl mx-auto">
+              {schedule.mainHall.map((session) => (
                 <SessionItem key={session.id} session={session} />
               ))}
+            </div>
+          </TabsContent>
+          <TabsContent value="upper-hall">
+            <div className="space-y-4 mt-8 max-w-4xl mx-auto">
+                <Card className="text-center p-8">
+                    <p className="text-muted-foreground">Workshop schedule will be announced soon. Stay tuned!</p>
+                </Card>
             </div>
           </TabsContent>
         </Tabs>

@@ -18,7 +18,7 @@ const findImage = (id: string): ImagePlaceholder => {
 export const speakers = [
   {
     id: '1',
-    name: 'Aria Wijaya',
+    name: 'Azhar Fuad',
     title: 'Cloud Engineering Lead, TechCorp',
     photo: findImage('speaker-1'),
     bio: '',
@@ -26,7 +26,7 @@ export const speakers = [
   },
   {
     id: '2',
-    name: 'Bima Satria',
+    name: 'Adhitia (TBD)',
     title: 'AI/ML Researcher, InnoAI',
     photo: findImage('speaker-2'),
     bio: '',
@@ -34,7 +34,7 @@ export const speakers = [
   },
   {
     id: '3',
-    name: 'Citra Kirana',
+    name: 'Cendekia',
     title: 'Frontend Architect, WebWeavers',
     photo: findImage('speaker-3'),
     bio: '',
@@ -42,7 +42,7 @@ export const speakers = [
   },
   {
     id: '4',
-    name: 'Dharma Putra',
+    name: 'Luqman Aljundi',
     title: 'Mobile Developer, AppWorks',
     photo: findImage('speaker-4'),
     bio: '',
@@ -50,7 +50,7 @@ export const speakers = [
   },
   {
     id: '5',
-    name: 'Eka Lestari',
+    name: 'Farah Clara (TBD)',
     title: 'Data Scientist, DataDriven',
     photo: findImage('speaker-5'),
     bio: '',
@@ -58,7 +58,7 @@ export const speakers = [
   },
   {
     id: '6',
-    name: 'Fajar Nugroho',
+    name: 'TBA',
     title: 'Cybersecurity Analyst, SecureNet',
     photo: findImage('speaker-6'),
     bio: '',
@@ -67,19 +67,19 @@ export const speakers = [
 ];
 
 export const schedule = {
-  day1: [
-    { id: 'd1-1', time: '08:00', title: 'Open Gate', speakerId: '', location: 'Lobby', description: 'Registration and badge collection' },
-    { id: 'd1-2', time: '09:00', title: 'Opening', speakerId: '', location: 'Main Stage', description: 'Welcome remarks' },
-    { id: 'd1-3', time: '09:30', title: 'Keynote 1', speakerId: '1', location: 'Main Stage', description: '' },
-    { id: 'd1-4', time: '10:00', title: 'Session 1', speakerId: '2', location: 'Main Stage', description: '' },
-    { id: 'd1-5', time: '10:30', title: 'Coffee Break', speakerId: '', location: 'Lobby', description: 'Networking' },
-    { id: 'd1-6', time: '11:00', title: 'Session 2', speakerId: '3', location: 'Room A', description: '' },
-    { id: 'd1-7', time: '11:00', title: 'Session 3', speakerId: '4', location: 'Room B', description: '' },
-    { id: 'd1-8', time: '12:00', title: 'Lunch Break', speakerId: '', location: 'Lobby', description: 'Lunch and networking' },
-    { id: 'd1-9', time: '13:00', title: 'Session 4', speakerId: '5', location: 'Room A', description: '' },
-    { id: 'd1-10', time: '13:00', title: 'Session 5', speakerId: '6', location: 'Room B', description: '' },
-    { id: 'd1-11', time: '14:00', title: 'Closing', speakerId: '', location: 'Main Stage', description: 'Closing remarks' },
+  mainHall: [
+    { id: 'mh-1', time: '9:15 AM - 9:50 AM', duration: '35 min', title: 'Opening & Keynote', speakerId: '', location: 'Main Hall', description: '' },
+    { id: 'mh-2', time: '10:00 AM - 10:35 AM', duration: '35 min', title: 'Techtalk 1: Al di Industri Film', speakerId: '1', location: 'Main Hall', description: '' },
+    { id: 'mh-3', time: '10:55 AM - 11:30 AM', duration: '35 min', title: 'Techtalk 2: Persib', speakerId: '2', location: 'Main Hall', description: '' },
+    { id: 'mh-4', time: '11:30 AM - 1:00 PM', duration: '1.5 hrs', title: 'LUNCH BREAK', speakerId: '', location: 'Lobby', description: '' },
+    { id: 'mh-5', time: '1:00 PM - 1:35 PM', duration: '35 min', title: 'Techtalk 3: Al di PLN', speakerId: '3', location: 'Main Hall', description: '' },
+    { id: 'mh-6', time: '1:55 PM - 2:30 PM', duration: '35 min', title: 'Techtalk 4: GCP Billing', speakerId: '4', location: 'Main Hall', description: '' },
+    { id: 'mh-7', time: '2:50 PM - 3:25 PM', duration: '35 min', title: 'Techtalk 5: Python', speakerId: '5', location: 'Main Hall', description: '' },
+    { id: 'mh-8', time: '3:45 PM - 4:20 PM', duration: '35 min', title: 'Techtalk 6', speakerId: '6', location: 'Main Hall', description: '' },
+    { id: 'mh-9', time: '4:40 PM - 4:50 PM', duration: '10 min', title: 'CLOSING', speakerId: '', location: 'Main Hall', description: '' },
   ],
+  upperHall: [],
+  day1: [],
   day2: [],
 };
 
@@ -92,6 +92,9 @@ export const sponsors = {
     { id: 'g2', name: 'Dewaweb', website: 'https://dewaweb.com', logo: findImage('sponsor-dewaweb') },
   ],
   silver: [
+    { id: 's1', name: 'Sponsor 1', website: '#', logo: findImage('sponsor-default-1') },
+    { id: 's2', name: 'Sponsor 2', website: '#', logo: findImage('sponsor-default-2') },
+    { id: 's3', name: 'Sponsor 3', website: '#', logo: findImage('sponsor-default-3') },
   ]
 };
 
