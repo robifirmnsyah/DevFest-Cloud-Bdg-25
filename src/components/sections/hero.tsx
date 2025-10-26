@@ -1,48 +1,52 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { Calendar, MapPin, Ticket } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Calendar, MapPin, Users } from "lucide-react";
+import Header from "../layout/header";
 
 export default function Hero() {
-  const heroImage = PlaceHolderImages.find(p => p.id === 'hero-bg');
-
   return (
-    <section className="relative h-[80vh] min-h-[500px] w-full flex items-center justify-center text-white">
-      {heroImage && (
-        <Image
-          src={heroImage.imageUrl}
-          alt={heroImage.description}
-          fill
-          className="object-cover"
-          priority
-          data-ai-hint={heroImage.imageHint}
-        />
-      )}
-      <div className="absolute inset-0 bg-black/60" />
-      <div className="relative z-10 flex flex-col items-center text-center p-4">
+    <section className="relative w-full flex flex-col items-center justify-center text-white gradient-background">
+      <Header />
+      <div className="relative z-10 flex flex-col items-center text-center px-4 pt-32 pb-24 md:pt-48 md:pb-40">
+        <Badge
+          variant="secondary"
+          className="mb-4 bg-white/10 text-white backdrop-blur-sm"
+        >
+          GDG Cloud Bandung Presents
+        </Badge>
         <h1 className="text-4xl md:text-6xl font-bold font-headline tracking-tight">
-          DevFest Bandung 2024
+          Cloud DevFest <br /> Bandung 2025
         </h1>
         <p className="mt-4 max-w-3xl text-lg md:text-xl text-primary-foreground/80">
-          The biggest Google developer conference in Bandung, curated by the community, for the community.
+          Building Safe, Secure and Scalable Solutions with AI and Cloud
         </p>
-        <div className="mt-6 flex flex-wrap justify-center items-center gap-4 text-sm md:text-base">
+        <div className="mt-8 flex flex-wrap justify-center items-center gap-4 md:gap-8 text-sm md:text-base">
           <div className="flex items-center gap-2">
-            <Calendar className="h-5 w-5 text-accent" />
-            <span>12 December 2024</span>
+            <Calendar className="h-5 w-5" />
+            <span>December 6, 2025</span>
           </div>
           <div className="flex items-center gap-2">
-            <MapPin className="h-5 w-5 text-accent" />
-            <span>Landmark Convention Hall, Bandung</span>
+            <MapPin className="h-5 w-5" />
+            <span>Bandung, Indonesia</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Users className="h-5 w-5" />
+            <span>500+ Developers</span>
           </div>
         </div>
-        <Button size="lg" className="mt-8" asChild>
-          <Link href="https://google.com" target="_blank">
-            <Ticket className="mr-2 h-5 w-5" />
-            Get Tickets
-          </Link>
-        </Button>
+        <div className="mt-10 flex gap-4">
+          <Button size="lg" className="bg-white text-blue-600 hover:bg-white/90" asChild>
+            <Link href="#tickets">
+              Register Now
+            </Link>
+          </Button>
+          <Button size="lg" variant="outline" className="text-white border-white/50 hover:bg-white/10 hover:text-white" asChild>
+            <Link href="#schedule">
+              View Schedule
+            </Link>
+          </Button>
+        </div>
       </div>
     </section>
   );

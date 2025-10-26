@@ -1,28 +1,30 @@
 "use client";
 
 import Link from "next/link";
-import { Code2, Menu, Ticket } from "lucide-react";
+import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
 
 const navLinks = [
-  { href: "#speakers", label: "Speakers" },
+  { href: "#", label: "Home" },
+  { href: "#about", label: "About" },
+  { href: "#tickets", label: "Tickets" },
   { href: "#schedule", label: "Schedule" },
-  { href: "#sponsors", label: "Sponsors" },
-  { href: "#venue", label: "Venue" },
+  { href: "#speakers", label: "Speakers" },
+  { href: "#partners", label: "Partners" },
 ];
 
 export default function Header() {
   const [isSheetOpen, setSheetOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-14 items-center">
+    <header className="absolute top-0 z-50 w-full text-white">
+      <div className="container flex h-20 items-center">
         <div className="mr-4 flex items-center">
           <Link href="/" className="mr-6 flex items-center space-x-2">
             <span className="font-bold font-headline sm:inline-block">
-              DevFest Bandung
+              DevFest 2025
             </span>
           </Link>
         </div>
@@ -32,15 +34,15 @@ export default function Header() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="font-medium text-muted-foreground transition-colors hover:text-primary"
+                className="font-medium text-primary-foreground/80 transition-colors hover:text-primary-foreground"
               >
                 {link.label}
               </Link>
             ))}
           </nav>
-          <Button className="hidden sm:inline-flex" asChild>
+          <Button className="hidden sm:inline-flex bg-white text-primary hover:bg-white/90" asChild>
             <Link href="https://google.com" target="_blank">
-              Get Tickets
+              Register
             </Link>
           </Button>
 
@@ -51,9 +53,9 @@ export default function Header() {
                 <span className="sr-only">Toggle Menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="pr-0">
+            <SheetContent side="left" className="pr-0 bg-background text-foreground">
               <Link href="/" className="mr-6 flex items-center space-x-2">
-                <span className="font-bold font-headline">DevFest Bandung</span>
+                <span className="font-bold font-headline">DevFest 2025</span>
               </Link>
               <div className="my-4 h-px w-full bg-border" />
               <div className="flex flex-col space-y-4">
@@ -69,7 +71,7 @@ export default function Header() {
                 ))}
                 <Button onClick={() => setSheetOpen(false)} asChild>
                   <Link href="https://google.com" target="_blank">
-                    Get Tickets
+                    Register
                   </Link>
                 </Button>
               </div>
