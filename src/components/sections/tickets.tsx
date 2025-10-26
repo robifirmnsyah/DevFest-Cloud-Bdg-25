@@ -12,11 +12,6 @@ const includedFeatures = [
     },
     {
       icon: <Sparkles className="h-6 w-6 text-primary" />,
-      title: "Lunch & Snacks",
-      description: "Complimentary meals"
-    },
-    {
-      icon: <Sparkles className="h-6 w-6 text-primary" />,
       title: "Networking",
       description: "Connect with 500+ developers"
     }
@@ -85,7 +80,7 @@ export default function Tickets() {
 
         <div className="mt-24 text-center">
             <h3 className="text-3xl md:text-4xl font-bold font-headline">What's Included in Your Ticket?</h3>
-            <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
                 {includedFeatures.map((feature, index) => (
                     <Card key={index} className="p-6 text-center bg-muted/20 hover:bg-muted/40 transition-colors">
                         <div className="flex justify-center items-center h-12 w-12 rounded-full bg-primary/10 mx-auto mb-4">
