@@ -7,7 +7,7 @@ const Schedule = () => {
   const mainHallSessions = [
     { time: "9:15 AM - 9:50 AM", title: "Opening & Keynote", speaker: "", duration: "35 min" },
     { time: "10:00 AM - 10:35 AM", title: "Techtalk 1: AI di Industri Film", speaker: "Azhar Fuad", duration: "35 min" },
-    { time: "10:55 AM - 11:30 AM", title: "Techtalk 2: Persib", speaker: "Adhitia", duration: "35 min" },
+    { time: "10:55 AM - 11:30 AM", title: "Techtalk 2", speaker: "", duration: "35 min" },
     { time: "11:30 AM - 1:00 PM", title: "LUNCH BREAK", speaker: "", duration: "1.5 hrs", isBreak: true },
     { time: "1:00 PM - 1:35 PM", title: "Techtalk 3: AI di PLN", speaker: "Cendekia Luthfieta", duration: "35 min" },
     { time: "1:55 PM - 2:30 PM", title: "Techtalk 4: GCP Billing", speaker: "Luqman Aljundi", duration: "35 min" },
@@ -23,7 +23,7 @@ const Schedule = () => {
     { time: "1:00 PM - 1:45 PM", title: "Workshop 3: NotebookLM", speaker: "Angga Agia", duration: "45 min" },
     { time: "1:55 PM - 2:40 PM", title: "Workshop 4: Cyber Security", speaker: "Meyta Jennis", duration: "45 min" },
     { time: "2:50 PM - 3:35 PM", title: "Workshop 5: Gemma", speaker: "M Ghifary", duration: "45 min" },
-    { time: "3:45 PM - 4:30 PM", title: "Workshop 6: AI for Stock", speaker: "Farhan Rafly", duration: "45 min" },
+    { time: "3:45 PM - 4:30 PM", title: "Workshop 6", speaker: "", duration: "45 min" },
   ];
 
   return (

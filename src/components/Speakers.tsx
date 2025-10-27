@@ -13,8 +13,6 @@ const Speakers = () => {
     { name: "Rendra Toro", topic: "CEO Lintas Media Danawa", track: "Workshop" },
     { name: "Cendekia Luthfieta", topic: "Contact System Center Officer PLN", track: "Techtalk" },
     { name: "Ibnu Wardy", topic: "CTO Carte WMS & Google AI & Cloud Dev Expert", track: "Techtalk" },
-    { name: "Adhitia", topic: "Persib", track: "Techtalk" },
-    { name: "Farhan Rafly", topic: "AI for Stock", track: "Workshop" },
   ];
 
   return (
