@@ -16,7 +16,7 @@ const Moments = () => {
         <Card className="max-w-5xl mx-auto gradient-card border-primary/20 hover:shadow-[var(--shadow-card)] transition-all duration-300">
           <CardContent className="p-4">
             <img
-              src="https://storage.googleapis.com/gpt-engineer-file-uploads/lovable-images/59b13955-46aa-4b0d-b8d4-9f44cc18e953.png"
+              src="https://storage.googleapis.com/gpt-engineer-file-uploads/lovable-images/91560946-b633-4f9e-8c38-0ce8d1f27464.png"
               alt="Group photo from a previous DevFest event"
               className="rounded-md w-full"
               data-ai-hint="event crowd"
