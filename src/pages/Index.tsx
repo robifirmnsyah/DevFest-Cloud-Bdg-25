@@ -6,6 +6,7 @@ import Speakers from "@/components/Speakers";
 import Partners from "@/components/Partners";
 import Footer from "@/components/Footer";
 import Presale from "@/components/Presale";
+import Moments from "@/components/Moments";
 
 const Index = () => {
   return (
@@ -17,6 +18,7 @@ const Index = () => {
       <Schedule />
       <Speakers />
       <Partners />
+      <Moments />
       <Footer />
     </div>
   );
