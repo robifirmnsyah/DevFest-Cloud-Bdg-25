@@ -67,7 +67,7 @@ const Presale = () => {
 
                 {/* CTA Button */}
                 <a 
-                  href="https://bit.ly/devcloudfest25" 
+                  href="https://www.goersapp.com/events/indonesia-premier-cloud-and-ai-festival-dev-fest-cloud-bandung-2025--devfestcloudbdg25" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="block"

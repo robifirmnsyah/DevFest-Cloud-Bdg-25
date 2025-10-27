@@ -57,7 +57,7 @@ const Navigation = () => {
                 {item.label}
               </a>
             ))}
-            <a href="https://bit.ly/devcloudfest25" target="_blank" rel="noopener noreferrer">
+            <a href="https://www.goersapp.com/events/indonesia-premier-cloud-and-ai-festival-dev-fest-cloud-bandung-2025--devfestcloudbdg25" target="_blank" rel="noopener noreferrer">
               <Button
                 className={`${
                   isScrolled
@@ -96,7 +96,7 @@ const Navigation = () => {
                 {item.label}
               </a>
             ))}
-            <a href="https://bit.ly/devcloudfest25" target="_blank" rel="noopener noreferrer" className="block">
+            <a href="https://www.goersapp.com/events/indonesia-premier-cloud-and-ai-festival-dev-fest-cloud-bandung-2025--devfestcloudbdg25" target="_blank" rel="noopener noreferrer" className="block">
               <Button className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold rounded-full">
                 Register
               </Button>
