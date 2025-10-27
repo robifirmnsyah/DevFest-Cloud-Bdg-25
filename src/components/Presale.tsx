@@ -145,7 +145,7 @@ const Presale = () => {
           <div className="grid md:grid-cols-3 gap-6">
             {[
               { title: "Full Day Access", desc: "All techtalks & workshops" },
-              { title: "Lunch & Snacks", desc: "Complimentary meals" },
+              { title: "Swag Exclusive", desc: "Official DevFest Merchandise" },
               { title: "Networking", desc: "Connect with 500+ developers" },
             ].map((benefit, index) => (
               <Card key={index} className="gradient-card border-primary/20 text-center hover:shadow-[var(--shadow-card)] transition-all duration-300">
