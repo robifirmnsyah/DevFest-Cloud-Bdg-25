@@ -1,90 +1,40 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Building2, Handshake } from "lucide-react";
+import { Handshake } from "lucide-react";
 
 const Partners = () => {
-  const partnerTiers = [
-    {
-      tier: "Platinum Partners",
-      description: "Our premier partners supporting DevFest 2025",
-      partners: [
-        { name: "Google Cloud", category: "Cloud Provider" },
-        { name: "Google Developer Groups", category: "Community" },
-      ],
-    },
-    {
-      tier: "Gold Partners",
-      description: "Valued partners helping us build the future",
-      partners: [
-        { name: "Partner Company 1", category: "Technology" },
-        { name: "Partner Company 2", category: "Innovation" },
-        { name: "Partner Company 3", category: "Enterprise" },
-      ],
-    },
-    {
-      tier: "Community Partners",
-      description: "Supporting the developer ecosystem",
-      partners: [
-        { name: "Tech Community 1", category: "Developer Community" },
-        { name: "Tech Community 2", category: "Open Source" },
-        { name: "Tech Community 3", category: "Education" },
-        { name: "Tech Community 4", category: "Startup" },
-      ],
-    },
+  const collaborators = [
+    { name: "Google", logo: "https://storage.googleapis.com/gpt-engineer-file-uploads/lovable-images/b44917f2-1b1e-450f-a311-6677c7247a32.png" },
+    { name: "Todak", logo: "https://storage.googleapis.com/gpt-engineer-file-uploads/lovable-images/593685e8-5b4d-44a6-bb8a-e99446979601.png" },
+    { name: "Dicoding", logo: "https://storage.googleapis.com/gpt-engineer-file-uploads/lovable-images/0e1e4a64-073c-48b5-9005-4c0e64b73b54.png" },
+    { name: "Goers", logo: "https://storage.googleapis.com/gpt-engineer-file-uploads/lovable-images/7f6a73c1-b753-4886-8802-8a1dd8d10b0d.png" },
+    { name: "Gits.id", logo: "https://storage.googleapis.com/gpt-engineer-file-uploads/lovable-images/a6c5b058-f9b8-4c94-916c-83b63004b7f8.png" },
+    { name: "Startup Bandung", logo: "https://storage.googleapis.com/gpt-engineer-file-uploads/lovable-images/c7e2897c-9c7f-44a2-bd88-062e0bb94474.png" },
+    { name: "FlutterFlow", logo: "https://storage.googleapis.com/gpt-engineer-file-uploads/lovable-images/e7d7a5b6-71d5-4e78-831d-2309f98f8045.png" },
+    { name: "Qwords", logo: "https://storage.googleapis.com/gpt-engineer-file-uploads/lovable-images/a195b0c3-f041-477d-949e-13c51817812e.png" },
+    { name: "SMKDEV", logo: "https://storage.googleapis.com/gpt-engineer-file-uploads/lovable-images/2a73a3c2-07a8-4e11-8260-449e7592f6d5.png" },
+    { name: "BenQ", logo: "https://storage.googleapis.com/gpt-engineer-file-uploads/lovable-images/1f94a4c6-2c5e-49b5-961d-8547372f5d75.png" },
+    { name: "Cloudraya", logo: "https://storage.googleapis.com/gpt-engineer-file-uploads/lovable-images/17983637-2598-4c74-a690-344c9b35b1d9.png" },
+    { name: "Mangkatsu", logo: "https://storage.googleapisgpt-engineer-file-uploads/lovable-images/08f36c64-d2e3-4f9e-bc4b-e85d8e9e1c0d.png" },
+    { name: "Cleo", logo: "https://storage.googleapis.com/gpt-engineer-file-uploads/lovable-images/34190b9f-0c4a-4b0d-b2a5-489370138945.png" },
   ];
 
   return (
     <section className="py-20 md:py-32 bg-muted/30" id="partners">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 mb-4">
-            <Handshake className="w-8 h-8 text-primary" />
-          </div>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-primary via-secondary to-[hsl(271,76%,53%)] bg-clip-text text-transparent">
-            Our Partners
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-foreground">
+            Our Collaborators
           </h2>
-          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-            We're proud to partner with leading organizations who share our vision of empowering developers
-          </p>
         </div>
 
-        <div className="space-y-16 max-w-6xl mx-auto">
-          {partnerTiers.map((tier, tierIndex) => (
-            <div key={tierIndex} className="space-y-8">
-              <div className="text-center">
-                <h3 className="text-3xl md:text-4xl font-bold mb-3 text-foreground">
-                  {tier.tier}
-                </h3>
-                <p className="text-muted-foreground">{tier.description}</p>
-              </div>
-
-              <div className={`grid gap-6 ${
-                tier.partners.length <= 2 
-                  ? 'md:grid-cols-2' 
-                  : tier.partners.length === 3 
-                  ? 'md:grid-cols-3' 
-                  : 'md:grid-cols-2 lg:grid-cols-4'
-              }`}>
-                {tier.partners.map((partner, index) => (
-                  <Card
-                    key={index}
-                    className="gradient-card hover:shadow-[var(--shadow-card)] transition-all duration-300 hover:-translate-y-2 border-primary/20"
-                  >
-                    <CardContent className="p-8 text-center space-y-4">
-                      <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-primary to-secondary mb-2">
-                        <Building2 className="w-10 h-10 text-white" />
-                      </div>
-                      <div>
-                        <h4 className="text-xl font-bold text-foreground mb-2">
-                          {partner.name}
-                        </h4>
-                        <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary">
-                          {partner.category}
-                        </span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 items-center max-w-6xl mx-auto">
+          {collaborators.map((collaborator, index) => (
+            <div key={index} className="flex justify-center items-center">
+              <img
+                src={collaborator.logo}
+                alt={collaborator.name}
+                className="max-h-16 object-contain"
+              />
             </div>
           ))}
         </div>
