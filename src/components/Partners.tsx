@@ -23,7 +23,7 @@ const Partners = () => {
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-foreground">
-            Our Collaborators
+            Our Collaboration History
           </h2>
         </div>
 
