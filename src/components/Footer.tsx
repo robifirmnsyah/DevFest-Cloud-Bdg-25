@@ -44,10 +44,6 @@ const Footer = () => {
                 <ExternalLink className="w-4 h-4" />
                 <span>About DevFest</span>
               </a>
-              <a href="#schedule" className="flex items-center gap-2 text-background/80 hover:text-background transition-colors">
-                <ExternalLink className="w-4 h-4" />
-                <span>Schedule</span>
-              </a>
               <a href="#speakers" className="flex items-center gap-2 text-background/80 hover:text-background transition-colors">
                 <ExternalLink className="w-4 h-4" />
                 <span>Speakers</span>
