@@ -5,7 +5,7 @@ import { Calendar, Clock, MapPin, Ticket, Sparkles } from "lucide-react";
 
 const Presale = () => {
   return (
-    <section className="py-20 md:py-32 bg-gradient-to-br from-background via-muted/30 to-background relative overflow-hidden">
+    <section id="presale" className="py-20 md:py-32 bg-gradient-to-br from-background via-muted/30 to-background relative overflow-hidden">
       {/* Decorative elements */}
       <div className="absolute top-20 left-10 w-32 h-32 bg-accent/20 rounded-full blur-3xl animate-pulse"></div>
       <div className="absolute bottom-20 right-10 w-40 h-40 bg-primary/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
