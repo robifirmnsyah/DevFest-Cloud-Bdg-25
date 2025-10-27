@@ -3,16 +3,17 @@ import { User } from "lucide-react";
 
 const Speakers = () => {
   const speakers = [
-    { name: "Azhar Fuad", topic: "AI di Industri Film", track: "Techtalk" },
+    { name: "Angga Agia", topic: "IT Manager Langham Hospitality Group & Google Cloud Dev Expert", track: "Workshop" },
+    { name: "M Ghifary", topic: "CTO GovTech Edu & Google AI Dev Expert", track: "Workshop" },
+    { name: "Luqman Aljundi", topic: "Business Lead GITS Cloud", track: "Techtalk" },
+    { name: "Azhar Fuad", topic: "CEO Curaweda", track: "Techtalk" },
+    { name: "Meyta Jennis", topic: "Act Principal Coordinator ITSEC Asia", track: "Workshop" },
+    { name: "Natali Ardianto", topic: "Founder Tiket.com & CEO Lifepack", track: "Workshop" },
+    { name: "Farah Clara", topic: "Community Organizer PythonID", track: "Techtalk" },
+    { name: "Rendra Toro", topic: "CEO Lintas Media Danawa", track: "Workshop" },
+    { name: "Cendekia Luthfieta", topic: "Contact System Center Officer PLN", track: "Techtalk" },
+    { name: "Ibnu Wardy", topic: "CTO Carte WMS & Google AI & Cloud Dev Expert", track: "Techtalk" },
     { name: "Adhitia", topic: "Persib", track: "Techtalk" },
-    { name: "Cendekia", topic: "AI di PLN", track: "Techtalk" },
-    { name: "Luqman Aljundi", topic: "GCP Billing", track: "Techtalk" },
-    { name: "Farah Clara", topic: "Python", track: "Techtalk" },
-    { name: "Rendra", topic: "Flowise", track: "Workshop" },
-    { name: "Natali Ardianto", topic: "n8n", track: "Workshop" },
-    { name: "Angga Agia", topic: "NotebookLM", track: "Workshop" },
-    { name: "Meyta Jennis", topic: "Cyber Security", track: "Workshop" },
-    { name: "M Ghifary", topic: "Gemma", track: "Workshop" },
     { name: "Farhan Rafly", topic: "AI for Stock", track: "Workshop" },
   ];
 
