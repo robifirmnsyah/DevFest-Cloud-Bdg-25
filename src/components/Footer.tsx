@@ -52,9 +52,9 @@ const Footer = () => {
                 <ExternalLink className="w-4 h-4" />
                 <span>Speakers</span>
               </a>
-              <a href="#register" className="flex items-center gap-2 text-background/80 hover:text-background transition-colors">
+              <a href="#presale" className="flex items-center gap-2 text-background/80 hover:text-background transition-colors">
                 <ExternalLink className="w-4 h-4" />
-                <span>Register</span>
+                <span>Tickets</span>
               </a>
             </div>
           </div>
