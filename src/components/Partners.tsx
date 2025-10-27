@@ -21,26 +21,8 @@ const Partners = () => {
   return (
     <section className="py-20 md:py-32 bg-muted/30" id="partners">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-foreground">
-            Our Collaboration History
-          </h2>
-        </div>
-
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-8 gap-y-12 items-center max-w-6xl mx-auto">
-          {collaborators.map((collaborator, index) => (
-            <div key={index} className="flex justify-center items-center h-16">
-              <img
-                src={collaborator.logo}
-                alt={collaborator.name}
-                className="max-h-full max-w-full object-contain"
-              />
-            </div>
-          ))}
-        </div>
-
         {/* Become a Partner CTA */}
-        <div className="mt-20 text-center">
+        <div className="text-center mb-20">
           <Card className="max-w-3xl mx-auto gradient-card border-primary/30">
             <CardContent className="p-12">
               <h3 className="text-3xl font-bold mb-4 text-foreground">
@@ -58,6 +40,24 @@ const Partners = () => {
               </a>
             </CardContent>
           </Card>
+        </div>
+
+        <div className="text-center mb-16">
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-foreground">
+            Our Collaboration History
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-8 gap-y-12 items-center max-w-6xl mx-auto">
+          {collaborators.map((collaborator, index) => (
+            <div key={index} className="flex justify-center items-center h-16">
+              <img
+                src={collaborator.logo}
+                alt={collaborator.name}
+                className="max-h-full max-w-full object-contain"
+              />
+            </div>
+          ))}
         </div>
       </div>
     </section>
