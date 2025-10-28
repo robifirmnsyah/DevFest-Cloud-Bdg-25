@@ -7,7 +7,7 @@ const Partners = () => {
     { name: "Todak", logo: "https://cdn-main.todak.com/todak-com/brand/logo-black/Todak-Logo-Black.png" },
     { name: "Dicoding", logo: "https://dicoding-assets.sgp1.cdn.digitaloceanspaces.com/blog/wp-content/uploads/2014/12/dicoding-header-logo.png" },
     { name: "Goers", logo: "https://rec-data.kalibrr.com/www.kalibrr.com/logos/Z3PDNCTU3DKKJPV4CWZG5BPKKFZALDU3R6PX7KTB-5d01cf3a.png" },
-    { name: "Gits.id", logo: "https://www.gits.id/wp-content/uploads/2022/11/Logo-GITS-W-1.png" },
+    { name: "Gits.id", logo: "https://i0.wp.com/gits.id/wp-content/uploads/2023/02/cropped-Favicon-GITS-2.webp?fit=512%2C512&ssl=1" },
     { name: "Startup Bandung", logo: "https://smkcoding.id/assets/images/startupbandung.png" },
     { name: "FlutterFlow", logo: "https://cdn.prod.website-files.com/64c7a317aea92912392c0420/6797bc3da6569c846c184b4d_logo_primary_color_onLight%402x.png" },
     { name: "Qwords", logo: "https://qwords.co.id/wp-content/uploads/2025/03/logo.webp" },
