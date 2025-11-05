@@ -48,13 +48,13 @@ const Partners = () => {
           </h2>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-8 gap-y-12 items-center max-w-6xl mx-auto">
+        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-8 items-center max-w-6xl mx-auto">
           {collaborators.map((collaborator, index) => (
-            <div key={index} className="flex justify-center items-center h-16">
+            <div key={index} className="flex justify-center items-center h-12 md:h-16 p-2">
               <img
                 src={collaborator.logo}
                 alt={collaborator.name}
-                className="max-h-full max-w-full object-contain"
+                className="max-h-full max-w-full object-contain hover:scale-110 transition-all duration-300"
               />
             </div>
           ))}

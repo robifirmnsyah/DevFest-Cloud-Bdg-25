@@ -1,18 +1,17 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { User } from "lucide-react";
 
 const Speakers = () => {
   const speakers = [
-    { name: "Angga Agia", topic: "IT Manager Langham Hospitality Group & Google Cloud Dev Expert", track: "Workshop" },
-    { name: "M Ghifary", topic: "CTO GovTech Edu & Google AI Dev Expert", track: "Workshop" },
-    { name: "Luqman Aljundi", topic: "Business Lead GITS Cloud", track: "Techtalk" },
-    { name: "Azhar Fuad", topic: "CEO Curaweda", track: "Techtalk" },
-    { name: "Meyta Jennis", topic: "Act Principal Coordinator ITSEC Asia", track: "Workshop" },
-    { name: "Natali Ardianto", topic: "Founder Tiket.com & CEO Lifepack", track: "Workshop" },
-    { name: "Farah Clara", topic: "Community Organizer PythonID", track: "Techtalk" },
-    { name: "Rendra Toro", topic: "CEO Lintas Media Danawa", track: "Workshop" },
-    { name: "Cendekia Luthfieta", topic: "Contact System Center Officer PLN", track: "Techtalk" },
-    { name: "Ibnu Wardy", topic: "CTO Carte WMS & Google AI & Cloud Dev Expert", track: "Techtalk" },
+    { name: "Angga Agia", image: "/images/Angga.jpg", topic: "IT Manager Langham Hospitality Group & Google Cloud Dev Expert", track: "Workshop" },
+    { name: "M Ghifary", image: "/images/Ghifary.jpg", topic: "CTO GovTech Edu & Google AI Dev Expert", track: "Workshop" },
+    { name: "Luqman Aljundi", image: "/images/Luqman.jpg", topic: "Business Lead GITS Cloud", track: "Techtalk" },
+    { name: "Azhar Fuad", image: "/images/Azhar.jpg", topic: "CEO Curaweda", track: "Techtalk" },
+    { name: "Meyta Jennis", image: "/images/Meyta.jpg", topic: "Act Principal Coordinator ITSEC Asia", track: "Workshop" },
+    { name: "Natali Ardianto", image: "/images/Natali.jpg", topic: "Founder Tiket.com & CEO Lifepack", track: "Workshop" },
+    { name: "Farah Clara", image: "/images/Farah.jpg", topic: "Community Organizer PythonID", track: "Techtalk" },
+    { name: "Rendra Toro", image: "/images/Rendra.jpg", topic: "CEO Lintas Media Danawa", track: "Workshop" },
+    { name: "Cendekia Luthfieta", image: "/images/Cendekia.png", topic: "Contact System Center Officer PLN", track: "Techtalk" },
+    { name: "Ibnu Wardy", image: "/images/Ibnu.jpg", topic: "CTO Carte WMS & Google AI & Cloud Dev Expert", track: "Techtalk" },
   ];
 
   return (
@@ -34,9 +33,19 @@ const Speakers = () => {
               className="gradient-card hover:shadow-[var(--shadow-card)] transition-all duration-300 hover:-translate-y-2 border-primary/20"
             >
               <CardContent className="p-6 text-center space-y-4">
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-primary to-secondary mb-2">
-                  <User className="w-10 h-10 text-white" />
+                {/* Use explicit image file per speaker */}
+                <div className="inline-flex items-center justify-center w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden mb-2">
+                  <img
+                    src={speaker.image}
+                    alt={speaker.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) =>
+                      // fallback ke Angga.jpg jika file tidak ditemukan di folder /public/images
+                      (e.currentTarget.src = "/images/Angga.jpg")
+                    }
+                  />
                 </div>
+
                 <div>
                   <h3 className="text-xl font-bold text-foreground mb-2">{speaker.name}</h3>
                   <p className="text-sm text-muted-foreground mb-2">{speaker.topic}</p>

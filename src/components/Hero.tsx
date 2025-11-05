@@ -49,21 +49,12 @@ const Hero = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-wrap justify-center gap-4 pt-8">
-            <a href="https://www.goersapp.com/events/indonesia-premier-cloud-and-ai-festival-dev-fest-cloud-bandung-2025--devfestcloudbdg25" target="_blank" rel="noopener noreferrer">
+            <a href="/register">
               <Button 
                 size="lg" 
                 className="bg-white text-primary hover:bg-white/90 font-semibold text-lg px-8 py-6 rounded-full shadow-2xl"
               >
                 Register Now
-              </Button>
-            </a>
-            <a href="#about">
-              <Button 
-                size="lg" 
-                variant="outline"
-                className="bg-transparent border-2 border-white text-white hover:bg-white/10 font-semibold text-lg px-8 py-6 rounded-full"
-              >
-                View Schedule
               </Button>
             </a>
           </div>

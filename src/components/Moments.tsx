@@ -13,16 +13,26 @@ const Moments = () => {
           </p>
         </div>
 
-        <Card className="max-w-5xl mx-auto gradient-card border-primary/20 hover:shadow-[var(--shadow-card)] transition-all duration-300">
-          <CardContent className="p-4">
-            <img
-              src="https://storage.googleapis.com/gpt-engineer-file-uploads/lovable-images/91560946-b633-4f9e-8c38-0ce8d1f27464.png"
-              alt="Group photo from a previous DevFest event"
-              className="rounded-md w-full"
-              data-ai-hint="event crowd"
-            />
-          </CardContent>
-        </Card>
+        <div className="max-w-6xl mx-auto space-y-8">
+          {/* YouTube Video */}
+          <Card className="gradient-card border-primary/20 hover:shadow-[var(--shadow-card)] transition-all duration-300">
+            <CardContent className="p-4">
+              <div
+                className="relative w-full"
+                style={{ paddingBottom: "56.25%" }}
+              >
+                <iframe
+                  className="absolute top-0 left-0 w-full h-full rounded-md"
+                  src="https://www.youtube.com/embed/EWcgnS2DrO4"
+                  title="DevFest Cloud Bandung 2024 Highlights"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                ></iframe>
+              </div>
+            </CardContent>
+          </Card>
+
+        </div>
       </div>
     </section>
   );

@@ -15,21 +15,125 @@ const Presale = () => {
         <div className="text-center mb-8 animate-fade-in">
           <div className="inline-block relative">
             <div className="absolute inset-0 bg-gradient-to-r from-accent via-[hsl(4,90%,58%)] to-accent blur-xl opacity-50 animate-pulse"></div>
-            <h2 className="relative text-5xl md:text-7xl lg:text-8xl font-black text-transparent bg-gradient-to-r from-accent via-[hsl(4,90%,58%)] to-accent bg-clip-text tracking-tight transform -skew-x-6">
+            <h2 className="relative text-4xl md:text-7xl lg:text-8xl font-black text-transparent bg-gradient-to-r from-accent via-[hsl(4,90%,58%)] to-accent bg-clip-text tracking-tight transform -skew-x-6">
               PRESALE
             </h2>
           </div>
           <div className="flex items-center justify-center gap-2 mt-4">
-            <Sparkles className="w-5 h-5 text-accent animate-pulse" />
-            <p className="text-xl md:text-2xl font-bold text-foreground">Limited Seats Available!</p>
-            <Sparkles className="w-5 h-5 text-accent animate-pulse" />
+            <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-accent animate-pulse" />
+            <p className="text-lg md:text-2xl font-bold text-foreground">Limited Seats Available!</p>
+            <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-accent animate-pulse" />
           </div>
         </div>
 
         {/* Main Ticket Card */}
         <Card className="max-w-4xl mx-auto gradient-card border-2 border-primary/30 shadow-[var(--shadow-lg)] hover:shadow-[var(--shadow-lg)] hover:-translate-y-2 transition-all duration-500">
-          <CardContent className="p-8 md:p-12">
-            <div className="grid md:grid-cols-2 gap-8 md:gap-12">
+          <CardContent className="p-6 md:p-12">
+            {/* Mobile Layout - Stack vertically */}
+            <div className="space-y-8 md:hidden">
+              {/* Header */}
+              <div className="text-center space-y-4">
+                <Badge className="bg-secondary text-secondary-foreground text-sm px-4 py-1">
+                  Early Bird Special
+                </Badge>
+                <h3 className="text-2xl font-bold text-foreground leading-tight">
+                  Lock Your Seat
+                  <br />
+                  <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                    DevFest 2025
+                  </span>{" "}
+                  Awaits!
+                </h3>
+                <p className="text-muted-foreground">
+                  Join the Revolution of Technology
+                </p>
+              </div>
+
+              {/* Pricing */}
+              <div className="text-center space-y-3 py-6 bg-muted/50 rounded-2xl">
+                <div className="flex items-baseline justify-center gap-3">
+                  <span className="text-5xl font-black text-secondary">
+                    30k
+                  </span>
+                  <span className="text-2xl text-muted-foreground line-through">
+                    55k
+                  </span>
+                </div>
+                <Badge variant="outline" className="border-secondary text-secondary font-semibold">
+                  <Ticket className="w-3 h-3 mr-1" />
+                  Limited Seats
+                </Badge>
+              </div>
+
+              {/* Event Details */}
+              <div className="space-y-4 bg-muted/50 rounded-2xl p-5">
+                <h4 className="text-lg font-bold text-foreground flex items-center gap-2 justify-center">
+                  <Calendar className="w-5 h-5 text-primary" />
+                  Save the Date
+                </h4>
+
+                <div className="space-y-3">
+                  {/* Location */}
+                  <div className="flex items-start gap-3">
+                    <div className="bg-primary/10 p-2 rounded-lg flex-shrink-0">
+                      <MapPin className="w-4 h-4 text-primary" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-sm text-foreground">Location</p>
+                      <p className="text-sm text-muted-foreground">Selan Hall, Piset Square</p>
+                    </div>
+                  </div>
+
+                  {/* Date */}
+                  <div className="flex items-start gap-3">
+                    <div className="bg-secondary/10 p-2 rounded-lg flex-shrink-0">
+                      <Calendar className="w-4 h-4 text-secondary" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-sm text-foreground">Date</p>
+                      <p className="text-sm text-muted-foreground">December 6, 2025</p>
+                    </div>
+                  </div>
+
+                  {/* Time */}
+                  <div className="flex items-start gap-3">
+                    <div className="bg-accent/10 p-2 rounded-lg flex-shrink-0">
+                      <Clock className="w-4 h-4 text-accent" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-sm text-foreground">Time</p>
+                      <p className="text-sm text-muted-foreground">9:00 AM - 5:00 PM</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Discount Info */}
+              <div className="bg-primary/5 rounded-xl p-4 border border-primary/20">
+                <p className="text-sm text-center text-muted-foreground">
+                  🎉 Early bird discount ends soon! <br />
+                  <span className="font-semibold text-primary">Save 45% now</span>
+                </p>
+              </div>
+
+              {/* CTA Button */}
+              <a 
+                href="https://www.goersapp.com/events/indonesia-premier-cloud-and-ai-festival-dev-fest-cloud-bandung-2025--devfestcloudbdg25" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="block"
+              >
+                <Button 
+                  size="lg"
+                  className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground font-bold text-base py-6 rounded-xl transform transition-all hover:scale-105 shadow-lg"
+                >
+                  Purchase Your Ticket Now
+                </Button>
+              </a>
+            </div>
+
+            {/* Desktop Layout - Side by side */}
+            <div className="hidden md:grid md:grid-cols-2 gap-8 md:gap-12">
               {/* Left Side - Main Info */}
               <div className="space-y-6">
                 <div>
@@ -139,10 +243,10 @@ const Presale = () => {
 
         {/* Benefits Section */}
         <div className="mt-16 max-w-4xl mx-auto">
-          <h4 className="text-2xl md:text-3xl font-bold text-center mb-8 text-foreground">
+          <h4 className="text-xl md:text-3xl font-bold text-center mb-8 text-foreground">
             What's Included in Your Ticket?
           </h4>
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
             {[
               { title: "Full Day Access", desc: "All techtalks & workshops" },
               { title: "Swag Exclusive", desc: "Official DevFest Merchandise" },
@@ -151,7 +255,7 @@ const Presale = () => {
               <Card key={index} className="gradient-card border-primary/20 text-center hover:shadow-[var(--shadow-card)] transition-all duration-300">
                 <CardContent className="p-6">
                   <div className="text-4xl mb-3">✨</div>
-                  <h5 className="font-bold text-lg mb-2 text-foreground">{benefit.title}</h5>
+                  <h5 className="font-bold text-base md:text-lg mb-2 text-foreground">{benefit.title}</h5>
                   <p className="text-sm text-muted-foreground">{benefit.desc}</p>
                 </CardContent>
               </Card>
