@@ -32,7 +32,7 @@ const Partners = () => {
                 Join us in supporting the developer community and showcase your organization to 500+ attendees
               </p>
               <a
-                href="mailto:gdg@cloudbandung.id?subject=DevFest 2025 Partnership Inquiry"
+                href="https://docs.google.com/forms/d/e/1FAIpQLSfrIKq5A8o77uVww8Yj_DARd17kI_lPyZsPvYeHa-M4L8-DcA/viewform"
                 className="inline-flex items-center gap-2 px-8 py-4 bg-primary text-primary-foreground rounded-full font-semibold hover:bg-primary/90 transition-colors"
               >
                 <Handshake className="w-5 h-5" />

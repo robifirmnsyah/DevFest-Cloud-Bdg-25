@@ -104,6 +104,28 @@ const Register = () => {
                     Indonesia Premier Cloud & AI Festival (DevFest Cloud Bandung 2025)
                   </a>
                 </div>
+
+                {/* Widget Loading Note */}
+                <div className="mt-6 text-center">
+                  <p className="text-sm text-muted-foreground">
+                    Widget not loading? Please{" "}
+                    <button 
+                      onClick={() => window.location.reload()} 
+                      className="text-primary hover:underline font-semibold"
+                    >
+                      refresh the page
+                    </button>
+                    {" "}or{" "}
+                    <a 
+                      href="https://goersapp.com/events/indonesia-premier-cloud-ai-festival-devfest-cloud-bandung-2025--devfestcloudbdg25"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary hover:underline font-semibold"
+                    >
+                      visit the ticket page directly
+                    </a>
+                  </p>
+                </div>
               </CardContent>
             </Card>
           </div>
