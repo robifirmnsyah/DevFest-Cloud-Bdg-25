@@ -67,7 +67,7 @@ const Navigation = () => {
             <Link to="/" className="flex items-center space-x-2 group relative z-50">
               <div className="text-xl md:text-2xl font-bold transition-all">
                 <span className={`${isRegisterPage || isScrolled ? "text-primary" : "text-white drop-shadow-lg"} transition-colors`}>
-                  DevFest
+                  Cloud DevFest
                 </span>
                 <span className={`${isRegisterPage || isScrolled ? "text-secondary" : "text-white/90 drop-shadow-lg"} transition-colors`}>
                   {" "}2025
