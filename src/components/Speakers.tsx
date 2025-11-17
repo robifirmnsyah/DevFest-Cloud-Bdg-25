@@ -1,30 +1,37 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Sparkles, User } from "lucide-react";
+
+// Puzzle background colors
+const puzzleColors = [
+  "bg-gradient-to-br from-[#FFE066]/80 via-[#FFF6E0]/90 to-[#FFD6A5]/80",
+  "bg-gradient-to-br from-[#A2D5F2]/80 via-[#EAF6FF]/90 to-[#B5EAD7]/80",
+  "bg-gradient-to-br from-[#FFB3C6]/80 via-[#FFF0F6]/90 to-[#C3B1E1]/80",
+  "bg-gradient-to-br from-[#B5EAD7]/80 via-[#E0FFF6]/90 to-[#A2D5F2]/80",
+  "bg-gradient-to-br from-[#FFD6A5]/80 via-[#FFF6E0]/90 to-[#FFE066]/80",
+  "bg-gradient-to-br from-[#C3B1E1]/80 via-[#F6F0FF]/90 to-[#FFB3C6]/80",
+  "bg-gradient-to-br from-[#FFDAC1]/80 via-[#FFF6E0]/90 to-[#FFD6A5]/80",
+  "bg-gradient-to-br from-[#B5EAD7]/80 via-[#E0FFF6]/90 to-[#A2D5F2]/80",
+  "bg-gradient-to-br from-[#A2D5F2]/80 via-[#EAF6FF]/90 to-[#B5EAD7]/80",
+  "bg-gradient-to-br from-[#FFB3C6]/80 via-[#FFF0F6]/90 to-[#C3B1E1]/80",
+  "bg-gradient-to-br from-[#FFE066]/80 via-[#FFF6E0]/90 to-[#FFD6A5]/80",
+  "bg-gradient-to-br from-[#FFD6A5]/80 via-[#FFF6E0]/90 to-[#FFDAC1]/80",
+  "bg-gradient-to-br from-[#C3B1E1]/80 via-[#F6F0FF]/90 to-[#FFB3C6]/80",
+  "bg-gradient-to-br from-[#FFDAC1]/80 via-[#FFF6E0]/90 to-[#FFD6A5]/80",
+];
 
 const Speakers = () => {
   const speakers = [
     {
-      name: "Angga Agia",
-      image: "/images/Angga.jpg",
-      topic: "NotebookLM as Your Company Insights Engine",
-      title: "IT Manager Langham Hospitality Group & Google Cloud Dev Expert",
-      detail:
-        "Build company-level insights from internal docs using NotebookLM. Live demo: ingest, query, and visualize insights.",
-      track: "Workshop",
-    },
-    {
-      name: "M Ghifary",
-      image: "/images/Ghifary.jpg",
-      topic: "Personal Doctor AI Assistant",
-      title: "CTO GovTech Edu & Google AI Dev Expert",
-      detail:
-        "Designing a privacy-aware personal medical assistant with MedGemma — intents, data connectors, and safety considerations.",
-      track: "Workshop",
+      name: "Jason Stanley",
+      image: "/images/jason.jpg",
+      title: "Full Stack Web3 Engineer @ Xellar",
+      topic: "Web3 Explained: What Happens When Users Own The Internet. Do We Need Cloud?",
+      detail: "Understand the future of Web3 and cloud from a developer's perspective.",
+      track: "Techtalk",
     },
     {
       name: "Luqman Aljundi",
-      image: "/images/Luqman.jpg",
+      image: "/images/luqman.jpg",
       topic: "GCP Discount & Billing",
       title: "Business Lead GITS Cloud",
       detail:
@@ -33,7 +40,7 @@ const Speakers = () => {
     },
     {
       name: "Azhar Fuad",
-      image: "/images/Azhar.jpg",
+      image: "/images/azhar.jpg",
       topic: "Ethical Video with AI",
       title: "CEO Curaweda",
       detail:
@@ -42,7 +49,7 @@ const Speakers = () => {
     },
     {
       name: "Meyta Jennis",
-      image: "/images/Meyta.jpg",
+      image: "/images/meyta.jpg",
       topic: "Visual Agent Builder",
       title: "Act Principal Coordinator ITSEC Asia",
       detail:
@@ -51,7 +58,7 @@ const Speakers = () => {
     },
     {
       name: "Cendekia Luthfieta",
-      image: "/images/Cendekia.png",
+      image: "/images/cendekia.jpg",
       topic: "AI/ML for Power Outage Detection",
       title: "Contact System Center Officer PLN",
       detail:
@@ -60,7 +67,7 @@ const Speakers = () => {
     },
     {
       name: "Ibnu Wardy",
-      image: "/images/Ibnu.jpg",
+      image: "/images/ibnu.jpg",
       topic: "Spec Driven Development",
       title: "CTO Carte WMS & Google AI & Cloud Dev Expert",
       detail:
@@ -69,113 +76,166 @@ const Speakers = () => {
     },
     {
       name: "Natali Ardianto",
-      image: "/images/Natali.jpg",
+      image: "/images/natali.jpg",
       title: "Founder Tiket.com & CEO Lifepack",
-      topic: "TBD",
-      detail: "Coming Soon",
+      topic: "Intro to n8n: Creating expense tracker in 30 minutes",
+      detail: "Learn how to automate expense tracking in minutes using n8n.",
       track: "Workshop",
     },
     {
       name: "Farah Clara",
-      image: "/images/Farah.jpg",
+      image: "/images/farah.jpg",
       title: "Community Organizer PythonID",
-      topic: "TBD",
-      detail: "Coming Soon",
+      topic: "Python Landscape in Industry and Community",
+      detail: "Explore Python's impact in industry and community.",
       track: "Techtalk",
     },
     {
-      name: "Rendra Toro",
-      image: "/images/Rendra.jpg",
-      title: "CEO Lintas Media Danawa",
-      topic: "TBD",
-      detail: "Coming Soon",
+      name: "M Ghifary",
+      image: "/images/ghifari.jpg",
+      topic: "Personal Doctor AI Assistant",
+      title: "CTO GovTech Edu & Google AI Dev Expert",
+      detail:
+        "Designing a privacy-aware personal medical assistant with MedGemma — intents, data connectors, and safety considerations.",
       track: "Workshop",
     },
+    {
+      name: "Farhan Rafly",
+      image: "/images/farhan.jpg",
+      title: "Frontend Engineer at Ape AI",
+      topic: "Don't Follow the Vibe - Lead It with Gemini CLI",
+      detail: "Lead the developer vibe with Gemini CLI for modern workflows.",
+      track: "Workshop",
+    },
+        {
+      name: "Deni Fuzi",
+      image: "/images/deni.jpg",
+      title: "UI/UX Designer at Aegislabs",
+      topic: "UI Designer? No Worries! Coding as a Designer with Stitch",
+      detail: "Empower designers to code easily with Stitch.",
+      track: "Workshop",
+    },
+    {
+      name: "Indah Widowati",
+      image: "/images/indah.jpg",
+      title: "Frontend Engineer at INA Digital Edu",
+      topic: "Building Modern Frontends and Careers with Firebase Studio",
+      detail: "Build scalable frontends and careers with Firebase Studio.",
+      track: "Workshop",
+    },
+        {
+      name: "Farhan Naufal Ghani",
+      image: "/images/naufal.jpg",
+      title: "DevSecOps Engineer at 99 Group",
+      topic: "TBD",
+      detail: "Stay tuned for DevSecOps insights from 99 Group.",
+      track: "Workshop",
+    }
   ];
 
   return (
     <section className="py-20 md:py-32 bg-background" id="speakers">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
+        <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-secondary via-primary to-[hsl(271,76%,53%)] bg-clip-text text-transparent">
             Our Speakers
           </h2>
           <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
-            Learn from industry experts and Google Developer Experts
+            Enhance Your Skills: Join Techtalks & Workshops
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+        {/* Speaker Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8 max-w-6xl mx-auto">
           {speakers.map((speaker, index) => (
-            <Card 
-              key={index} 
-              className="gradient-card hover:shadow-[var(--shadow-card)] transition-all duration-500 hover:-translate-y-3 border-2 border-primary/10 hover:border-primary/30 overflow-hidden group"
+            <div
+              key={index}
+              className={`rounded-3xl shadow-lg flex flex-col items-center justify-between p-4 md:p-6 transition-all duration-300 hover:scale-105 ${puzzleColors[index % puzzleColors.length]} max-w-xs mx-auto md:max-w-none`}
+              style={{
+                minHeight: 340,
+                boxShadow: "0 2px 16px 0 rgba(0,0,0,0.08) inset",
+                backgroundBlendMode: "overlay"
+              }}
             >
-              <CardContent className="p-0">
-                {/* Image Section with Track Badge */}
-                {/* CHANGED: increase container height responsively, center image, reduce hover scale */}
-                <div className="relative h-64 md:h-72 lg:h-80 overflow-hidden">
+              {/* Avatar */}
+              <div className="flex flex-col items-center w-full relative">
+                {/* Track Badge - moved to top right above photo */}
+                <Badge
+                  className={`absolute top-0 right-0 px-3 py-1 rounded-full text-xs font-semibold shadow-lg ${
+                    speaker.track === "Techtalk"
+                      ? "bg-primary/80 text-white"
+                      : "bg-secondary/80 text-white"
+                  }`}
+                  style={{ transform: "translate(10%, -30%)" }}
+                >
+                  {speaker.track}
+                </Badge>
+                <div className="w-24 h-24 md:w-28 md:h-28 rounded-full mb-3 mt-4 relative flex items-center justify-center">
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/30 via-secondary/30 to-[#FFD6A5]/30 blur-[2px]"></div>
+                  <div className="absolute inset-0 rounded-full ring-4 ring-white/60"></div>
                   <img
                     src={speaker.image}
                     alt={speaker.name}
-                    className="w-full h-full object-cover object-center transition-transform duration-300 ease-out group-hover:scale-102"
+                    className="w-full h-full object-cover object-top rounded-full relative z-10"
                     onError={(e) =>
                       (e.currentTarget.src = "/images/Angga.jpg")
                     }
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent"></div>
-                  
-                  <Badge 
-                    className={`absolute top-4 right-4 ${
-                      speaker.track === 'Techtalk' 
-                        ? 'bg-primary text-primary-foreground' 
-                        : 'bg-secondary text-white'
-                    } px-3 py-1 text-xs font-bold shadow-lg`}
-                  >
-                    {speaker.track}
-                  </Badge>
                 </div>
+                {/* Name */}
+                <h3 className="text-lg md:text-xl font-bold text-foreground text-center mb-1">{speaker.name}</h3>
+                {/* Title */}
+                <p className="text-xs md:text-sm text-muted-foreground text-center font-medium mb-2">{speaker.title}</p>
+              </div>
 
-                {/* Content Section */}
-                <div className="p-6 space-y-4">
-                  {/* Speaker Name & Title */}
-                  <div className="text-center space-y-2">
-                    <h3 className="text-xl font-bold text-foreground">
-                      {speaker.name}
-                    </h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {speaker.title}
-                    </p>
+              {/* Topic */}
+              <div className="w-full flex flex-col items-center mt-2 mb-2">
+                {speaker.topic !== "TBD" ? (
+                  <div className="mb-1 w-full flex justify-center">
+                    <span
+                      className="text-sm md:text-base font-extrabold text-center bg-gradient-to-r from-primary via-secondary to-neutral-800 bg-clip-text text-transparent"
+                      style={{
+                        letterSpacing: "0.5px",
+                        WebkitTextStroke: "0.5px #222",
+                        color: "#222" // fallback warna gelap
+                      }}
+                    >
+                      {speaker.topic}
+                    </span>
                   </div>
+                ) : (
+                  <div className="mb-1 w-full flex justify-center">
+                    <span className="text-xs md:text-sm font-bold text-muted-foreground text-center">
+                      Coming Soon
+                    </span>
+                  </div>
+                )}
+              </div>
 
-                  {/* Topic - Highlighted Section */}
-                  {speaker.topic !== "TBD" ? (
-                    <div className="speaker-topic-highlight">
-                      <div className="flex items-start gap-2 justify-center">
-                        <Sparkles className="w-5 h-5 flex-shrink-0 mt-1" />
-                        <p className="text-base font-bold leading-tight text-center">
-                          {speaker.topic}
-                        </p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="coming-soon-badge">
-                      <div className="flex items-center gap-2 justify-center">
-                        <Sparkles className="w-5 h-5" />
-                        <p className="text-base font-bold">
-                          Coming Soon
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Detail */}
-                  <p className="text-sm text-muted-foreground leading-relaxed text-center min-h-[60px]">
-                    {speaker.detail}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+              {/* Detail */}
+              <p className="text-xs md:text-sm text-muted-foreground text-center mt-2 min-h-[40px]">
+                {(() => {
+                  switch (speaker.name) {
+                    case "Natali Ardianto":
+                      return "Learn how to automate expense tracking in minutes using n8n.";
+                    case "Farah Clara":
+                      return "Explore Python's impact in industry and community.";
+                    case "Jason Stanley":
+                      return "Understand the future of Web3 and cloud from a developer's perspective.";
+                    case "Farhan Rafly":
+                      return "Lead the developer vibe with Gemini CLI for modern workflows.";
+                    case "Deni Fuzi":
+                      return "Empower designers to code easily with Stitch.";
+                    case "Indah Widowati":
+                      return "Build scalable frontends and careers with Firebase Studio.";
+                    case "Farhan Naufal Ghani":
+                      return "Stay tuned for DevSecOps insights from 99 Group.";
+                    default:
+                      return speaker.detail;
+                  }
+                })()}
+              </p>
+            </div>
           ))}
         </div>
       </div>

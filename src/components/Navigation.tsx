@@ -105,7 +105,11 @@ const Navigation = () => {
                   </a>
                 )
               ))}
-              <Link to="/register">
+              <a
+                href="https://www.goersapp.com/events/indonesia-premier-cloud-and-ai-festival-dev-fest-cloud-bandung-2025--devfestcloudbdg25"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <Button
                   className={`${
                     isRegisterPage || isScrolled
@@ -115,7 +119,7 @@ const Navigation = () => {
                 >
                   Register
                 </Button>
-              </Link>
+              </a>
             </div>
 
             {/* Mobile Menu Button */}
@@ -178,11 +182,16 @@ const Navigation = () => {
 
           {/* Register Button */}
           <div className="pt-6 border-t border-border">
-            <Link to="/register" onClick={() => setIsMobileMenuOpen(false)}>
+            <a
+              href="https://www.goersapp.com/events/indonesia-premier-cloud-and-ai-festival-dev-fest-cloud-bandung-2025--devfestcloudbdg25"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
               <Button className="w-full bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 font-bold text-lg py-6 rounded-full shadow-lg">
                 Register Now
               </Button>
-            </Link>
+            </a>
             
             {/* Social Links or Additional Info */}
             <div className="mt-6 text-center">
