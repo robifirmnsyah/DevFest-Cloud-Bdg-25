@@ -170,7 +170,7 @@ const Speakers = () => {
                 >
                   {speaker.track}
                 </Badge>
-                <div className="w-24 h-24 md:w-28 md:h-28 rounded-full mb-3 mt-4 relative flex items-center justify-center">
+                <div className="w-28 h-28 md:w-32 md:h-32 rounded-full mb-3 mt-4 relative flex items-center justify-center">
                   <div className="absolute inset-0 rounded-full bg-gradient-to-br from-primary/30 via-secondary/30 to-[#FFD6A5]/30 blur-[2px]"></div>
                   <div className="absolute inset-0 rounded-full ring-4 ring-white/60"></div>
                   <img

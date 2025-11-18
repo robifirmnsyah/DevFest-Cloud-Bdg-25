@@ -6,6 +6,7 @@ import Partners from "@/components/Partners";
 import Footer from "@/components/Footer";
 import Presale from "@/components/Presale";
 import Moments from "@/components/Moments";
+import JobFair from "@/components/JobFair";
 
 const Index = () => {
   return (
@@ -15,6 +16,7 @@ const Index = () => {
       <About />
       <Presale />
       <Speakers />
+      <JobFair />
       <Partners />
       <Moments />
       <Footer />

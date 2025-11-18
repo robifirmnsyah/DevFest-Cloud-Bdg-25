@@ -35,6 +35,7 @@ const Navigation = () => {
     { label: "About", href: isHomePage ? "#about" : "/#about" },
     { label: "Tickets", href: isHomePage ? "#presale" : "/#presale" },
     { label: "Speakers", href: isHomePage ? "#speakers" : "/#speakers" },
+    { label: "Job Fair", href: isHomePage ? "#jobfair" : "/#jobfair" },
     { label: "Partners", href: isHomePage ? "#partners" : "/#partners" },
   ];
 
@@ -50,12 +51,12 @@ const Navigation = () => {
   // Determine background style based on page and scroll state
   const getNavBackground = () => {
     if (isRegisterPage) {
-      return "bg-background/98 backdrop-blur-xl shadow-xl border-b border-border/50";
+      return "bg-white/95 backdrop-blur-xl shadow-xl border-b border-[#4285F4]/20";
     }
     
     return isScrolled
-      ? "bg-background/98 backdrop-blur-xl shadow-xl border-b border-border/50"
-      : "bg-gradient-to-b from-black/20 to-transparent backdrop-blur-sm";
+      ? "bg-white/95 backdrop-blur-xl shadow-xl border-b border-[#4285F4]/20"
+      : "bg-gradient-to-b from-[#4285F4]/10 to-transparent backdrop-blur-sm";
   };
 
   return (
@@ -65,12 +66,10 @@ const Navigation = () => {
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-2 group relative z-50">
-              <div className="text-xl md:text-2xl font-bold transition-all">
-                <span className={`${isRegisterPage || isScrolled ? "text-primary" : "text-white drop-shadow-lg"} transition-colors`}>
-                  Cloud DevFest
-                </span>
-                <span className={`${isRegisterPage || isScrolled ? "text-secondary" : "text-white/90 drop-shadow-lg"} transition-colors`}>
-                  {" "}2025
+              <div className="flex items-center gap-2">
+                <img src="/gdg_logo.jpg" alt="GDG Cloud Bandung" className="h-8 w-auto" />
+                <span className={`text-xl md:text-2xl font-bold transition-all text-[#4285F4]`}>
+                  Cloud DevFest 2025
                 </span>
               </div>
             </Link>
@@ -82,10 +81,10 @@ const Navigation = () => {
                   <Link
                     key={item.label}
                     to={item.href}
-                    className={`font-medium transition-all hover:scale-105 ${
+                    className={`font-semibold transition-all hover:scale-105 ${
                       isRegisterPage || isScrolled
-                        ? "text-foreground hover:text-primary" 
-                        : "text-white drop-shadow-lg hover:text-white/80"
+                        ? "text-[#4285F4] hover:text-[#1a73e8]"
+                        : "text-[#4285F4] hover:text-[#1a73e8] drop-shadow-lg"
                     }`}
                   >
                     {item.label}
@@ -95,10 +94,10 @@ const Navigation = () => {
                     key={item.label}
                     href={item.href}
                     onClick={() => handleNavClick(item.href)}
-                    className={`font-medium transition-all hover:scale-105 ${
+                    className={`font-semibold transition-all hover:scale-105 ${
                       isRegisterPage || isScrolled
-                        ? "text-foreground hover:text-primary" 
-                        : "text-white drop-shadow-lg hover:text-white/80"
+                        ? "text-[#4285F4] hover:text-[#1a73e8]"
+                        : "text-[#4285F4] hover:text-[#1a73e8] drop-shadow-lg"
                     }`}
                   >
                     {item.label}
@@ -111,11 +110,7 @@ const Navigation = () => {
                 rel="noopener noreferrer"
               >
                 <Button
-                  className={`${
-                    isRegisterPage || isScrolled
-                      ? "bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg hover:shadow-xl"
-                      : "bg-white text-primary hover:bg-white/90 shadow-xl hover:shadow-2xl"
-                  } font-semibold rounded-full px-6 transition-all hover:scale-105`}
+                  className={`bg-[#4285F4] text-white hover:bg-[#1a73e8] shadow-xl hover:shadow-2xl font-black rounded-full px-8 py-3 text-base transition-all hover:scale-105`}
                 >
                   Register
                 </Button>
@@ -188,11 +183,10 @@ const Navigation = () => {
               rel="noopener noreferrer"
               onClick={() => setIsMobileMenuOpen(false)}
             >
-              <Button className="w-full bg-gradient-to-r from-primary to-secondary text-white hover:opacity-90 font-bold text-lg py-6 rounded-full shadow-lg">
+              <Button className="w-full bg-[#4285F4] text-white hover:bg-[#1a73e8] font-black text-lg py-6 rounded-full shadow-xl hover:shadow-2xl transition-all hover:scale-105">
                 Register Now
               </Button>
             </a>
-            
             {/* Social Links or Additional Info */}
             <div className="mt-6 text-center">
               <p className="text-sm text-muted-foreground">
