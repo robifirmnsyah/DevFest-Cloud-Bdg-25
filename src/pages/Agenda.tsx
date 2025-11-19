@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Calendar, MapPin, Clock, User } from "lucide-react";
 import TabBar from "@/components/TabBar";
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = (import.meta.env.VITE_API_URL ?? "https://devfest-api.cloudbandung.id/").replace(/\/?$/, "/");
 
 const Agenda = () => {
   const [tab, setTab] = useState<"all" | "my">("all");

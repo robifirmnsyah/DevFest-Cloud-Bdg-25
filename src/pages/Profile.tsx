@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import TabBar from "@/components/TabBar";
 import axios from "axios";
 import { LogOut, Pencil, RefreshCw } from "lucide-react";
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = (import.meta.env.VITE_API_URL ?? "https://devfest-api.cloudbandung.id/").replace(/\/?$/, "/");
 
 const Profile = () => {
   const [profile, setProfile] = useState<any>(null);

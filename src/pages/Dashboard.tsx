@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Megaphone, Bell } from "lucide-react";
 import TabBar from "@/components/TabBar";
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = (import.meta.env.VITE_API_URL ?? "https://devfest-api.cloudbandung.id/").replace(/\/?$/, "/");
 
 const announcements = [
   { icon: <Megaphone className="w-6 h-6 text-primary" />, text: "Check-in opens at 9:00 AM" },

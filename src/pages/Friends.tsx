@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { User, QrCode, Camera } from "lucide-react";
+import { User, Camera } from "lucide-react";
 import TabBar from "@/components/TabBar";
 import QrScanner from "react-qr-scanner";
 
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = (import.meta.env.VITE_API_URL ?? "https://devfest-api.cloudbandung.id/").replace(/\/?$/, "/");
 
 const Friends = () => {
   const [cameraOpen, setCameraOpen] = useState(false);
@@ -60,7 +60,7 @@ const Friends = () => {
             className="flex items-center gap-2 bg-primary text-white px-5 py-2 rounded-full font-bold shadow hover:bg-[#1a73e8] transition-all"
             onClick={() => setScanOpen(true)}
           >
-            <QrCode className="w-5 h-5" />
+            <Camera className="w-5 h-5" />
             Scan QR (Manual)
           </button>
           <button
