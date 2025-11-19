@@ -1,0 +1,3020 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Cloud DevFest Bandung",
+    "description": "\n    Cloud DevFest Bandung Mobile Application Backend API\n    \n    ## Features\n    \n    ### Participants\n    - View and manage event agenda\n    - Book and cancel sessions\n    - Network with other attendees (QR code scanning)\n    - Submit quests and earn points\n    - View personal profile and QR code\n    \n    ### Organizers\n    - Check-in/check-out participants\n    - Session attendance management\n    - Swag distribution tracking\n    - Quest completion verification\n    - View participant profiles and statistics\n    \n    ### Booth Staff\n    - Lead capture via QR scanning\n    - Contact management\n    - View participant profiles\n    - Search and filter contacts\n    ",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "Root",
+        "operationId": "root__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "summary": "Health Check",
+        "operationId": "health_check_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/register": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Register",
+        "description": "Register a new user.\n\n- **email**: User's email address (must be unique)\n- **password**: User's password (will be hashed)\n- **name**: User's full name\n- **role**: User role (participant, organizer, booth_staff)\n- **title**: Job title (optional)\n- **company**: Company name (optional)\n- **booth_id**: Booth ID (required for booth_staff)",
+        "operationId": "register_api_v1_auth_register_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserInDB"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Login",
+        "description": "Authenticate user and return JWT token.\n\n- **email**: User's email address\n- **password**: User's password\n\nReturns access token and user information.",
+        "operationId": "login_api_v1_auth_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Token"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/google": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Google Sign In",
+        "description": "Authenticate user with Google Sign-In.\n\n- **id_token**: Google ID token from client-side OAuth flow\n\nReturns access token and user information.\nUser must have an existing account (registered via /register endpoint first).",
+        "operationId": "google_sign_in_api_v1_auth_google_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GoogleSignInRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Token"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/refresh": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Refresh Token",
+        "description": "Refresh JWT token.\n\nReturns a new access token for the authenticated user.",
+        "operationId": "refresh_token_api_v1_auth_refresh_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Token"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/participants/profile": {
+      "get": {
+        "tags": [
+          "Participants"
+        ],
+        "summary": "Get My Profile",
+        "description": "Get current user's profile.\n[P-PROFILE-1] Show My Profile",
+        "operationId": "get_my_profile_api_v1_participants_profile_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserInDB"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Participants"
+        ],
+        "summary": "Update My Profile",
+        "description": "Update current user's profile.\n[P-PROFILE-1] Show My Profile - Edit functionality",
+        "operationId": "update_my_profile_api_v1_participants_profile_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserInDB"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/participants/qr-code": {
+      "get": {
+        "tags": [
+          "Participants"
+        ],
+        "summary": "Get My Qr Code",
+        "description": "Get user's unique QR code.\n[P-QR-1] Show My QR Code",
+        "operationId": "get_my_qr_code_api_v1_participants_qr_code_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserQRCode"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/participants/sessions": {
+      "get": {
+        "tags": [
+          "Participants"
+        ],
+        "summary": "Get Agenda",
+        "description": "View complete event schedule with booking status.\n[P-AGENDA-1] View Agenda\n\nOptional filters:\n- **track**: Filter by session track",
+        "operationId": "get_agenda_api_v1_participants_sessions_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "track",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "title": "Track"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SessionWithBookingStatus"
+                  },
+                  "title": "Response Get Agenda Api V1 Participants Sessions Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/participants/sessions/book": {
+      "post": {
+        "tags": [
+          "Participants"
+        ],
+        "summary": "Book Session",
+        "description": "Book a session.\n[P-AGENDA-2] Book Session\n\nValidation:\n- Session must exist and be active\n- Session must not be full\n- User must not have a booking conflict\n\nAuto-cancels any conflicting session bookings.",
+        "operationId": "book_session_api_v1_participants_sessions_book_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionBookingCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionBookingResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/participants/sessions/{session_id}/cancel": {
+      "delete": {
+        "tags": [
+          "Participants"
+        ],
+        "summary": "Cancel Session Booking",
+        "description": "Cancel a session booking.\n[P-AGENDA-3] Cancel Booking\n\n- Can only cancel before session starts",
+        "operationId": "cancel_session_booking_api_v1_participants_sessions__session_id__cancel_delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/participants/sessions/my-bookings": {
+      "get": {
+        "tags": [
+          "Participants"
+        ],
+        "summary": "Get My Bookings",
+        "description": "Get all user's booked sessions.",
+        "operationId": "get_my_bookings_api_v1_participants_sessions_my_bookings_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/SessionBookingWithDetails"
+                  },
+                  "type": "array",
+                  "title": "Response Get My Bookings Api V1 Participants Sessions My Bookings Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/participants/networking/friends": {
+      "get": {
+        "tags": [
+          "Participants"
+        ],
+        "summary": "Get My Friends",
+        "description": "Get list of all friends.\n[P-NET-2] View Friends",
+        "operationId": "get_my_friends_api_v1_participants_networking_friends_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/FriendWithProfile"
+                  },
+                  "type": "array",
+                  "title": "Response Get My Friends Api V1 Participants Networking Friends Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Participants"
+        ],
+        "summary": "Add Friend",
+        "description": "Add friend by scanning their QR code.\n[P-NET-1] Scan QR Code to Add Friend",
+        "operationId": "add_friend_api_v1_participants_networking_friends_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FriendRequestCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/participants/quests": {
+      "get": {
+        "tags": [
+          "Participants"
+        ],
+        "summary": "Get Available Quests",
+        "description": "Get all available quests.",
+        "operationId": "get_available_quests_api_v1_participants_quests_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/QuestInDB"
+                  },
+                  "type": "array",
+                  "title": "Response Get Available Quests Api V1 Participants Quests Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/participants/quests/submit": {
+      "post": {
+        "tags": [
+          "Participants"
+        ],
+        "summary": "Submit Quest",
+        "description": "Submit quest completion.\n[P-QUEST-1] Submit Quest Completion\n\nSupports:\n- Text answers\n- Photo uploads\n- NETWORKING quests (auto-checked based on friend count)",
+        "operationId": "submit_quest_api_v1_participants_quests_submit_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestSubmissionCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/participants/quests/my-submissions": {
+      "get": {
+        "tags": [
+          "Participants"
+        ],
+        "summary": "Get My Quest Submissions",
+        "description": "Get all user's quest submissions.",
+        "operationId": "get_my_quest_submissions_api_v1_participants_quests_my_submissions_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/QuestSubmissionWithDetails"
+                  },
+                  "type": "array",
+                  "title": "Response Get My Quest Submissions Api V1 Participants Quests My Submissions Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/participants/points": {
+      "get": {
+        "tags": [
+          "Participants"
+        ],
+        "summary": "Get My Points",
+        "description": "Get user's current points total.",
+        "operationId": "get_my_points_api_v1_participants_points_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/participants/quests/{quest_id}/progress": {
+      "get": {
+        "tags": [
+          "Participants"
+        ],
+        "summary": "Get Quest Progress",
+        "description": "Get progress for a specific quest.\n\nFor NETWORKING quests, returns:\n- current_count: Number of accepted friends\n- target_count: Target number of friends needed\n- progress_percentage: Completion percentage",
+        "operationId": "get_quest_progress_api_v1_participants_quests__quest_id__progress_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "quest_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Quest Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/organizers/checkin": {
+      "post": {
+        "tags": [
+          "Organizers"
+        ],
+        "summary": "Check In Participant",
+        "description": "Check in a participant to the main event.\n[O-SCAN-1] Scan QR Code for Event Check-in\n\nReturns:\n- GREEN (success=True) if check-in successful\n- RED (success=False) if already checked in or error",
+        "operationId": "check_in_participant_api_v1_organizers_checkin_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckInCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckInResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/organizers/checkout": {
+      "post": {
+        "tags": [
+          "Organizers"
+        ],
+        "summary": "Check Out Participant",
+        "description": "Check out a participant from the main event.\n[O-SCAN-5] Scan QR Code for Event Checkout",
+        "operationId": "check_out_participant_api_v1_organizers_checkout_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckInCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckInResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/organizers/sessions/checkin": {
+      "post": {
+        "tags": [
+          "Organizers"
+        ],
+        "summary": "Check In Session",
+        "description": "Check in a participant to a specific session.\n[O-SCAN-2] Scan QR Code for Session Check-in\n\nValidates:\n- Participant has booked the session\n- Participant hasn't already checked in",
+        "operationId": "check_in_session_api_v1_organizers_sessions_checkin_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionCheckInCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionCheckInResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/organizers/sessions/checkin-waiting-list": {
+      "post": {
+        "tags": [
+          "Organizers"
+        ],
+        "summary": "Check In Waiting List",
+        "description": "Check in a participant from waiting list (no booking required).\n[O-SCAN-7] Scan QR Code for Waiting List Check-in\n\nThis endpoint is for participants who show up without a booking.\nThey must wait until the session starts before being admitted.\n\nValidates:\n- Session has already started\n- Participant doesn't have a booking (should use regular check-in)\n- Participant hasn't already checked in",
+        "operationId": "check_in_waiting_list_api_v1_organizers_sessions_checkin_waiting_list_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionCheckInCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionCheckInResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/organizers/sessions/checkout": {
+      "post": {
+        "tags": [
+          "Organizers"
+        ],
+        "summary": "Check Out Session",
+        "description": "Check out a participant from a session.\n[O-SCAN-6] Scan QR Code for Session Checkout",
+        "operationId": "check_out_session_api_v1_organizers_sessions_checkout_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionCheckOutCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/organizers/swag/claim": {
+      "post": {
+        "tags": [
+          "Organizers"
+        ],
+        "summary": "Claim Swag",
+        "description": "Process swag claim for a participant.\n[O-SCAN-3] Scan QR Code for Claim Swag\n\nPrevents duplicate claims.",
+        "operationId": "claim_swag_api_v1_organizers_swag_claim_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwagClaimCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SwagClaimResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/organizers/quests/complete": {
+      "post": {
+        "tags": [
+          "Organizers"
+        ],
+        "summary": "Complete Quest",
+        "description": "Manually complete a quest for a participant.\n[O-SCAN-4] Scan QR Code for Quest/Class Finish\n\nAwards points immediately.",
+        "operationId": "complete_quest_api_v1_organizers_quests_complete_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestCompletionCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestCompletionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/organizers/profile/view": {
+      "post": {
+        "tags": [
+          "Organizers"
+        ],
+        "summary": "View Profile",
+        "description": "View full participant profile and statistics.\n[O-SCAN-7] Scan QR Code to View Profile\n\nReturns:\n- Full registration data\n- Booked agenda\n- Check-in history\n- Points total",
+        "operationId": "view_profile_api_v1_organizers_profile_view_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScanQRRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileViewResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/organizers/sessions": {
+      "get": {
+        "tags": [
+          "Organizers"
+        ],
+        "summary": "Get All Sessions",
+        "description": "Get all sessions (for organizer management).",
+        "operationId": "get_all_sessions_api_v1_organizers_sessions_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/organizers/stats": {
+      "get": {
+        "tags": [
+          "Organizers"
+        ],
+        "summary": "Get Event Stats",
+        "description": "Get event statistics for organizers.",
+        "operationId": "get_event_stats_api_v1_organizers_stats_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/organizers/quests/pending": {
+      "get": {
+        "tags": [
+          "Organizers"
+        ],
+        "summary": "Get Pending Quests",
+        "description": "Get all pending quest submissions for review.\n[O-QUEST-1] List Pending Quest Submissions\n\nReturns submissions with status=PENDING that require organizer approval.",
+        "operationId": "get_pending_quests_api_v1_organizers_quests_pending_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/QuestSubmissionWithDetails"
+                  },
+                  "type": "array",
+                  "title": "Response Get Pending Quests Api V1 Organizers Quests Pending Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/organizers/quests/{submission_id}/review": {
+      "put": {
+        "tags": [
+          "Organizers"
+        ],
+        "summary": "Review Quest Submission",
+        "description": "Approve or reject a quest submission.\n[O-QUEST-2] Review Quest Submission\n\n- APPROVED: Awards points to participant\n- REJECTED: No points awarded",
+        "operationId": "review_quest_submission_api_v1_organizers_quests__submission_id__review_put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "submission_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Submission Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestSubmissionReview"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/booth-staff/profile/view": {
+      "post": {
+        "tags": [
+          "Booth Staff"
+        ],
+        "summary": "View Participant Profile",
+        "description": "View participant profile by scanning QR code.\n[B-SCAN-1] Scan QR Code to View Profile\n\nReturns:\n- Name, Title, Company (public profile)",
+        "operationId": "view_participant_profile_api_v1_booth_staff_profile_view_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScanQRRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfileViewResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/booth-staff/contacts/add": {
+      "post": {
+        "tags": [
+          "Booth Staff"
+        ],
+        "summary": "Add Contact",
+        "description": "Add a participant as a contact (lead capture).\n[B-NET-1] Add to Contact after View Profile\n\nConverts a scanned participant into a saved lead.",
+        "operationId": "add_contact_api_v1_booth_staff_contacts_add_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/booth-staff/contacts": {
+      "get": {
+        "tags": [
+          "Booth Staff"
+        ],
+        "summary": "Get My Contacts",
+        "description": "Get all captured leads/contacts.\n[B-NET-2] View Contacts\n\nReturns searchable list with:\n- Name, Title, Company\n- Timestamp of capture",
+        "operationId": "get_my_contacts_api_v1_booth_staff_contacts_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ContactWithProfile"
+                  },
+                  "type": "array",
+                  "title": "Response Get My Contacts Api V1 Booth Staff Contacts Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/booth-staff/contacts/search": {
+      "get": {
+        "tags": [
+          "Booth Staff"
+        ],
+        "summary": "Search Contacts",
+        "description": "Search contacts by name, title, or company.",
+        "operationId": "search_contacts_api_v1_booth_staff_contacts_search_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Query"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/booth-staff/booth": {
+      "get": {
+        "tags": [
+          "Booth Staff"
+        ],
+        "summary": "Get Booth Info",
+        "description": "Get booth information for current booth staff.",
+        "operationId": "get_booth_info_api_v1_booth_staff_booth_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/booth-staff/stats": {
+      "get": {
+        "tags": [
+          "Booth Staff"
+        ],
+        "summary": "Get Booth Stats",
+        "description": "Get statistics for booth staff.",
+        "operationId": "get_booth_stats_api_v1_booth_staff_stats_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CancelledSessionInfo": {
+        "properties": {
+          "session_id": {
+            "type": "integer",
+            "title": "Session Id"
+          },
+          "session_title": {
+            "type": "string",
+            "title": "Session Title"
+          },
+          "start_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Start Time"
+          },
+          "end_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "End Time"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id",
+          "session_title",
+          "start_time",
+          "end_time"
+        ],
+        "title": "CancelledSessionInfo",
+        "description": "Info about an auto-cancelled session."
+      },
+      "CheckInCreate": {
+        "properties": {
+          "participant_qr_code": {
+            "type": "string",
+            "title": "Participant Qr Code"
+          }
+        },
+        "type": "object",
+        "required": [
+          "participant_qr_code"
+        ],
+        "title": "CheckInCreate"
+      },
+      "CheckInResponse": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserPublicProfile"
+          },
+          "checked_in": {
+            "type": "boolean",
+            "title": "Checked In"
+          },
+          "checked_in_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Checked In At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "success",
+          "message",
+          "user",
+          "checked_in"
+        ],
+        "title": "CheckInResponse"
+      },
+      "ContactCreate": {
+        "properties": {
+          "participant_qr_code": {
+            "type": "string",
+            "title": "Participant Qr Code"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "participant_qr_code"
+        ],
+        "title": "ContactCreate",
+        "description": "Create contact by scanning participant QR code."
+      },
+      "ContactWithProfile": {
+        "properties": {
+          "contact_id": {
+            "type": "integer",
+            "title": "Contact Id"
+          },
+          "participant": {
+            "$ref": "#/components/schemas/UserPublicProfile"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "captured_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Captured At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "contact_id",
+          "participant",
+          "captured_at"
+        ],
+        "title": "ContactWithProfile",
+        "description": "Contact with participant profile."
+      },
+      "FriendRequestCreate": {
+        "properties": {
+          "receiver_qr_code": {
+            "type": "string",
+            "title": "Receiver Qr Code"
+          }
+        },
+        "type": "object",
+        "required": [
+          "receiver_qr_code"
+        ],
+        "title": "FriendRequestCreate",
+        "description": "Create friend request by scanning QR code."
+      },
+      "FriendWithProfile": {
+        "properties": {
+          "friend_id": {
+            "type": "integer",
+            "title": "Friend Id"
+          },
+          "user_profile": {
+            "$ref": "#/components/schemas/UserPublicProfile"
+          },
+          "status": {
+            "$ref": "#/components/schemas/FriendshipStatus"
+          },
+          "connected_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Connected At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "friend_id",
+          "user_profile",
+          "status",
+          "connected_at"
+        ],
+        "title": "FriendWithProfile",
+        "description": "Friend connection with user profile."
+      },
+      "FriendshipStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "accepted",
+          "rejected"
+        ],
+        "title": "FriendshipStatus"
+      },
+      "GoogleSignInRequest": {
+        "properties": {
+          "id_token": {
+            "type": "string",
+            "title": "Id Token"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id_token"
+        ],
+        "title": "GoogleSignInRequest"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "LoginRequest": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          },
+          "password": {
+            "type": "string",
+            "title": "Password"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "title": "LoginRequest"
+      },
+      "ProfileViewResponse": {
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/UserPublicProfile"
+          },
+          "is_checked_in": {
+            "type": "boolean",
+            "title": "Is Checked In"
+          },
+          "total_bookings": {
+            "type": "integer",
+            "title": "Total Bookings"
+          },
+          "total_attended": {
+            "type": "integer",
+            "title": "Total Attended"
+          },
+          "points": {
+            "type": "integer",
+            "title": "Points"
+          },
+          "checked_in_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Checked In At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user",
+          "is_checked_in",
+          "total_bookings",
+          "total_attended",
+          "points"
+        ],
+        "title": "ProfileViewResponse",
+        "description": "View full participant profile."
+      },
+      "QuestCompletionCreate": {
+        "properties": {
+          "participant_qr_code": {
+            "type": "string",
+            "title": "Participant Qr Code"
+          },
+          "quest_id": {
+            "type": "integer",
+            "title": "Quest Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "participant_qr_code",
+          "quest_id"
+        ],
+        "title": "QuestCompletionCreate",
+        "description": "Manual quest completion by organizer."
+      },
+      "QuestCompletionResponse": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserPublicProfile"
+          },
+          "quest_title": {
+            "type": "string",
+            "title": "Quest Title"
+          },
+          "points_awarded": {
+            "type": "integer",
+            "title": "Points Awarded"
+          }
+        },
+        "type": "object",
+        "required": [
+          "success",
+          "message",
+          "user",
+          "quest_title",
+          "points_awarded"
+        ],
+        "title": "QuestCompletionResponse"
+      },
+      "QuestInDB": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "quest_type": {
+            "$ref": "#/components/schemas/QuestType"
+          },
+          "points": {
+            "type": "integer",
+            "title": "Points",
+            "default": 10
+          },
+          "requires_approval": {
+            "type": "boolean",
+            "title": "Requires Approval",
+            "default": false
+          },
+          "target_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Count"
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "description",
+          "quest_type",
+          "id",
+          "is_active",
+          "created_at"
+        ],
+        "title": "QuestInDB"
+      },
+      "QuestStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "approved",
+          "rejected"
+        ],
+        "title": "QuestStatus"
+      },
+      "QuestSubmissionCreate": {
+        "properties": {
+          "quest_id": {
+            "type": "integer",
+            "title": "Quest Id"
+          },
+          "answer_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Answer Text"
+          },
+          "photo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Photo Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "quest_id"
+        ],
+        "title": "QuestSubmissionCreate"
+      },
+      "QuestSubmissionReview": {
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/QuestStatus"
+          },
+          "review_notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Review Notes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "QuestSubmissionReview",
+        "description": "Organizer review of quest submission."
+      },
+      "QuestSubmissionWithDetails": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "user_id": {
+            "type": "integer",
+            "title": "User Id"
+          },
+          "quest_id": {
+            "type": "integer",
+            "title": "Quest Id"
+          },
+          "answer_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Answer Text"
+          },
+          "photo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Photo Url"
+          },
+          "status": {
+            "$ref": "#/components/schemas/QuestStatus"
+          },
+          "points_awarded": {
+            "type": "integer",
+            "title": "Points Awarded"
+          },
+          "reviewed_by": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed By"
+          },
+          "review_notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Review Notes"
+          },
+          "submitted_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Submitted At"
+          },
+          "reviewed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reviewed At"
+          },
+          "quest": {
+            "$ref": "#/components/schemas/QuestInDB"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "user_id",
+          "quest_id",
+          "status",
+          "points_awarded",
+          "submitted_at",
+          "quest"
+        ],
+        "title": "QuestSubmissionWithDetails",
+        "description": "Quest submission with quest details."
+      },
+      "QuestType": {
+        "type": "string",
+        "enum": [
+          "text_answer",
+          "photo_upload",
+          "scavenger_hunt",
+          "workshop_completion",
+          "networking"
+        ],
+        "title": "QuestType"
+      },
+      "ScanQRRequest": {
+        "properties": {
+          "qr_code": {
+            "type": "string",
+            "title": "Qr Code"
+          }
+        },
+        "type": "object",
+        "required": [
+          "qr_code"
+        ],
+        "title": "ScanQRRequest",
+        "description": "Generic QR code scan request."
+      },
+      "SessionBookingCreate": {
+        "properties": {
+          "session_id": {
+            "type": "integer",
+            "title": "Session Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "session_id"
+        ],
+        "title": "SessionBookingCreate"
+      },
+      "SessionBookingResponse": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "user_id": {
+            "type": "integer",
+            "title": "User Id"
+          },
+          "session_id": {
+            "type": "integer",
+            "title": "Session Id"
+          },
+          "is_cancelled": {
+            "type": "boolean",
+            "title": "Is Cancelled"
+          },
+          "is_attended": {
+            "type": "boolean",
+            "title": "Is Attended"
+          },
+          "booked_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Booked At"
+          },
+          "cancelled_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cancelled At"
+          },
+          "attended_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attended At"
+          },
+          "session": {
+            "$ref": "#/components/schemas/SessionInDB"
+          },
+          "cancelled_sessions": {
+            "items": {
+              "$ref": "#/components/schemas/CancelledSessionInfo"
+            },
+            "type": "array",
+            "title": "Cancelled Sessions",
+            "default": []
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "user_id",
+          "session_id",
+          "is_cancelled",
+          "is_attended",
+          "booked_at",
+          "session",
+          "message"
+        ],
+        "title": "SessionBookingResponse",
+        "description": "Response for booking a session, includes cancelled sessions info."
+      },
+      "SessionBookingWithDetails": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "user_id": {
+            "type": "integer",
+            "title": "User Id"
+          },
+          "session_id": {
+            "type": "integer",
+            "title": "Session Id"
+          },
+          "is_cancelled": {
+            "type": "boolean",
+            "title": "Is Cancelled"
+          },
+          "is_attended": {
+            "type": "boolean",
+            "title": "Is Attended"
+          },
+          "booked_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Booked At"
+          },
+          "cancelled_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cancelled At"
+          },
+          "attended_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Attended At"
+          },
+          "session": {
+            "$ref": "#/components/schemas/SessionInDB"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "user_id",
+          "session_id",
+          "is_cancelled",
+          "is_attended",
+          "booked_at",
+          "session"
+        ],
+        "title": "SessionBookingWithDetails",
+        "description": "Booking with session details."
+      },
+      "SessionCheckInCreate": {
+        "properties": {
+          "participant_qr_code": {
+            "type": "string",
+            "title": "Participant Qr Code"
+          },
+          "session_id": {
+            "type": "integer",
+            "title": "Session Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "participant_qr_code",
+          "session_id"
+        ],
+        "title": "SessionCheckInCreate"
+      },
+      "SessionCheckInResponse": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserPublicProfile"
+          },
+          "session_title": {
+            "type": "string",
+            "title": "Session Title"
+          },
+          "checked_in": {
+            "type": "boolean",
+            "title": "Checked In"
+          }
+        },
+        "type": "object",
+        "required": [
+          "success",
+          "message",
+          "user",
+          "session_title",
+          "checked_in"
+        ],
+        "title": "SessionCheckInResponse"
+      },
+      "SessionCheckOutCreate": {
+        "properties": {
+          "participant_qr_code": {
+            "type": "string",
+            "title": "Participant Qr Code"
+          },
+          "session_id": {
+            "type": "integer",
+            "title": "Session Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "participant_qr_code",
+          "session_id"
+        ],
+        "title": "SessionCheckOutCreate"
+      },
+      "SessionInDB": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "speaker": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speaker"
+          },
+          "location": {
+            "type": "string",
+            "title": "Location"
+          },
+          "track": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Track"
+          },
+          "start_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Start Time"
+          },
+          "end_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "End Time"
+          },
+          "capacity": {
+            "type": "integer",
+            "title": "Capacity",
+            "default": 100
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "booked_count": {
+            "type": "integer",
+            "title": "Booked Count"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "location",
+          "start_time",
+          "end_time",
+          "id",
+          "booked_count",
+          "is_active",
+          "created_at"
+        ],
+        "title": "SessionInDB"
+      },
+      "SessionWithBookingStatus": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "speaker": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speaker"
+          },
+          "location": {
+            "type": "string",
+            "title": "Location"
+          },
+          "track": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Track"
+          },
+          "start_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Start Time"
+          },
+          "end_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "End Time"
+          },
+          "capacity": {
+            "type": "integer",
+            "title": "Capacity",
+            "default": 100
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "booked_count": {
+            "type": "integer",
+            "title": "Booked Count"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          },
+          "is_booked": {
+            "type": "boolean",
+            "title": "Is Booked",
+            "default": false
+          },
+          "is_full": {
+            "type": "boolean",
+            "title": "Is Full",
+            "default": false
+          },
+          "available_spots": {
+            "type": "integer",
+            "title": "Available Spots",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "location",
+          "start_time",
+          "end_time",
+          "id",
+          "booked_count",
+          "is_active",
+          "created_at"
+        ],
+        "title": "SessionWithBookingStatus",
+        "description": "Session with user's booking status."
+      },
+      "SwagClaimCreate": {
+        "properties": {
+          "participant_qr_code": {
+            "type": "string",
+            "title": "Participant Qr Code"
+          },
+          "swag_item": {
+            "type": "string",
+            "title": "Swag Item"
+          }
+        },
+        "type": "object",
+        "required": [
+          "participant_qr_code",
+          "swag_item"
+        ],
+        "title": "SwagClaimCreate"
+      },
+      "SwagClaimResponse": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserPublicProfile"
+          },
+          "swag_item": {
+            "type": "string",
+            "title": "Swag Item"
+          },
+          "claimed_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Claimed At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "success",
+          "message",
+          "user",
+          "swag_item",
+          "claimed_at"
+        ],
+        "title": "SwagClaimResponse"
+      },
+      "Token": {
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "title": "Access Token"
+          },
+          "token_type": {
+            "type": "string",
+            "title": "Token Type"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserInDB"
+          }
+        },
+        "type": "object",
+        "required": [
+          "access_token",
+          "token_type",
+          "user"
+        ],
+        "title": "Token"
+      },
+      "UserCreate": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "company": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company"
+          },
+          "bio": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bio"
+          },
+          "password": {
+            "type": "string",
+            "title": "Password"
+          },
+          "role": {
+            "$ref": "#/components/schemas/UserRole"
+          },
+          "booth_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Booth Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "name",
+          "password",
+          "role"
+        ],
+        "title": "UserCreate"
+      },
+      "UserInDB": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "company": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company"
+          },
+          "bio": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bio"
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "role": {
+            "$ref": "#/components/schemas/UserRole"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active"
+          },
+          "is_checked_in": {
+            "type": "boolean",
+            "title": "Is Checked In"
+          },
+          "qr_code": {
+            "type": "string",
+            "title": "Qr Code"
+          },
+          "qr_code_image_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Qr Code Image Url"
+          },
+          "profile_photo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profile Photo Url"
+          },
+          "booth_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Booth Id"
+          },
+          "points": {
+            "type": "integer",
+            "title": "Points"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "checked_in_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Checked In At"
+          },
+          "checked_out_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Checked Out At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "name",
+          "id",
+          "role",
+          "is_active",
+          "is_checked_in",
+          "qr_code",
+          "points",
+          "created_at"
+        ],
+        "title": "UserInDB"
+      },
+      "UserPublicProfile": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "company": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company"
+          },
+          "profile_photo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profile Photo Url"
+          },
+          "role": {
+            "$ref": "#/components/schemas/UserRole"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "role"
+        ],
+        "title": "UserPublicProfile",
+        "description": "Public profile visible to other users."
+      },
+      "UserQRCode": {
+        "properties": {
+          "qr_code": {
+            "type": "string",
+            "title": "Qr Code"
+          },
+          "qr_code_image_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Qr Code Image Url"
+          },
+          "user_id": {
+            "type": "integer",
+            "title": "User Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "is_checked_in": {
+            "type": "boolean",
+            "title": "Is Checked In"
+          }
+        },
+        "type": "object",
+        "required": [
+          "qr_code",
+          "user_id",
+          "name",
+          "is_checked_in"
+        ],
+        "title": "UserQRCode"
+      },
+      "UserRole": {
+        "type": "string",
+        "enum": [
+          "participant",
+          "organizer",
+          "booth_staff"
+        ],
+        "title": "UserRole"
+      },
+      "UserUpdate": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "company": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company"
+          },
+          "bio": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bio"
+          },
+          "profile_photo_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profile Photo Url"
+          }
+        },
+        "type": "object",
+        "title": "UserUpdate"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}

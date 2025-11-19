@@ -115,6 +115,15 @@ const Navigation = () => {
                   Register
                 </Button>
               </a>
+              {/* Login Button */}
+              <Link to="/auth">
+                <Button
+                  variant="outline"
+                  className="border-[#4285F4] text-[#4285F4] hover:bg-[#4285F4]/10 font-bold rounded-full px-8 py-3 text-base transition-all hover:scale-105"
+                >
+                  Login
+                </Button>
+              </Link>
             </div>
 
             {/* Mobile Menu Button */}
@@ -175,7 +184,7 @@ const Navigation = () => {
             ))}
           </nav>
 
-          {/* Register Button */}
+          {/* Register & Login Buttons */}
           <div className="pt-6 border-t border-border">
             <a
               href="https://www.goersapp.com/events/indonesia-premier-cloud-and-ai-festival-dev-fest-cloud-bandung-2025--devfestcloudbdg25"
@@ -187,6 +196,12 @@ const Navigation = () => {
                 Register Now
               </Button>
             </a>
+            {/* Login Button */}
+            <Link to="/auth" onClick={() => setIsMobileMenuOpen(false)}>
+              <Button className="w-full mt-4 border-[#4285F4] text-[#4285F4] hover:bg-[#4285F4]/10 font-bold text-lg py-6 rounded-full shadow hover:scale-105 transition-all" variant="outline">
+                Login
+              </Button>
+            </Link>
             {/* Social Links or Additional Info */}
             <div className="mt-6 text-center">
               <p className="text-sm text-muted-foreground">
