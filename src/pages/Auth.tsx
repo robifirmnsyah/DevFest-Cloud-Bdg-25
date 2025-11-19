@@ -1,11 +1,21 @@
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
 const API_URL = import.meta.env.VITE_API_URL;
 
 const GOOGLE_CLIENT_ID = "156370990724-4m89fb910oii6q72jn29vt994kcr9m6s.apps.googleusercontent.com";
-// Ganti redirect ke frontend, backend akan handle code dan redirect ke dashboard
-const GOOGLE_REDIRECT_URI =
-  import.meta.env.VITE_GOOGLE_REDIRECT_URI || `${window.location.origin}/auth/google/callback`;
+
+declare global {
+  interface Window {
+    google?: {
+      accounts?: {
+        id?: {
+          initialize?: (opts: any) => void;
+          renderButton?: (element: HTMLElement | null, options?: any) => void;
+        };
+      };
+    };
+  }
+}
 
 const Auth = () => {
   const [mode, setMode] = useState<"login" | "register">("login");
@@ -13,20 +23,77 @@ const Auth = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [gsiReady, setGsiReady] = useState(false);
+  const gsiButtonRef = useRef<HTMLDivElement | null>(null);
+  const gsiScriptInjected = useRef(false);
 
-  // Google OAuth handler dengan Redirect Flow
-  const handleGoogleLogin = () => {
-    setError("");
-    const params = new URLSearchParams({
-      client_id: GOOGLE_CLIENT_ID,
-      redirect_uri: GOOGLE_REDIRECT_URI,
-      response_type: "token id_token",
-      scope: "openid email profile",
-      prompt: "select_account",
-      state: crypto.randomUUID(),
-    });
-    window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`;
-  };
+  const handleGoogleCredential = useCallback(
+    async (response: any) => {
+      if (!response?.credential) {
+        setError("Google login failed. Missing credential.");
+        return;
+      }
+      setLoading(true);
+      try {
+        const res = await axios.post(`${API_URL}api/v1/auth/google`, {
+          id_token: response.credential,
+        });
+        localStorage.setItem("token", res.data.access_token);
+        window.location.href = "/dashboard";
+      } catch (err: any) {
+        setError(
+          err.response?.data?.detail?.[0]?.msg ||
+            err.response?.data?.message ||
+            "Google login failed"
+        );
+      }
+      setLoading(false);
+    },
+    []
+  );
+
+  useEffect(() => {
+    const initializeGSI = () => {
+      if (!window.google?.accounts?.id || !gsiButtonRef.current) return;
+      window.google.accounts.id.initialize({
+        client_id: GOOGLE_CLIENT_ID,
+        callback: handleGoogleCredential,
+        ux_mode: "popup",
+        auto_select: false,
+        context: "signin",
+      });
+      gsiButtonRef.current.innerHTML = "";
+      window.google.accounts.id.renderButton(gsiButtonRef.current, {
+        type: "standard",
+        theme: "filled_blue",
+        size: "large",
+        text: "signin_with",
+        shape: "pill",
+        logo_alignment: "left",
+        width: "100%",
+      });
+      setGsiReady(true);
+    };
+
+    if (window.google?.accounts?.id) {
+      initializeGSI();
+      return;
+    }
+    if (gsiScriptInjected.current) return;
+
+    const script = document.createElement("script");
+    script.src = "https://accounts.google.com/gsi/client";
+    script.async = true;
+    script.defer = true;
+    script.onload = initializeGSI;
+    script.onerror = () => setError("Gagal memuat Google Sign-In. Coba refresh.");
+    document.head.appendChild(script);
+    gsiScriptInjected.current = true;
+
+    return () => {
+      script.onload = null;
+    };
+  }, [handleGoogleCredential]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -142,20 +209,18 @@ const Auth = () => {
             <span className="mx-4 text-[#888] font-semibold">OR</span>
             <hr className="flex-grow border-t border-[#e0e0e0]" />
           </div>
-          {/* Google Login Button */}
-          <button
-            type="button"
-            className="w-full flex items-center justify-center gap-3 bg-white border border-[#e0e0e0] text-[#222] font-bold py-3 rounded-xl text-base shadow hover:bg-[#f6f8fa] transition-all disabled:opacity-50"
-            onClick={handleGoogleLogin}
-            disabled={loading}
-          >
-            <img
-              src="https://www.freepnglogos.com/uploads/google-logo-png/google-logo-png-webinar-optimizing-for-success-google-business-webinar-13.png"
-              alt="Google"
-              className="w-6 h-6"
-            />
-            <span>Login dengan Google</span>
-          </button>
+          <div className="mt-2 flex justify-center">
+            <div ref={gsiButtonRef} className="w-full flex justify-center" />
+          </div>
+          {!gsiReady && (
+            <button
+              type="button"
+              className="w-full mt-4 flex items-center justify-center gap-3 bg-white border border-[#e0e0e0] text-[#888] font-bold py-3 rounded-xl text-base shadow"
+              disabled
+            >
+              Loading Google Sign-In...
+            </button>
+          )}
           <div className="mt-8 text-center text-[#222]">
             <span>No account yet? Register and buy your tickets at </span>
             <a
