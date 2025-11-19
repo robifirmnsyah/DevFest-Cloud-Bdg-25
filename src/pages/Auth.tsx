@@ -4,7 +4,8 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 const GOOGLE_CLIENT_ID = "156370990724-4m89fb910oii6q72jn29vt994kcr9m6s.apps.googleusercontent.com";
 // Ganti redirect ke frontend, backend akan handle code dan redirect ke dashboard
-const GOOGLE_REDIRECT_URI = `${window.location.origin}/auth/google/callback`;
+const GOOGLE_REDIRECT_URI =
+  import.meta.env.VITE_GOOGLE_REDIRECT_URI || `${window.location.origin}/auth/google/callback`;
 
 const Auth = () => {
   const [mode, setMode] = useState<"login" | "register">("login");
