@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import axios from "axios";
-const API_URL = (import.meta.env.VITE_API_URL ?? "https://devfest-api.cloudbandung.id/").replace(/\/?$/, "/");
+const API_URL = import.meta.env.VITE_API_URL;
 
 const GOOGLE_CLIENT_ID = "156370990724-4m89fb910oii6q72jn29vt994kcr9m6s.apps.googleusercontent.com";
 
@@ -27,6 +27,18 @@ const Auth = () => {
   const gsiButtonRef = useRef<HTMLDivElement | null>(null);
   const gsiScriptInjected = useRef(false);
 
+  // Helper to handle login success and redirect by role
+  const handleAuthSuccess = (data: any) => {
+    const userRole = data?.user?.role;
+    localStorage.setItem("token", data.access_token);
+    if (userRole) localStorage.setItem("role", userRole);
+    if (userRole === "organizer") {
+      window.location.href = "/organizer";
+    } else {
+      window.location.href = "/dashboard";
+    }
+  };
+
   const handleGoogleCredential = useCallback(
     async (response: any) => {
       if (!response?.credential) {
@@ -38,8 +50,7 @@ const Auth = () => {
         const res = await axios.post(`${API_URL}api/v1/auth/google`, {
           id_token: response.credential,
         });
-        localStorage.setItem("token", res.data.access_token);
-        window.location.href = "/dashboard";
+        handleAuthSuccess(res.data);
       } catch (err: any) {
         setError(
           err.response?.data?.detail?.[0]?.msg ||
@@ -109,8 +120,7 @@ const Auth = () => {
           email: form.email,
           password: form.password,
         });
-        localStorage.setItem("token", res.data.access_token);
-        window.location.href = "/dashboard";
+        handleAuthSuccess(res.data);
       } else {
         await axios.post(`${API_URL}api/v1/auth/register`, {
           email: form.email,

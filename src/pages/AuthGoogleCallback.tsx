@@ -19,8 +19,14 @@ const AuthGoogleCallback = () => {
     axios
       .post(`${API_URL}api/v1/auth/google`, { id_token: idToken })
       .then((res) => {
+        const userRole = res.data?.user?.role;
         localStorage.setItem("token", res.data.access_token);
-        window.location.href = "/dashboard";
+        if (userRole) localStorage.setItem("role", userRole);
+        if (userRole === "organizer") {
+          window.location.href = "/organizer";
+        } else {
+          window.location.href = "/dashboard";
+        }
       })
       .catch(() => {
         setMessage("Google login failed. Redirecting...");

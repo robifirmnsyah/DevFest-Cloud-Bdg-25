@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { Calendar, MapPin, Clock, User } from "lucide-react";
 import TabBar from "@/components/TabBar";
-const API_URL = (import.meta.env.VITE_API_URL ?? "https://devfest-api.cloudbandung.id/").replace(/\/?$/, "/");
+import OrganizerTabBar from "@/components/OrganizerTabBar";
+const API_URL = import.meta.env.VITE_API_URL;
 
 const Agenda = () => {
   const [tab, setTab] = useState<"all" | "my">("all");
@@ -49,6 +50,9 @@ const Agenda = () => {
     "Day 1": "Day 1",
     "Day 2": "Day 2",
   };
+
+  // Detect role for tab bar
+  const role = localStorage.getItem("role");
 
   return (
     <div className="min-h-screen bg-[#f6f8fa] text-[#222] pb-16">
@@ -142,7 +146,10 @@ const Agenda = () => {
           ))
         )}
       </div>
-      <TabBar activeTab="agenda" />
+      {role === "organizer"
+        ? <OrganizerTabBar activeTab="agenda" />
+        : <TabBar activeTab="agenda" />
+      }
     </div>
   );
 };

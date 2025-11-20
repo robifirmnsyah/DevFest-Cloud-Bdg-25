@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import TabBar from "@/components/TabBar";
-import axios from "axios";
-import { LogOut, Pencil, RefreshCw } from "lucide-react";
+import OrganizerTabBar from "@/components/OrganizerTabBar";
+import { LogOut, Pencil } from "lucide-react";
 const API_URL = (import.meta.env.VITE_API_URL ?? "https://devfest-api.cloudbandung.id/").replace(/\/?$/, "/");
+
+const role = localStorage.getItem("role");
 
 const Profile = () => {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [qrOpen, setQrOpen] = useState(false);
-  const [qrLoading, setQrLoading] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [editName, setEditName] = useState("");
   const [editTitle, setEditTitle] = useState("");
@@ -22,39 +23,36 @@ const Profile = () => {
       return;
     }
     try {
-      const res = await axios.get(`${API_URL}api/v1/participants/profile`, {
+      const res = await import("axios").then(ax => ax.default.get(`${API_URL}api/v1/participants/profile`, {
         headers: { Authorization: `Bearer ${token}` },
-      });
+      }));
       setProfile(res.data);
-    } catch {
-      window.location.href = "/auth";
+    } catch (err: any) {
+      // Show error and logout if unauthorized
+      if (err?.response?.status === 401 || err?.response?.status === 403) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
+        window.location.href = "/auth";
+      } else {
+        setProfile(null);
+      }
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
+    if (role === "organizer") {
+      setLoading(false);
+      setProfile({
+        name: "Robi Firmansyah",
+        title: "Lead Organizer, GDG Bandung",
+        bio: "Passionate about building communities and empowering developers with cloud technologies. Coffee enthusiast and a proud dog parent.",
+      });
+      return;
+    }
     fetchProfile();
   }, []);
-
-  // Generate new QR code
-  const handleGenerateQr = async () => {
-    setQrLoading(true);
-    const token = localStorage.getItem("token");
-    try {
-      await axios.get(
-        `${API_URL}api/v1/participants/qr-code`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: "application/json",
-          },
-        }
-      );
-      await fetchProfile();
-    } catch {}
-    setQrLoading(false);
-  };
 
   // Open edit popup and fill current profile
   const handleEditClick = () => {
@@ -93,6 +91,45 @@ const Profile = () => {
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#f6f8fa] text-[#222]">Loading...</div>;
   if (!profile) return null;
 
+  if (role === "organizer") {
+    return (
+      <div className="min-h-screen bg-[#f6f8fa] text-[#222] pb-16">
+        <div className="px-6 py-6 max-w-md mx-auto">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-bold text-center flex-1">My Profile</h2>
+            <button
+              className="ml-2 text-[#4285F4] hover:text-[#1a73e8] p-2"
+              onClick={() => {
+                localStorage.removeItem("token");
+                localStorage.removeItem("role");
+                window.location.href = "/auth";
+              }}
+              title="Logout"
+            >
+              <LogOut className="w-6 h-6" />
+            </button>
+          </div>
+          <div className="flex flex-col items-center mb-6">
+            <div className="w-24 h-24 rounded-full bg-[#e0e0e0] flex items-center justify-center text-4xl font-bold text-primary mb-3 border-4 border-[#4285F4]">
+              {profile.name?.charAt(0) || "?"}
+            </div>
+            <div className="text-2xl font-bold mb-1">{profile.name}</div>
+            <div className="text-base text-[#4285F4] mb-2">{profile.title}</div>
+            <div className="text-sm text-[#888] mb-4 text-center">{profile.bio}</div>
+            <button
+              className="w-full flex items-center justify-center gap-2 border border-[#4285F4] rounded-lg py-2 font-bold text-[#4285F4] hover:bg-[#4285F4]/10 transition mb-4"
+              disabled
+            >
+              <Pencil className="w-4 h-4" />
+              Edit Profile
+            </button>
+          </div>
+        </div>
+        <OrganizerTabBar activeTab="profile" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#f6f8fa] text-[#222] pb-16">
       <div className="px-6 py-6 max-w-md mx-auto">
@@ -124,6 +161,7 @@ const Profile = () => {
             Edit Profile
           </button>
         </div>
+        {/* QR code display only, no generate button */}
         <div className="bg-white rounded-xl shadow border border-[#e0e0e0] p-6 mb-6">
           <div className="font-bold text-lg mb-2 text-center">My QR Code</div>
           <div className="text-sm text-[#888] mb-4 text-center">
@@ -215,7 +253,10 @@ const Profile = () => {
           </div>
         </div>
       )}
-      <TabBar activeTab="profile" />
+      {role === "organizer"
+        ? <OrganizerTabBar activeTab="profile" />
+        : <TabBar activeTab="profile" />
+      }
     </div>
   );
 };
