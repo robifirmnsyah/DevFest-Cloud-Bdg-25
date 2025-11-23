@@ -3,10 +3,10 @@ import { Badge } from "@/components/ui/badge";
 
 // Puzzle background colors
 const puzzleColors = [
-  "bg-gradient-to-br from-[#B5EAD7]/80 via-[#E0FFF6]/90 to-[#A2D5F2]/80",
   "bg-gradient-to-br from-[#FFE066]/80 via-[#FFF6E0]/90 to-[#FFD6A5]/80",
   "bg-gradient-to-br from-[#A2D5F2]/80 via-[#EAF6FF]/90 to-[#B5EAD7]/80",
   "bg-gradient-to-br from-[#FFB3C6]/80 via-[#FFF0F6]/90 to-[#C3B1E1]/80",
+  "bg-gradient-to-br from-[#B5EAD7]/80 via-[#E0FFF6]/90 to-[#A2D5F2]/80",
   "bg-gradient-to-br from-[#B5EAD7]/80 via-[#E0FFF6]/90 to-[#A2D5F2]/80",
   "bg-gradient-to-br from-[#FFD6A5]/80 via-[#FFF6E0]/90 to-[#FFE066]/80",
   "bg-gradient-to-br from-[#C3B1E1]/80 via-[#F6F0FF]/90 to-[#FFB3C6]/80",
@@ -23,15 +23,6 @@ const puzzleColors = [
 const Speakers = () => {
   const speakers = [
     {
-      name: "Angga Agia",
-      image: "/images/angga.jpg",
-      title: "IT Manager, The Langham Jakarta | Google Cloud Developer Expert",
-      topic: "From (Power) Prompts to Company Insights: NotebookLM as Your Company Insights Engine",
-      detail:
-        "Turn internal documents into a searchable insights engine with NotebookLM — from prompt design to extracting actionable company knowledge.",
-      track: "Techtalk",
-    },
-    {
       name: "Jason Stanley",
       image: "/images/jason.jpg",
       title: "Full Stack Web3 Engineer @ Xellar",
@@ -43,8 +34,8 @@ const Speakers = () => {
     {
       name: "Luqman Aljundi",
       image: "/images/luqman.jpg",
-      topic: "GCP Discount & Billing",
-      title: "Business Lead GITS Cloud",
+      topic: "How to Apply Discount in GCP and Avoid Unexpected Billing Usage",
+      title: "Founder & CEO Curaweda",
       detail:
         "Practical strategies to apply discounts, optimize billing, set alerts, and avoid surprise costs in GCP.",
       track: "Techtalk",
@@ -52,11 +43,19 @@ const Speakers = () => {
     {
       name: "Azhar Fuad",
       image: "/images/azhar.jpg",
-      topic: "Ethical Video with AI",
+      topic: "The Responsible Lens: Crafting Video with Ethical AI",
       title: "CEO Curaweda",
       detail:
         "Best practices and tools for creating responsible AI-generated video while minimizing misuse and ethical risks.",
       track: "Techtalk",
+    },
+    {
+      name: "Angga Agia",
+      image: "/images/angga.jpg",
+      title: "IT Manager, The Langham Jakarta | Google Cloud Developer Expert",
+      topic: "From (Power) Prompts to Company Insights: NotebookLM as Your Company Insights Engine",
+      detail: "Turn internal documents into a searchable insights engine with NotebookLM",
+      track: "Workshop",
     },
     {
       name: "Meyta Jennis",
