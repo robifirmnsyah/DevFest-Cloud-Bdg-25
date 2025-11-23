@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 
 // Puzzle background colors
 const puzzleColors = [
+  "bg-gradient-to-br from-[#B5EAD7]/80 via-[#E0FFF6]/90 to-[#A2D5F2]/80",
   "bg-gradient-to-br from-[#FFE066]/80 via-[#FFF6E0]/90 to-[#FFD6A5]/80",
   "bg-gradient-to-br from-[#A2D5F2]/80 via-[#EAF6FF]/90 to-[#B5EAD7]/80",
   "bg-gradient-to-br from-[#FFB3C6]/80 via-[#FFF0F6]/90 to-[#C3B1E1]/80",
@@ -22,11 +23,21 @@ const puzzleColors = [
 const Speakers = () => {
   const speakers = [
     {
+      name: "Angga Agia",
+      image: "/images/angga.jpg",
+      title: "IT Manager, The Langham Jakarta | Google Cloud Developer Expert",
+      topic: "From (Power) Prompts to Company Insights: NotebookLM as Your Company Insights Engine",
+      detail:
+        "Turn internal documents into a searchable insights engine with NotebookLM — from prompt design to extracting actionable company knowledge.",
+      track: "Techtalk",
+    },
+    {
       name: "Jason Stanley",
       image: "/images/jason.jpg",
       title: "Full Stack Web3 Engineer @ Xellar",
       topic: "Web3 Explained: What Happens When Users Own The Internet. Do We Need Cloud?",
-      detail: "Understand the future of Web3 and cloud from a developer's perspective.",
+      detail:
+        "Explore user-owned internet concepts, tokenized ownership models, and how cloud infrastructure complements Web3 applications.",
       track: "Techtalk",
     },
     {
@@ -35,7 +46,7 @@ const Speakers = () => {
       topic: "GCP Discount & Billing",
       title: "Business Lead GITS Cloud",
       detail:
-        "Practical strategies to apply discounts, monitor costs, and set alerts to avoid surprising bills in GCP.",
+        "Practical strategies to apply discounts, optimize billing, set alerts, and avoid surprise costs in GCP.",
       track: "Techtalk",
     },
     {
@@ -44,7 +55,7 @@ const Speakers = () => {
       topic: "Ethical Video with AI",
       title: "CEO Curaweda",
       detail:
-        "Best practices and tooling for creating responsible video content with generative AI while avoiding misuse.",
+        "Best practices and tools for creating responsible AI-generated video while minimizing misuse and ethical risks.",
       track: "Techtalk",
     },
     {
@@ -53,7 +64,7 @@ const Speakers = () => {
       topic: "Visual Agent Builder",
       title: "Act Principal Coordinator ITSEC Asia",
       detail:
-        "Create and orchestrate multi-agent workflows visually in ADK — patterns, debugging, and production tips.",
+        "Design and orchestrate multi-agent workflows visually — patterns, debugging tips, and production readiness for agent systems.",
       track: "Workshop",
     },
     {
@@ -62,7 +73,7 @@ const Speakers = () => {
       topic: "AI/ML for Power Outage Detection",
       title: "Contact System Center Officer PLN",
       detail:
-        "Detect anomalies and predict outages using sensor data and ML models; deployment strategies for edge and cloud.",
+        "Detect anomalies and predict outages using sensor data and ML models; deployment strategies for edge and cloud environments.",
       track: "Techtalk",
     },
     {
@@ -71,7 +82,7 @@ const Speakers = () => {
       topic: "Spec Driven Development",
       title: "CTO Carte WMS & Google AI & Cloud Dev Expert",
       detail:
-        "Using spec-driven workflows to reduce rework: spec-first design, tests-as-specs, and fast iteration patterns.",
+        "Adopt spec-first workflows to reduce rework: spec-as-tests, contract-driven design, and faster iteration cycles.",
       track: "Techtalk",
     },
     {
@@ -79,7 +90,8 @@ const Speakers = () => {
       image: "/images/natali.jpg",
       title: "Founder Tiket.com & CEO Lifepack",
       topic: "Intro to n8n: Creating expense tracker in 30 minutes",
-      detail: "Learn how to automate expense tracking in minutes using n8n.",
+      detail:
+        "Build an automated expense tracker in 30 minutes using n8n — connectors, flows, and deployment tips for automation.",
       track: "Workshop",
     },
     {
@@ -87,7 +99,8 @@ const Speakers = () => {
       image: "/images/farah.jpg",
       title: "Community Organizer PythonID",
       topic: "Python Landscape in Industry and Community",
-      detail: "Explore Python's impact in industry and community.",
+      detail:
+        "Survey Python's role across industry and communities: common use cases, ecosystem highlights, and career paths.",
       track: "Techtalk",
     },
     {
@@ -96,7 +109,7 @@ const Speakers = () => {
       topic: "Personal Doctor AI Assistant",
       title: "CTO GovTech Edu & Google AI Dev Expert",
       detail:
-        "Designing a privacy-aware personal medical assistant with MedGemma — intents, data connectors, and safety considerations.",
+        "Design a privacy-aware medical assistant: intents, secure data connectors, model selection, and safety guardrails.",
       track: "Workshop",
     },
     {
@@ -104,15 +117,17 @@ const Speakers = () => {
       image: "/images/farhan.jpg",
       title: "Frontend Engineer at Ape AI",
       topic: "Don't Follow the Vibe - Lead It with Gemini CLI",
-      detail: "Lead the developer vibe with Gemini CLI for modern workflows.",
+      detail:
+        "Improve developer workflows and reproducibility using Gemini CLI for prompt-driven automation and local dev loops.",
       track: "Workshop",
     },
-        {
+    {
       name: "Deni Fuzi",
       image: "/images/deni.jpg",
       title: "UI/UX Designer at Aegislabs",
       topic: "UI Designer? No Worries! Coding as a Designer with Stitch",
-      detail: "Empower designers to code easily with Stitch.",
+      detail:
+        "Enable designers to build real UIs: Stitch workflows, component-driven design, and rapid prototyping techniques.",
       track: "Workshop",
     },
     {
@@ -120,17 +135,18 @@ const Speakers = () => {
       image: "/images/indah.jpg",
       title: "Frontend Engineer at INA Digital Edu",
       topic: "Building Modern Frontends and Careers with Firebase Studio",
-      detail: "Build scalable frontends and careers with Firebase Studio.",
+      detail:
+        "Use Firebase Studio to scaffold scalable frontends, CI/CD patterns, and best practices for career growth in frontend engineering.",
       track: "Workshop",
     },
-        {
+    {
       name: "Farhan Naufal Ghani",
       image: "/images/naufal.jpg",
       title: "DevSecOps Engineer at 99 Group",
       topic: "TBD",
       detail: "Stay tuned for DevSecOps insights from 99 Group.",
       track: "Workshop",
-    }
+    },
   ];
 
   return (
