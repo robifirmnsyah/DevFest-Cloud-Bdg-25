@@ -1,21 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
 import { BrowserMultiFormatReader, NotFoundException } from '@zxing/library';
-import { RotateCw } from 'lucide-react';
 
 interface QrScannerProps {
   onScan: (data: string | null) => void;
   onError: (error: string) => void;
   delay?: number;
   style?: React.CSSProperties;
-  showSwitchButton?: boolean;
 }
 
-const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, delay = 300, style, showSwitchButton = true }) => {
+const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, delay = 300, style }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const readerRef = useRef<BrowserMultiFormatReader | null>(null);
   const [isScanning, setIsScanning] = useState(false);
-  const [videoDevices, setVideoDevices] = useState<MediaDeviceInfo[]>([]);
-  const [currentDeviceIndex, setCurrentDeviceIndex] = useState(0);
   const scanningRef = useRef(false);
 
   const enumerateVideoDevices = async () => {
@@ -50,7 +46,7 @@ const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, delay = 300, sty
     return Array.from(map.values());
   };
 
-  const startScanning = async (deviceIndex?: number) => {
+  const startScanning = async () => {
     if (!videoRef.current || isScanning || scanningRef.current) return;
 
     try {
@@ -79,7 +75,7 @@ const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, delay = 300, sty
 
       // Find preferred back/rear camera
       let preferredIndex = devices.findIndex((d) =>
-        /back|rear|environment|wide/i.test(d.label || "")
+        /back|rear|environment/i.test(d.label || "")
       );
       
       // If no back camera found, use last device (commonly back camera on mobile)
@@ -87,31 +83,54 @@ const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, delay = 300, sty
         preferredIndex = devices.length - 1;
       }
       
-      // Use explicit deviceIndex if provided, otherwise use preferred
-      const startIndex = typeof deviceIndex === "number" ? deviceIndex : preferredIndex;
+      const selectedDeviceId = devices[preferredIndex].deviceId;
       
-      setVideoDevices(devices);
-      setCurrentDeviceIndex(startIndex);
-      
-      const selectedDeviceId = devices[startIndex].deviceId;
-      
-      // Start decoding from video device
-      readerRef.current.decodeFromVideoDevice(
-        selectedDeviceId,
-        videoRef.current,
-        (result, error) => {
+      // Get video stream with zoom constraints to reduce wide angle
+      const constraints = {
+        video: {
+          deviceId: { exact: selectedDeviceId },
+          width: { ideal: 1920 },
+          height: { ideal: 1080 },
+          aspectRatio: { ideal: 1 },
+          focusMode: 'continuous' as any,
+          zoom: 1.5 as any // Zoom in to reduce wide angle
+        }
+      };
+
+      // Try with zoom first, fallback to basic if not supported
+      let stream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia(constraints);
+      } catch (e) {
+        // Fallback without zoom if not supported
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { 
+            deviceId: { exact: selectedDeviceId },
+            width: { ideal: 1280 },
+            height: { ideal: 720 }
+          }
+        });
+      }
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play();
+      }
+
+      // Start decoding from video element
+      readerRef.current.decodeFromVideoElement(videoRef.current!)
+        .then((result) => {
           if (result) {
             // Successfully scanned QR code
             onScan(result.getText());
-            return;
           }
-          
-          if (error && !(error instanceof NotFoundException)) {
+        })
+        .catch((error) => {
+          if (!(error instanceof NotFoundException)) {
             // Only log non-NotFoundException errors
             console.error('Scanning error:', error);
           }
-        }
-      );
+        });
 
     } catch (error) {
       console.error('Camera access error:', error);
@@ -121,35 +140,17 @@ const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, delay = 300, sty
     }
   };
 
-  const switchCamera = () => {
-    if (videoDevices.length <= 1) return;
-    
-    const newIndex = (currentDeviceIndex + 1) % videoDevices.length;
-    setCurrentDeviceIndex(newIndex);
-    
-    // Stop current scanning
-    if (readerRef.current) {
-      try {
-        readerRef.current.reset();
-      } catch (e) {
-        console.log('Switch camera reset error:', e);
-      }
-    }
-    
-    setIsScanning(false);
-    scanningRef.current = false;
-    
-    // Start with new camera after a brief delay
-    setTimeout(() => {
-      startScanning(newIndex);
-    }, 120);
-  };
-
   useEffect(() => {
     startScanning();
 
     // Cleanup function
     return () => {
+      // Stop video stream
+      if (videoRef.current?.srcObject) {
+        const stream = videoRef.current.srcObject as MediaStream;
+        stream.getTracks().forEach(track => track.stop());
+      }
+      
       if (readerRef.current) {
         try {
           readerRef.current.reset();
@@ -163,32 +164,17 @@ const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, delay = 300, sty
   }, [onScan, onError]);
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-      <video
-        ref={videoRef}
-        style={{ 
-          width: '100%', 
-          height: '100%', 
-          objectFit: 'cover',
-          ...style 
-        }}
-        playsInline
-        muted
-      />
-      
-      {/* Camera Switch Button - Inside scanner frame at bottom center */}
-      {showSwitchButton && videoDevices.length > 1 && (
-        <button
-          onClick={switchCamera}
-          className="absolute bottom-4 left-1/2 -translate-x-1/2 w-12 h-12 bg-white/90 hover:bg-white text-gray-800 rounded-full flex items-center justify-center transition-colors shadow-lg border-2 border-gray-200"
-          style={{ zIndex: 50 }}
-          type="button"
-          title="Switch Camera"
-        >
-          <RotateCw className="w-6 h-6" />
-        </button>
-      )}
-    </div>
+    <video
+      ref={videoRef}
+      style={{ 
+        width: '100%', 
+        height: '100%', 
+        objectFit: 'cover',
+        ...style 
+      }}
+      playsInline
+      muted
+    />
   );
 };
 
