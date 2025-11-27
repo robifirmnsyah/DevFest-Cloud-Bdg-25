@@ -108,7 +108,7 @@ const Friends = () => {
                 />
 
                 {/* Dark overlay + corner guides only */}
-                <div className="absolute inset-0 pointer-events-none">
+                <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 10 }}>
                   <div className="absolute inset-0 bg-black/36" />
                   <span className="absolute left-4 top-4 w-6 h-6 border-t-4 border-l-4 border-white rounded-tl-sm opacity-90" />
                   <span className="absolute right-4 top-4 w-6 h-6 border-t-4 border-r-4 border-white rounded-tr-sm opacity-90" />
