@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { BrowserMultiFormatReader, NotFoundException } from '@zxing/library';
-import { Camera } from 'lucide-react';
+import { RotateCw } from 'lucide-react';
 
 interface QrScannerProps {
   onScan: (data: string | null) => void;
@@ -18,7 +18,39 @@ const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, delay = 300, sty
   const [currentDeviceIndex, setCurrentDeviceIndex] = useState(0);
   const scanningRef = useRef(false);
 
-  const startScanning = async (deviceIndex: number = currentDeviceIndex) => {
+  const enumerateVideoDevices = async () => {
+    // First enumerate to get devices
+    let devices = await navigator.mediaDevices.enumerateDevices();
+    let videoInputDevices = devices.filter((d) => d.kind === "videoinput");
+
+    // If labels are empty (no permission yet), request temporary stream to obtain labels
+    const hasEmptyLabels = videoInputDevices.some((d) => !d.label || d.label.trim() === "");
+    if (hasEmptyLabels) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        stream.getTracks().forEach((t) => t.stop());
+        // Re-enumerate after getting permission
+        devices = await navigator.mediaDevices.enumerateDevices();
+        videoInputDevices = devices.filter((d) => d.kind === "videoinput");
+      } catch (e) {
+        console.warn("Permission for camera denied or not available");
+      }
+    }
+
+    // Deduplicate by deviceId and filter out invalid entries
+    const map = new Map<string, MediaDeviceInfo>();
+    for (const d of videoInputDevices) {
+      if (!d.deviceId || d.deviceId === "") continue;
+      // Skip if already added
+      if (!map.has(d.deviceId)) {
+        map.set(d.deviceId, d);
+      }
+    }
+    
+    return Array.from(map.values());
+  };
+
+  const startScanning = async (deviceIndex?: number) => {
     if (!videoRef.current || isScanning || scanningRef.current) return;
 
     try {
@@ -36,19 +68,32 @@ const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, delay = 300, sty
       
       readerRef.current = new BrowserMultiFormatReader();
       
-      const videoInputDevices = await readerRef.current.listVideoInputDevices();
+      const devices = await enumerateVideoDevices();
       
-      // Filter out devices without labels (these are usually invalid/duplicate entries)
-      const validDevices = videoInputDevices.filter(device => device.label && device.label.trim() !== '');
-      setVideoDevices(validDevices);
-      
-      if (validDevices.length === 0) {
+      if (devices.length === 0) {
         onError('No camera found');
+        setIsScanning(false);
+        scanningRef.current = false;
         return;
       }
 
-      // Use the selected device or default to back camera (usually index 0 on mobile)
-      const selectedDeviceId = validDevices[deviceIndex]?.deviceId || validDevices[0].deviceId;
+      // Find preferred back/rear camera
+      let preferredIndex = devices.findIndex((d) =>
+        /back|rear|environment|wide/i.test(d.label || "")
+      );
+      
+      // If no back camera found, use last device (commonly back camera on mobile)
+      if (preferredIndex === -1) {
+        preferredIndex = devices.length - 1;
+      }
+      
+      // Use explicit deviceIndex if provided, otherwise use preferred
+      const startIndex = typeof deviceIndex === "number" ? deviceIndex : preferredIndex;
+      
+      setVideoDevices(devices);
+      setCurrentDeviceIndex(startIndex);
+      
+      const selectedDeviceId = devices[startIndex].deviceId;
       
       // Start decoding from video device
       readerRef.current.decodeFromVideoDevice(
@@ -97,7 +142,7 @@ const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, delay = 300, sty
     // Start with new camera after a brief delay
     setTimeout(() => {
       startScanning(newIndex);
-    }, 100);
+    }, 120);
   };
 
   useEffect(() => {
@@ -140,7 +185,7 @@ const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, delay = 300, sty
           type="button"
           title="Switch Camera"
         >
-          <Camera className="w-6 h-6" />
+          <RotateCw className="w-6 h-6" />
         </button>
       )}
     </div>
