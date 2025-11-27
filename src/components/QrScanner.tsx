@@ -118,7 +118,7 @@ const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, delay = 300, sty
   }, [onScan, onError]);
 
   return (
-    <>
+    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
       <video
         ref={videoRef}
         style={{ 
@@ -131,20 +131,19 @@ const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, delay = 300, sty
         muted
       />
       
-      {/* Camera Switch Button - Moved outside, controlled by parent */}
+      {/* Camera Switch Button - Inside scanner frame at bottom center */}
       {showSwitchButton && videoDevices.length > 1 && (
-        <div style={{ position: 'absolute', bottom: '-60px', left: '50%', transform: 'translateX(-50%)', zIndex: 50 }}>
-          <button
-            onClick={switchCamera}
-            className="w-14 h-14 bg-gray-700 hover:bg-gray-800 text-white rounded-full flex items-center justify-center transition-colors shadow-lg"
-            type="button"
-            title="Switch Camera"
-          >
-            <Camera className="w-6 h-6" />
-          </button>
-        </div>
+        <button
+          onClick={switchCamera}
+          className="absolute bottom-4 left-1/2 -translate-x-1/2 w-12 h-12 bg-white/90 hover:bg-white text-gray-800 rounded-full flex items-center justify-center transition-colors shadow-lg border-2 border-gray-200"
+          style={{ zIndex: 50 }}
+          type="button"
+          title="Switch Camera"
+        >
+          <Camera className="w-6 h-6" />
+        </button>
       )}
-    </>
+    </div>
   );
 };
 

@@ -261,7 +261,7 @@ const OrganizerDashboard = () => {
             <h3 className="text-xl font-bold mb-4">Event {scanMode === "checkin" ? "Check-in" : "Check-out"}</h3>
 
             {/* Square scanner container with corner guides */}
-            <div className="mx-auto w-[86vw] max-w-[360px] md:w-[360px] md:h-[360px] h-[86vw] relative mb-20">
+            <div className="mx-auto w-[86vw] max-w-[360px] md:w-[360px] md:h-[360px] h-[86vw] relative mb-4">
               <div className="w-full h-full bg-[#000] rounded-lg overflow-hidden relative">
               <QrScanner
                 key={scanMode} // Force remount when scan mode changes

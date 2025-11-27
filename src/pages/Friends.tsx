@@ -99,7 +99,7 @@ const Friends = () => {
               <h3 className="font-bold text-lg mb-4">Scan QR via Camera</h3>
 
               {/* Square scanner container with corner guides */}
-              <div className="mx-auto w-[86vw] max-w-[360px] md:w-[360px] md:h-[360px] h-[86vw] relative mb-20">
+              <div className="mx-auto w-[86vw] max-w-[360px] md:w-[360px] md:h-[360px] h-[86vw] relative mb-4">
                 <div className="w-full h-full bg-[#000] rounded-lg overflow-hidden relative">
                 <QrScanner
                   delay={300}
