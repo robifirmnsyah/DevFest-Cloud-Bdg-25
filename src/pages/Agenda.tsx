@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Calendar, MapPin, Clock, User } from "lucide-react";
+import { Calendar, MapPin, Clock, User, Search, Filter, X } from "lucide-react";
 import TabBar from "@/components/TabBar";
 import OrganizerTabBar from "@/components/OrganizerTabBar";
 const API_URL = import.meta.env.VITE_API_URL;
@@ -10,6 +10,9 @@ const Agenda = () => {
   const [sessions, setSessions] = useState<any[]>([]);
   const [myAgenda, setMyAgenda] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedTrack, setSelectedTrack] = useState<string>("all");
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -34,7 +37,25 @@ const Agenda = () => {
       .catch(() => setMyAgenda([]));
   }, []);
 
-  const displayedSessions = tab === "all" ? sessions : myAgenda.map(a => a.session);
+  // Get unique tracks for filter
+  const allTracks = [...new Set(sessions.map(s => s.track).filter(Boolean))];
+
+  // Filter and search logic
+  let displayedSessions = tab === "all" ? sessions : myAgenda.map(a => a.session);
+  
+  // Apply search filter
+  if (searchQuery) {
+    displayedSessions = displayedSessions.filter(s => 
+      s.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      s.speaker?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      s.description?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }
+  
+  // Apply track filter
+  if (selectedTrack !== "all") {
+    displayedSessions = displayedSessions.filter(s => s.track === selectedTrack);
+  }
 
   // Group by day (assume start_time is ISO string)
   const sessionsByDay: Record<string, any[]> = {};
@@ -72,10 +93,98 @@ const Agenda = () => {
             All Sessions
           </button>
         </div>
+        
+        {/* Search and Filter Bar */}
+        <div className="mt-4 space-y-3">
+          {/* Search Input */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search sessions, speakers..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-10 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery("")}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
+          </div>
+          
+          {/* Filter Toggle Button */}
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            <Filter className="w-4 h-4" />
+            <span className="text-sm font-medium">Filters</span>
+            {selectedTrack !== "all" && (
+              <span className="ml-1 px-2 py-0.5 bg-primary/10 text-primary rounded-full text-xs">1</span>
+            )}
+          </button>
+          
+          {/* Filter Options */}
+          {showFilters && (
+            <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-3">
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-gray-700">Track</label>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => setSelectedTrack("all")}
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                      selectedTrack === "all"
+                        ? "bg-primary text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                  >
+                    All Tracks
+                  </button>
+                  {allTracks.map((track) => (
+                    <button
+                      key={track}
+                      onClick={() => setSelectedTrack(track)}
+                      className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                        selectedTrack === track
+                          ? "bg-primary text-white"
+                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      }`}
+                    >
+                      {track}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Clear Filters Button */}
+              {(selectedTrack !== "all" || searchQuery) && (
+                <button
+                  onClick={() => {
+                    setSelectedTrack("all");
+                    setSearchQuery("");
+                  }}
+                  className="w-full py-2 text-sm text-gray-600 hover:text-gray-800 font-medium"
+                >
+                  Clear All Filters
+                </button>
+              )}
+            </div>
+          )}
+        </div>
       </header>
+      
       <div className="px-4 pt-2">
         {loading ? (
           <div className="text-center py-12">Loading...</div>
+        ) : displayedSessions.length === 0 ? (
+          <div className="text-center py-12 text-gray-500">
+            <p className="text-lg mb-2">No sessions found</p>
+            <p className="text-sm">Try adjusting your search or filters</p>
+          </div>
         ) : (
           Object.entries(sessionsByDay).map(([day, items]) => (
             <div key={day} className="mb-8 flex flex-col items-center">
