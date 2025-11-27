@@ -318,7 +318,8 @@ const OrganizerAgenda = () => {
             <p className="text-sm text-gray-600 mb-4">{selectedSession.title}</p>
 
             {/* Square scanner container */}
-            <div className="mx-auto w-[86vw] max-w-[360px] md:w-[360px] md:h-[360px] h-[86vw] bg-black rounded-lg overflow-hidden relative mb-20">
+            <div className="mx-auto w-[86vw] max-w-[360px] md:w-[360px] md:h-[360px] h-[86vw] relative mb-20">
+              <div className="w-full h-full bg-black rounded-lg overflow-hidden relative">
               <QrScanner
                 key={`${scanMode}-${selectedSession?.id}`} // Force remount when scan mode or session changes
                 delay={300}
@@ -334,6 +335,7 @@ const OrganizerAgenda = () => {
                 <span className="absolute right-4 top-4 w-6 h-6 border-t-4 border-r-4 border-white opacity-90" />
                 <span className="absolute left-4 bottom-4 w-6 h-6 border-b-4 border-l-4 border-white opacity-90" />
                 <span className="absolute right-4 bottom-4 w-6 h-6 border-b-4 border-r-4 border-white opacity-90" />
+              </div>
               </div>
             </div>
 

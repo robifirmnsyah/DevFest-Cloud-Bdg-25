@@ -99,7 +99,8 @@ const Friends = () => {
               <h3 className="font-bold text-lg mb-4">Scan QR via Camera</h3>
 
               {/* Square scanner container with corner guides */}
-              <div className="mx-auto w-[86vw] max-w-[360px] md:w-[360px] md:h-[360px] h-[86vw] bg-[#000] rounded-lg overflow-hidden relative mb-20">
+              <div className="mx-auto w-[86vw] max-w-[360px] md:w-[360px] md:h-[360px] h-[86vw] relative mb-20">
+                <div className="w-full h-full bg-[#000] rounded-lg overflow-hidden relative">
                 <QrScanner
                   delay={300}
                   onError={(error) => setScanError(error)}
@@ -114,6 +115,7 @@ const Friends = () => {
                   <span className="absolute right-4 top-4 w-6 h-6 border-t-4 border-r-4 border-white rounded-tr-sm opacity-90" />
                   <span className="absolute left-4 bottom-4 w-6 h-6 border-b-4 border-l-4 border-white rounded-bl-sm opacity-90" />
                   <span className="absolute right-4 bottom-4 w-6 h-6 border-b-4 border-r-4 border-white rounded-br-sm opacity-90" />
+                </div>
                 </div>
               </div>
 
