@@ -85,52 +85,23 @@ const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, delay = 300, sty
       
       const selectedDeviceId = devices[preferredIndex].deviceId;
       
-      // Get video stream with zoom constraints to reduce wide angle
-      const constraints = {
-        video: {
-          deviceId: { exact: selectedDeviceId },
-          width: { ideal: 1920 },
-          height: { ideal: 1080 },
-          aspectRatio: { ideal: 1 },
-          focusMode: 'continuous' as any,
-          zoom: 1.5 as any // Zoom in to reduce wide angle
-        }
-      };
-
-      // Try with zoom first, fallback to basic if not supported
-      let stream;
-      try {
-        stream = await navigator.mediaDevices.getUserMedia(constraints);
-      } catch (e) {
-        // Fallback without zoom if not supported
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: { 
-            deviceId: { exact: selectedDeviceId },
-            width: { ideal: 1280 },
-            height: { ideal: 720 }
-          }
-        });
-      }
-
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-      }
-
-      // Start decoding from video element
-      readerRef.current.decodeFromVideoElement(videoRef.current!)
-        .then((result) => {
+      // Use decodeFromVideoDevice for continuous scanning
+      readerRef.current.decodeFromVideoDevice(
+        selectedDeviceId,
+        videoRef.current,
+        (result, error) => {
           if (result) {
             // Successfully scanned QR code
             onScan(result.getText());
+            return;
           }
-        })
-        .catch((error) => {
-          if (!(error instanceof NotFoundException)) {
+          
+          if (error && !(error instanceof NotFoundException)) {
             // Only log non-NotFoundException errors
             console.error('Scanning error:', error);
           }
-        });
+        }
+      );
 
     } catch (error) {
       console.error('Camera access error:', error);
@@ -145,12 +116,6 @@ const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, delay = 300, sty
 
     // Cleanup function
     return () => {
-      // Stop video stream
-      if (videoRef.current?.srcObject) {
-        const stream = videoRef.current.srcObject as MediaStream;
-        stream.getTracks().forEach(track => track.stop());
-      }
-      
       if (readerRef.current) {
         try {
           readerRef.current.reset();
