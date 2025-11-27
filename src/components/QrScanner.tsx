@@ -1,15 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { BrowserMultiFormatReader, NotFoundException } from '@zxing/library';
-import { RotateCcw } from 'lucide-react';
+import { Camera } from 'lucide-react';
 
 interface QrScannerProps {
   onScan: (data: string | null) => void;
   onError: (error: string) => void;
   delay?: number;
   style?: React.CSSProperties;
+  showSwitchButton?: boolean;
 }
 
-const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, delay = 300, style }) => {
+const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, delay = 300, style, showSwitchButton = true }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const readerRef = useRef<BrowserMultiFormatReader | null>(null);
   const [isScanning, setIsScanning] = useState(false);
@@ -36,15 +37,18 @@ const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, delay = 300, sty
       readerRef.current = new BrowserMultiFormatReader();
       
       const videoInputDevices = await readerRef.current.listVideoInputDevices();
-      setVideoDevices(videoInputDevices);
       
-      if (videoInputDevices.length === 0) {
+      // Filter out devices without labels (these are usually invalid/duplicate entries)
+      const validDevices = videoInputDevices.filter(device => device.label && device.label.trim() !== '');
+      setVideoDevices(validDevices);
+      
+      if (validDevices.length === 0) {
         onError('No camera found');
         return;
       }
 
-      // Use the selected device or default to first one
-      const selectedDeviceId = videoInputDevices[deviceIndex]?.deviceId || videoInputDevices[0].deviceId;
+      // Use the selected device or default to back camera (usually index 0 on mobile)
+      const selectedDeviceId = validDevices[deviceIndex]?.deviceId || validDevices[0].deviceId;
       
       // Start decoding from video device
       readerRef.current.decodeFromVideoDevice(
@@ -114,7 +118,7 @@ const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, delay = 300, sty
   }, [onScan, onError]);
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+    <>
       <video
         ref={videoRef}
         style={{ 
@@ -127,19 +131,20 @@ const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, delay = 300, sty
         muted
       />
       
-      {/* Camera Switch Button - Increase z-index to be above overlays */}
-      {videoDevices.length > 1 && (
-        <button
-          onClick={switchCamera}
-          className="absolute top-4 left-4 w-12 h-12 bg-black/70 hover:bg-black/90 text-white rounded-full flex items-center justify-center transition-colors shadow-xl border-2 border-white/40 backdrop-blur-sm"
-          style={{ zIndex: 30 }}
-          type="button"
-          title="Switch Camera"
-        >
-          <RotateCcw className="w-5 h-5" />
-        </button>
+      {/* Camera Switch Button - Moved outside, controlled by parent */}
+      {showSwitchButton && videoDevices.length > 1 && (
+        <div style={{ position: 'absolute', bottom: '-60px', left: '50%', transform: 'translateX(-50%)', zIndex: 50 }}>
+          <button
+            onClick={switchCamera}
+            className="w-14 h-14 bg-gray-700 hover:bg-gray-800 text-white rounded-full flex items-center justify-center transition-colors shadow-lg"
+            type="button"
+            title="Switch Camera"
+          >
+            <Camera className="w-6 h-6" />
+          </button>
+        </div>
       )}
-    </div>
+    </>
   );
 };
 
