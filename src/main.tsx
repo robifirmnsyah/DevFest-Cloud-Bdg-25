@@ -9,6 +9,7 @@ import Quests from "./pages/Quests";
 import Profile from "./pages/Profile";
 import AuthGoogleCallback from "./pages/AuthGoogleCallback";
 import OrganizerDashboard from "./pages/OrganizerDashboard";
+import OrganizerAgenda from "./pages/OrganizerAgenda";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 createRoot(document.getElementById("root")!).render(
@@ -23,6 +24,7 @@ createRoot(document.getElementById("root")!).render(
       <Route path="/profile" element={<Profile />} />
       <Route path="/auth/google/callback" element={<AuthGoogleCallback />} />
       <Route path="/organizer" element={<OrganizerDashboard />} />
+      <Route path="/organizer/agenda" element={<OrganizerAgenda />} />
     </Routes>
   </BrowserRouter>
 );

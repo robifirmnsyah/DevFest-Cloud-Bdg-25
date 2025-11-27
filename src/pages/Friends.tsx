@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { User, QrCode, Camera } from "lucide-react";
+import { User, QrCode } from "lucide-react";
 import TabBar from "@/components/TabBar";
-import QrScanner from "react-qr-scanner";
+import QrScanner from "@/components/QrScanner";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -58,17 +58,10 @@ const Friends = () => {
         <div className="mb-4 flex justify-end gap-2">
           <button
             className="flex items-center gap-2 bg-primary text-white px-5 py-2 rounded-full font-bold shadow hover:bg-[#1a73e8] transition-all"
-            onClick={() => setScanOpen(true)}
-          >
-            <QrCode className="w-5 h-5" />
-            Scan QR (Manual)
-          </button>
-          <button
-            className="flex items-center gap-2 bg-[#4285F4]/10 text-primary px-5 py-2 rounded-full font-bold shadow hover:bg-primary/10 transition-all"
             onClick={() => setCameraOpen(true)}
           >
-            <Camera className="w-5 h-5" />
-            Scan QR (Camera)
+            <QrCode className="w-5 h-5" />
+            Scan QR
           </button>
         </div>
         {/* Manual QR Scan Popup */}
@@ -101,21 +94,39 @@ const Friends = () => {
         )}
         {/* Camera QR Scan Popup (realtime) */}
         {cameraOpen && (
-          <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
-            <div className="bg-white rounded-xl p-8 shadow-lg max-w-sm w-full text-center">
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-xl p-4 shadow-lg max-w-sm w-full text-center">
               <h3 className="font-bold text-lg mb-4">Scan QR via Camera</h3>
-              <QrScanner
-                delay={300}
-                onError={() => setScanError("Camera error")}
-                onScan={handleScan}
-                style={{ width: "100%" }}
-              />
-              <button
-                className="mt-4 text-[#888] underline text-lg"
-                onClick={() => { setCameraOpen(false); setScanError(""); }}
-              >
-                Cancel
-              </button>
+
+              {/* Square scanner container with corner guides */}
+              <div className="mx-auto w-[86vw] max-w-[360px] md:w-[360px] md:h-[360px] h-[86vw] bg-[#000] rounded-lg overflow-hidden relative">
+                <QrScanner
+                  delay={300}
+                  onError={(error) => setScanError(error)}
+                  onScan={handleScan}
+                  style={{ width: "100%", height: "100%" }}
+                />
+
+                {/* Dark overlay + corner guides only */}
+                <div className="absolute inset-0 pointer-events-none">
+                  <div className="absolute inset-0 bg-black/36" />
+                  <span className="absolute left-4 top-4 w-6 h-6 border-t-4 border-l-4 border-white rounded-tl-sm opacity-90" />
+                  <span className="absolute right-4 top-4 w-6 h-6 border-t-4 border-r-4 border-white rounded-tr-sm opacity-90" />
+                  <span className="absolute left-4 bottom-4 w-6 h-6 border-b-4 border-l-4 border-white rounded-bl-sm opacity-90" />
+                  <span className="absolute right-4 bottom-4 w-6 h-6 border-b-4 border-r-4 border-white rounded-br-sm opacity-90" />
+                </div>
+              </div>
+
+              <div className="mt-4 text-sm text-[#666]">Align the QR code inside the box</div>
+
+              <div className="mt-4">
+                <button
+                  className="mt-2 text-[#888] underline text-lg"
+                  onClick={() => { setCameraOpen(false); setScanError(""); }}
+                >
+                  Cancel
+                </button>
+              </div>
               {scanError && <div className="text-red-500 mt-4">{scanError}</div>}
             </div>
           </div>

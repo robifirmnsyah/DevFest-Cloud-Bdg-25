@@ -3,7 +3,7 @@ import axios from "axios";
 import { Calendar, User, BarChart2, Users, LogOut, QrCode, Award, Gift, DoorOpen } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import OrganizerTabBar from "@/components/OrganizerTabBar";
-import QrScanner from "react-qr-scanner";
+import QrScanner from "@/components/QrScanner";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -56,27 +56,43 @@ const OrganizerDashboard = () => {
   };
 
   // Handle scan QR for check-in/out
-  const handleScan = async (qr: string) => {
+  const handleScan = async (qr: string | null) => {
     if (!qr || !scanMode) return;
+    
     setScanLoading(true);
     setScanError("");
+    setScanResult("");
+    
     const token = localStorage.getItem("token");
     try {
       const endpoint =
         scanMode === "checkin"
           ? `${API_URL}api/v1/organizers/checkin`
           : `${API_URL}api/v1/organizers/checkout`;
+      
       const res = await axios.post(
         endpoint,
         { participant_qr_code: qr },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setScanResult(res.data.message || "Success");
+      
+      // Show success message
+      setScanResult(`${scanMode === "checkin" ? "Check-in" : "Check-out"} successful: ${res.data.user?.name || "Unknown"}`);
+      
+      // Auto close after 3 seconds
+      setTimeout(() => {
+        setScanMode(null);
+        setScanResult("");
+        setScanError("");
+        setCameraActive(false);
+      }, 3000);
+      
     } catch (err: any) {
+      console.error("Scan error:", err);
       setScanError(
         err?.response?.data?.message ||
         err?.response?.data?.detail?.[0]?.msg ||
-        "Scan failed"
+        `${scanMode === "checkin" ? "Check-in" : "Check-out"} failed. Please try again.`
       );
     }
     setScanLoading(false);
@@ -95,17 +111,17 @@ const OrganizerDashboard = () => {
     } catch {}
   };
 
-  if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#f6f8fa] text-[#222]">Loading...</div>;
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-gray-50 text-[#222]">Loading...</div>;
 
   return (
-    <div className="min-h-screen bg-[#f6f8fa] text-[#222] pb-16">
-      <header className="bg-white shadow-sm px-6 py-4 flex items-center justify-between">
+    <div className="min-h-screen bg-gray-50 text-gray-900 pb-20">
+      <header className="bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#6366f1] to-[#a78bfa] flex items-center justify-center text-white font-bold text-xl">R</div>
-          <h1 className="text-xl font-bold text-primary">Organizer Hub</h1>
+          <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-sm">R</div>
+          <h1 className="text-lg font-semibold text-gray-900">Organizer Hub</h1>
         </div>
         <button
-          className="text-[#4285F4] hover:text-[#1a73e8] p-2"
+          className="text-gray-400 hover:text-red-500 p-2 transition-colors"
           onClick={() => {
             localStorage.removeItem("token");
             localStorage.removeItem("role");
@@ -113,142 +129,192 @@ const OrganizerDashboard = () => {
           }}
           title="Logout"
         >
-          <LogOut className="w-6 h-6" />
+          <LogOut className="w-5 h-5" />
         </button>
       </header>
-      <main className="px-6 py-6">
-        <h2 className="text-2xl font-bold mb-2">Welcome, Robi</h2>
-        <p className="text-[#666] mb-6">Here's your event overview.</p>
-        <div className="grid gap-4 mb-8">
-          <div className="bg-white rounded-xl p-5 flex flex-col gap-2 border border-[#e0e0e0]">
-            <span className="text-sm text-[#6366f1]">Checked-in</span>
-            <span className="text-3xl font-bold text-primary">{stats?.checked_in ?? 0}/{stats?.event_capacity ?? "-"}</span>
+
+      <main className="px-8 py-6 max-w-5xl mx-auto">
+        <div className="mb-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-1">Welcome, Robi</h2>
+          <p className="text-gray-500 text-sm">Here's your event overview.</p>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+          <div className="bg-white rounded-xl p-4 border border-gray-100">
+            <div className="flex items-center gap-2 mb-1">
+              <Users className="w-4 h-4 text-blue-500" />
+              <span className="text-xs font-medium text-blue-500">Checked-in</span>
+            </div>
+            <div className="text-2xl font-bold text-blue-500 mb-0.5">{stats?.checked_in_participants ?? 0}</div>
+            <div className="text-xs text-gray-400">of {stats?.total_participants ?? "-"} total</div>
           </div>
-          <div className="bg-white rounded-xl p-5 flex flex-col gap-2 border border-[#e0e0e0]">
-            <span className="text-sm text-[#6366f1]">Active Session</span>
-            <span className="text-xl font-bold text-primary">{stats?.active_session ?? "Keynote"}</span>
+
+          <div className="bg-white rounded-xl p-4 border border-gray-100">
+            <div className="flex items-center gap-2 mb-1">
+              <Calendar className="w-4 h-4 text-green-500" />
+              <span className="text-xs font-medium text-green-500">Sessions</span>
+            </div>
+            <div className="text-2xl font-bold text-green-500">{stats?.total_sessions ?? 0}</div>
+            <div className="text-xs text-gray-400">total sessions</div>
           </div>
-          <div className="bg-white rounded-xl p-5 flex flex-col gap-2 border border-[#e0e0e0]">
-            <span className="text-sm text-[#6366f1]">Event Progress</span>
-            <span className="text-xl font-bold text-primary">{stats?.current_day_label ?? "Day 1"} of {stats?.total_days ?? 1}</span>
+
+          <div className="bg-white rounded-xl p-4 border border-gray-100">
+            <div className="flex items-center gap-2 mb-1">
+              <BarChart2 className="w-4 h-4 text-purple-500" />
+              <span className="text-xs font-medium text-purple-500">Bookings</span>
+            </div>
+            <div className="text-2xl font-bold text-purple-500">{stats?.total_bookings ?? 0}</div>
+            <div className="text-xs text-gray-400">session bookings</div>
+          </div>
+
+          <div className="bg-white rounded-xl p-4 border border-gray-100">
+            <div className="flex items-center gap-2 mb-1">
+              <Gift className="w-4 h-4 text-orange-500" />
+              <span className="text-xs font-medium text-orange-500">Swag Claims</span>
+            </div>
+            <div className="text-2xl font-bold text-orange-500">{stats?.total_swag_claims ?? 0}</div>
+            <div className="text-xs text-gray-400">items claimed</div>
+          </div>
+
+          <div className="bg-white rounded-xl p-4 border border-gray-100">
+            <div className="flex items-center gap-2 mb-1">
+              <Award className="w-4 h-4 text-yellow-500" />
+              <span className="text-xs font-medium text-yellow-500">Quest Submissions</span>
+            </div>
+            <div className="text-2xl font-bold text-yellow-500">{stats?.total_quest_submissions ?? 0}</div>
+            <div className="text-xs text-gray-400">submissions</div>
+          </div>
+
+          <div className="bg-white rounded-xl p-4 border border-gray-100">
+            <div className="flex items-center gap-2 mb-1">
+              <User className="w-4 h-4 text-indigo-500" />
+              <span className="text-xs font-medium text-indigo-500">Total Participants</span>
+            </div>
+            <div className="text-2xl font-bold text-indigo-500">{stats?.total_participants ?? 0}</div>
+            <div className="text-xs text-gray-400">registered users</div>
           </div>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+
+        {/* Action Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 max-w-3xl mx-auto">
           <button
-            className="bg-[#2563eb] hover:bg-[#1d4ed8] text-white rounded-xl p-6 flex flex-col items-center gap-2 shadow transition col-span-2"
-            onClick={() => { setScanMode("checkin"); setCameraActive(false); setScanResult(""); setScanError(""); }}
+            className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl p-5 flex flex-col items-center justify-center gap-2 shadow-sm transition-all aspect-square max-w-[140px] mx-auto"
+            onClick={() => { setScanMode("checkin"); setCameraActive(true); setScanResult(""); setScanError(""); }}
           >
-            <QrCode className="w-8 h-8 mb-2" />
-            <span className="font-bold text-lg">Event Check-in/Check-out</span>
-            <span className="text-sm">Scan tickets</span>
+            <div className="bg-white/20 p-2 rounded-full">
+              <QrCode className="w-6 h-6" />
+            </div>
+            <div className="text-center">
+              <div className="font-bold text-sm mb-0.5">Event Check-in/Check-out</div>
+              <div className="text-xs opacity-80">Scan tickets</div>
+            </div>
           </button>
+
           <button
-            className="bg-white text-[#ef4444] rounded-xl p-6 flex flex-col items-center gap-2 shadow border border-[#e0e0e0] transition"
+            className="bg-white hover:bg-gray-50 rounded-xl p-5 flex flex-col items-center justify-center gap-2 shadow-sm border border-gray-100 transition-all aspect-square max-w-[140px] mx-auto"
+            onClick={() => navigate("/organizer/agenda")}
+          >
+            <div className="bg-red-50 p-2 rounded-full">
+              <DoorOpen className="w-6 h-6 text-red-500" />
+            </div>
+            <div className="text-center">
+              <div className="font-bold text-sm text-red-500 mb-0.5">Session Scan</div>
+              <div className="text-xs text-gray-400">Manage sessions</div>
+            </div>
+          </button>
+
+          <button
+            className="bg-white hover:bg-gray-50 rounded-xl p-5 flex flex-col items-center justify-center gap-2 shadow-sm border border-gray-100 transition-all aspect-square max-w-[140px] mx-auto"
             onClick={() => alert("Coming soon")}
           >
-            <DoorOpen className="w-8 h-8 mb-2" />
-            <span className="font-bold text-lg">Session Scan</span>
-            <span className="text-sm text-[#888]">Track attendance</span>
+            <div className="bg-green-50 p-2 rounded-full">
+              <Gift className="w-6 h-6 text-green-500" />
+            </div>
+            <div className="text-center">
+              <div className="font-bold text-sm text-green-500 mb-0.5">Swag Collection</div>
+              <div className="text-xs text-gray-400">Coming soon</div>
+            </div>
           </button>
+
           <button
-            className="bg-white text-[#22c55e] rounded-xl p-6 flex flex-col items-center gap-2 shadow border border-[#e0e0e0] transition"
-            onClick={() => alert("Coming soon")}
-          >
-            <Gift className="w-8 h-8 mb-2" />
-            <span className="font-bold text-lg">Swag Collection</span>
-            <span className="text-sm text-[#888]">Distribute merch</span>
-          </button>
-          <button
-            className="bg-white text-[#facc15] rounded-xl p-6 flex flex-col items-center gap-2 shadow border border-[#e0e0e0] transition"
+            className="bg-white hover:bg-gray-50 rounded-xl p-5 flex flex-col items-center justify-center gap-2 shadow-sm border border-gray-100 transition-all aspect-square max-w-[140px] mx-auto"
             onClick={() => { setQuestScanOpen(true); fetchPendingQuests(); }}
           >
-            <Award className="w-8 h-8 mb-2" />
-            <span className="font-bold text-lg">Quest Scan</span>
-            <span className="text-sm text-[#888]">Verify completion</span>
+            <div className="bg-yellow-50 p-2 rounded-full">
+              <Award className="w-6 h-6 text-yellow-500" />
+            </div>
+            <div className="text-center">
+              <div className="font-bold text-sm text-yellow-500 mb-0.5">Quest Scan</div>
+              <div className="text-xs text-gray-400">Verify completion</div>
+            </div>
           </button>
         </div>
-        <div className="bg-white rounded-xl shadow border border-[#e0e0e0] p-6 flex flex-col items-center">
-          <Users className="w-8 h-8 text-primary mb-2" />
-          <div className="font-bold text-lg mb-1">Total Participants</div>
-          <div className="text-3xl font-bold text-primary">{stats?.total_attendees ?? 0}</div>
-        </div>
+
+        {/* Remove the old Total Participants Card since it's now in the stats grid */}
       </main>
 
       {/* Scan Check-in/out Modal with mode switch */}
       {scanMode && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-8 shadow-xl w-full max-w-md text-center">
-            <h3 className="text-xl font-bold mb-4">Event Check-in</h3>
-            <div className="w-64 h-64 mx-auto mb-4 bg-[#f6f8fa] rounded-xl flex items-center justify-center border-2 border-[#2563eb] relative">
-              {!cameraActive ? (
-                <button
-                  className="bg-[#2563eb] text-white px-4 py-2 rounded font-bold shadow hover:bg-[#1d4ed8] transition"
-                  onClick={() => { setCameraActive(true); setScanResult(""); setScanError(""); }}
-                >
-                  Start Camera Scan
-                </button>
-              ) : (
-                <QrScanner
-                  delay={300}
-                  onError={() => setScanError("Camera error")}
-                  onScan={(data) => {
-                    if (data && typeof data === "string") {
-                      setScanResult(data);
-                      setCameraActive(false);
-                      // Do not auto submit, let user choose mode and submit
-                    }
-                  }}
-                  style={{ width: "100%", height: "100%" }}
-                />
-              )}
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-4 shadow-lg w-full max-w-md text-center relative">
+            <h3 className="text-xl font-bold mb-4">Event {scanMode === "checkin" ? "Check-in" : "Check-out"}</h3>
+
+            {/* Square scanner container with corner guides */}
+            <div className="mx-auto w-[86vw] max-w-[360px] md:w-[360px] md:h-[360px] h-[86vw] bg-[#000] rounded-lg overflow-hidden relative mb-4">
+              <QrScanner
+                key={scanMode} // Force remount when scan mode changes
+                delay={300}
+                onError={(error) => setScanError(error)}
+                onScan={handleScan}
+                style={{ width: "100%", height: "100%" }}
+              />
+
+              {/* Dark overlay + corner guides only */}
+              <div className="absolute inset-0 pointer-events-none">
+                <div className="absolute inset-0 bg-black/36" />
+                <span className="absolute left-4 top-4 w-6 h-6 border-t-4 border-l-4 border-white opacity-90" />
+                <span className="absolute right-4 top-4 w-6 h-6 border-t-4 border-r-4 border-white opacity-90" />
+                <span className="absolute left-4 bottom-4 w-6 h-6 border-b-4 border-l-4 border-white opacity-90" />
+                <span className="absolute right-4 bottom-4 w-6 h-6 border-b-4 border-r-4 border-white opacity-90" />
+              </div>
             </div>
+
             {/* Mode Switch */}
             <div className="flex justify-center gap-2 mb-4">
               <button
-                className={`px-6 py-2 rounded-full font-bold transition
-                  ${scanMode === "checkin" ? "bg-[#2563eb] text-white" : "bg-[#e0e0e0] text-[#222]"}
-                `}
+                className={`px-6 py-2 rounded-full font-bold transition ${scanMode === "checkin" ? "bg-[#2563eb] text-white" : "bg-[#e0e0e0] text-[#222]"}`}
                 onClick={() => setScanMode("checkin")}
                 disabled={scanLoading}
               >
                 Check-in
               </button>
               <button
-                className={`px-6 py-2 rounded-full font-bold transition
-                  ${scanMode === "checkout" ? "bg-[#2563eb] text-white" : "bg-[#e0e0e0] text-[#222]"}
-                `}
+                className={`px-6 py-2 rounded-full font-bold transition ${scanMode === "checkout" ? "bg-[#2563eb] text-white" : "bg-[#e0e0e0] text-[#222]"}`}
                 onClick={() => setScanMode("checkout")}
                 disabled={scanLoading}
               >
                 Check-out
               </button>
             </div>
-            <input
-              type="text"
-              className="w-full px-4 py-2 rounded border mb-3"
-              placeholder="Paste QR code value here"
-              value={scanResult}
-              onChange={e => setScanResult(e.target.value)}
-              disabled={scanLoading}
-            />
-            <div className="flex gap-4 justify-center mb-2">
-              <button
-                className="bg-[#2563eb] text-white px-6 py-2 rounded font-bold shadow hover:bg-[#1d4ed8] transition"
-                onClick={() => handleScan(scanResult)}
-                disabled={scanLoading || !scanResult}
-              >
-                {scanMode === "checkin" ? "Check-in" : "Check-out"}
-              </button>
-              <button
-                className="bg-[#e0e0e0] text-[#222] px-6 py-2 rounded font-bold shadow"
-                onClick={() => { setScanMode(null); setScanResult(""); setScanError(""); setCameraActive(false); }}
-                disabled={scanLoading}
-              >
-                Cancel
-              </button>
-            </div>
+
+            {/* Close button */}
+            <button
+              aria-label="Close"
+              onClick={() => { setScanMode(null); setScanResult(""); setScanError(""); setCameraActive(false); }}
+              className="absolute top-3 right-3 w-9 h-9 flex items-center justify-center rounded-full bg-white border border-red-100 text-red-600 hover:bg-red-50"
+              type="button"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="inline">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+
             <div className="text-[#888] text-sm mt-2">Point your camera at a participant's QR code to scan.</div>
-            {scanError && <div className="text-red-500 mt-2">{scanError}</div>}
+            {scanLoading && <div className="text-blue-500 mt-2 font-semibold">Processing...</div>}
+            {scanResult && <div className="text-green-600 mt-2 font-semibold">{scanResult}</div>}
+            {scanError && <div className="text-red-500 mt-2 font-semibold">{scanError}</div>}
           </div>
         </div>
       )}

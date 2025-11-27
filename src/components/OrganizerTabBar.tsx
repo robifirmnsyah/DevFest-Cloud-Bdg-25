@@ -26,7 +26,7 @@ const OrganizerTabBar = ({ activeTab }: { activeTab: OrganizerTab }) => {
         icon={<Calendar className="w-6 h-6" />}
         label="Agenda"
         active={activeTab === "agenda"}
-        onClick={() => navigate("/agenda")}
+        onClick={() => navigate("/organizer/agenda")}
       />
       <TabItem
         icon={<User className="w-6 h-6" />}
