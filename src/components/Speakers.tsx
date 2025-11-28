@@ -46,10 +46,10 @@ const Speakers = () => {
     {
       name: "Fadly Mahendra",
       image: "/images/fadly.jpeg",
-      title: "QA Manager at Durian Pay",
+      title: "QA Manager at Durianpay",
       topic: "AI in Quality Engineering: Practical Strategies You Can Apply Tomorrow",
       detail:
-        "Practical AI-based QA tactics: test case generation augmentation, ML-powered flaky test detection, risk-based test prioritization, and CI/CD pipeline integration.",
+        "Gemini Code Assist helps QA Engineers increase automated test coverage from 0 to 100% — even with Zero API Documentation.",
       track: "Techtalk",
     },
     {
