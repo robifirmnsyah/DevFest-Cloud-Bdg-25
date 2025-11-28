@@ -58,6 +58,13 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
+  // Skip external domains (Google Analytics, GTM, etc.)
+  const isExternalRequest = url.hostname !== self.location.hostname;
+  if (isExternalRequest) {
+    event.respondWith(fetch(request));
+    return;
+  }
+  
   // Skip API calls - always fetch fresh
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(fetch(request));
@@ -81,15 +88,22 @@ self.addEventListener('fetch', (event) => {
           return response;
         }
         return fetch(request).then((response) => {
-          // Cache successful responses
-          if (response && response.status === 200 && response.type === 'basic') {
+          // Cache successful responses from same origin
+          if (response && response.status === 200) {
             const responseToCache = response.clone();
             caches.open(CACHE_NAME)
               .then((cache) => {
                 cache.put(request, responseToCache);
+              })
+              .catch((err) => {
+                console.log('Cache put failed:', err);
               });
           }
           return response;
+        })
+        .catch((err) => {
+          console.log('Fetch failed:', err);
+          return caches.match('/');
         });
       })
   );

@@ -7,30 +7,27 @@ const PWAInstallPrompt = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [isInstalling, setIsInstalling] = useState(false);
   const [showManualInstructions, setShowManualInstructions] = useState(false);
-  const [showDebugInfo, setShowDebugInfo] = useState(false);
+  const [isDismissedPermanently, setIsDismissedPermanently] = useState(false);
 
-  // Show debug info in development
+  // Check if user has permanently dismissed the prompt
   useEffect(() => {
-    if (window.location.hostname === 'localhost') {
-      setShowDebugInfo(true);
+    const dismissed = localStorage.getItem('pwa-prompt-dismissed');
+    if (dismissed === 'true') {
+      setIsDismissedPermanently(true);
+      setIsVisible(false);
     }
   }, []);
 
-  if (!isInstallable || !isVisible) {
-    // Show debug info even when prompt is hidden
-    if (showDebugInfo && !isVisible) {
-      return (
-        <div className="fixed bottom-4 right-4 z-50 bg-black/80 text-white p-2 rounded text-xs">
-          <p>PWA Debug: Installable={isInstallable.toString()}, Installed={isInstalled.toString()}</p>
-          <button onClick={() => setIsVisible(true)} className="text-blue-400">Show Prompt</button>
-        </div>
-      );
-    }
+  // Temporarily disable PWA prompt until requirements are met
+  // PWA requires HTTPS in production
+  return null;
+
+  // Don't show if not installable, already installed, or dismissed
+  if (!isInstallable || isInstalled || !isVisible || isDismissedPermanently) {
     return null;
   }
 
   const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-  const isLocalhost = window.location.hostname === 'localhost';
 
   const handleInstall = async () => {
     setIsInstalling(true);
@@ -41,19 +38,22 @@ const PWAInstallPrompt = () => {
     setIsInstalling(false);
   };
 
+  const handleDismiss = () => {
+    setIsVisible(false);
+    // Don't permanently dismiss - allow it to show again on next visit
+  };
+
+  const handlePermanentDismiss = () => {
+    setIsVisible(false);
+    setIsDismissedPermanently(true);
+    localStorage.setItem('pwa-prompt-dismissed', 'true');
+  };
+
   return (
     <div className="fixed bottom-4 left-4 right-4 z-50 md:left-auto md:right-4 md:max-w-sm">
       <div className="bg-white rounded-xl shadow-2xl border border-gray-200 p-4 animate-slide-up">
-        {/* Debug Info */}
-        {showDebugInfo && (
-          <div className="mb-2 p-2 bg-gray-100 rounded text-xs">
-            <p>Debug: Installable={isInstallable.toString()}, Installed={isInstalled.toString()}</p>
-            <p>UA: {navigator.userAgent.substring(0, 50)}...</p>
-          </div>
-        )}
-        
         <button
-          onClick={() => setIsVisible(false)}
+          onClick={handleDismiss}
           className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 transition-colors"
         >
           <X className="w-5 h-5" />
@@ -74,7 +74,7 @@ const PWAInstallPrompt = () => {
               Get quick access to event info, agenda, and updates directly from your {isMobile ? 'home screen' : 'desktop'}.
             </p>
             
-            {showManualInstructions || isLocalhost ? (
+            {showManualInstructions ? (
               <div className="mb-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
                 <div className="flex items-start gap-2">
                   <Info className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
@@ -99,23 +99,31 @@ const PWAInstallPrompt = () => {
               </div>
             ) : null}
             
-            <button
-              onClick={handleInstall}
-              disabled={isInstalling}
-              className="w-full bg-[#4285F4] hover:bg-[#1a73e8] text-white font-semibold py-2 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              {isInstalling ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                  Installing...
-                </>
-              ) : (
-                <>
-                  <Download className="w-4 h-4" />
-                  {showManualInstructions ? 'Show Instructions' : 'Install App'}
-                </>
-              )}
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={handleInstall}
+                disabled={isInstalling}
+                className="flex-1 bg-[#4285F4] hover:bg-[#1a73e8] text-white font-semibold py-2 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {isInstalling ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                    Installing...
+                  </>
+                ) : (
+                  <>
+                    <Download className="w-4 h-4" />
+                    Install
+                  </>
+                )}
+              </button>
+              <button
+                onClick={handlePermanentDismiss}
+                className="text-xs text-gray-500 hover:text-gray-700 px-2"
+              >
+                Not now
+              </button>
+            </div>
           </div>
         </div>
       </div>
