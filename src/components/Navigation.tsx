@@ -1,14 +1,11 @@
 import { useState, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
-import { Menu, X, Download } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { usePWA } from "@/hooks/usePWA";
 
 const Navigation = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { isInstallable, installApp, isInstalled } = usePWA();
-  const [showInstallBtn, setShowInstallBtn] = useState(false);
   const location = useLocation();
   const isHomePage = location.pathname === "/";
   const isRegisterPage = location.pathname === "/register";
@@ -20,25 +17,6 @@ const Navigation = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  useEffect(() => {
-    // Show install button on desktop HTTPS if not installed
-    const isDesktop = !/Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    const isHTTPS = window.location.protocol === 'https:';
-    setShowInstallBtn(isHTTPS && isDesktop && !isInstalled);
-  }, [isInstalled]);
-
-  // Prevent body scroll when mobile menu is open
-  useEffect(() => {
-    if (isMobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isMobileMenuOpen]);
 
   const menuItems = [
     { label: "Home", href: "/" },
@@ -56,10 +34,6 @@ const Navigation = () => {
     if (href.startsWith("/#") && !isHomePage) {
       window.location.href = href;
     }
-  };
-
-  const handleInstallClick = async () => {
-    await installApp();
   };
 
   // Determine background style based on page and scroll state
@@ -118,17 +92,6 @@ const Navigation = () => {
                   </a>
                 )
               ))}
-              {showInstallBtn && (
-                <Button 
-                  onClick={handleInstallClick}
-                  variant="outline"
-                  size="sm"
-                  className="gap-2"
-                >
-                  <Download className="w-4 h-4" />
-                  Install App
-                </Button>
-              )}
               <a
                 href="https://www.goersapp.com/events/indonesia-premier-cloud-and-ai-festival-dev-fest-cloud-bandung-2025--devfestcloudbdg25"
                 target="_blank"
