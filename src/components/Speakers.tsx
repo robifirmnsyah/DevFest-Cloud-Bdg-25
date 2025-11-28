@@ -31,7 +31,7 @@ const Speakers = () => {
       title: "Full Stack Web3 Engineer @ Xellar",
       topic: "Web3 Explained: What Happens When Users Own The Internet. Do We Need Cloud?",
       detail:
-        "Clear overview of tokenized ownership, smart contracts, and how cloud infrastructure and decentralized stacks can complement each other.",
+        "Discussion on token ownership & smart contracts, trade-offs between cloud infrastructure vs decentralization, hybrid architecture examples, and security & privacy implications for user data.",
       track: "Techtalk",
     },
     {
@@ -40,7 +40,7 @@ const Speakers = () => {
       title: "IT Directorate Co-Lead at ParagonCorp",
       topic: "How ParagonCorp Scales Productivity with AI",
       detail:
-        "Case study of AI adoption: tooling, workflow automation, KPIs, and change-management practices used to scale team productivity.",
+        "Case study of AI adoption at ParagonCorp: toolchain used, end-to-end workflow automation, productivity metrics, and change-management strategies for large-scale implementation.",
       track: "Techtalk",
     },
     {
@@ -49,7 +49,7 @@ const Speakers = () => {
       title: "QA Manager at Durian Pay",
       topic: "AI in Quality Engineering: Practical Strategies You Can Apply Tomorrow",
       detail:
-        "Hands-on strategies: test automation augmentation with ML, flaky-test detection, test prioritization, and integrating AI into CI pipelines.",
+        "Practical AI-based QA tactics: test case generation augmentation, ML-powered flaky test detection, risk-based test prioritization, and CI/CD pipeline integration.",
       track: "Techtalk",
     },
     {
@@ -58,7 +58,7 @@ const Speakers = () => {
       title: "SVP Industry Solution at Lintasarta",
       topic: "Mastering the AI Skills that Overseas Companies Actually Look For",
       detail:
-        "Actionable guidance on in-demand AI skills, portfolio projects, interview prep, and how to communicate impact to international employers.",
+        "Guide to AI skills sought by global markets: relevant portfolio projects, must-know ML/engineering techniques, key tools & libraries, and presentation tips for international interviews.",
       track: "Techtalk",
     },
     {
@@ -67,7 +67,7 @@ const Speakers = () => {
       topic: "How to Apply Discount in GCP and Avoid Unexpected Billing Usage",
       title: "Founder & CEO Curaweda",
       detail:
-        "Practical tips for GCP cost management: committed use discounts, sustained use, labels, budgets & alerts, and monitoring to avoid surprises.",
+        "Practical GCP cost management tips: choosing committed/sustained discounts, labeling & cost allocation strategies, budget & alert setup, and monitoring to prevent unexpected billing.",
       track: "Techtalk",
     },
     {
@@ -76,7 +76,7 @@ const Speakers = () => {
       topic: "The Responsible Lens: Crafting Video with Ethical AI",
       title: "CEO Curaweda",
       detail:
-        "Ethical video generation practices: consent, dataset curation, watermarking, misuse mitigation, and governance frameworks for creators.",
+        "Principles of ethical AI video creation: data consent & licensing, dataset curation, watermarking & provenance, abuse mitigation, and governance policies for creators.",
       track: "Techtalk",
     },
     {
@@ -84,16 +84,17 @@ const Speakers = () => {
       image: "/images/angga.jpg",
       title: "IT Manager, The Langham Jakarta | Google Cloud Developer Expert",
       topic: "From (Power) Prompts to Company Insights: NotebookLM as Your Company Insights Engine",
-      detail: "How to turn internal docs into a searchable insights engine with NotebookLM: ingestion, prompt patterns, and integrations.",
+      detail:
+        "Guide to building insights pipeline: document ingestion, embedding & retrieval, effective prompt patterns, internal source connectors, and NotebookLM deployment for teams.",
       track: "Workshop",
     },
     {
       name: "Meyta Jennis",
       image: "/images/meyta.jpg",
-      topic: "Visual Agent Builder",
+      topic: "Create AI Multi Agent Using Visual Agent Builder in ADK",
       title: "Act Principal Coordinator ITSEC Asia",
       detail:
-        "Build and orchestrate multi-agent workflows visually: design patterns, debugging techniques, and readiness for production.",
+        "Visual multi-agent creation workshop: agent architecture design, inter-agent orchestration & communication, state management, debugging techniques, and production deployment steps.",
       track: "Workshop",
     },
     {
@@ -102,7 +103,7 @@ const Speakers = () => {
       topic: "AI/ML for Power Outage Detection",
       title: "Contact System Center Officer PLN",
       detail:
-        "Techniques for outage detection: sensor preprocessing, anomaly detection models, evaluation metrics, and edge/cloud deployment strategies.",
+        "Outage detection approach: sensor data preprocessing, suitable anomaly-detection models, evaluation metrics, and edge vs cloud deployment strategies for real-time response.",
       track: "Techtalk",
     },
     {
@@ -111,7 +112,7 @@ const Speakers = () => {
       topic: "Spec Driven Development",
       title: "CTO Carte WMS & Google AI & Cloud Dev Expert",
       detail:
-        "Adopt spec-first workflows: contract-driven design, spec-as-tests, contract testing, and faster iteration with less rework.",
+        "Spec-driven development principles: contract-first design, spec-as-tests, contract-testing techniques, and CI workflows that accelerate iteration while reducing regression.",
       track: "Techtalk",
     },
     {
@@ -120,7 +121,7 @@ const Speakers = () => {
       title: "Founder Tiket.com & CEO Lifepack",
       topic: "Intro to n8n: Creating expense tracker in 30 minutes",
       detail:
-        "Hands-on n8n workshop: building connectors, flows, webhooks, and deploying a 30-minute automated expense tracker end-to-end.",
+        "Hands-on n8n workshop: expense tracker flow design, creating connectors & webhooks, data transformation, scheduling, and deploying end-to-end automation in 30 minutes.",
       track: "Workshop",
     },
     {
@@ -129,7 +130,7 @@ const Speakers = () => {
       title: "Community Organizer PythonID",
       topic: "Python Landscape in Industry and Community",
       detail:
-        "Survey of Python use-cases, key libraries, community resources, and practical career paths across industry and open source.",
+        "Overview of Python usage in industry & community: library ecosystem (data, web, ML), best practices, real-world case examples, and learning paths for Python-based careers.",
       track: "Techtalk",
     },
     {
@@ -138,7 +139,7 @@ const Speakers = () => {
       topic: "Personal Doctor AI Assistant",
       title: "CTO GovTech Edu & Google AI Dev Expert",
       detail:
-        "Designing a privacy-first medical assistant: intent design, secure data connectors, model selection, and safety guardrails.",
+        "Private medical assistant design: intent modeling, patient data privacy & security, model & inference choices, and guardrails for safety and regulatory compliance.",
       track: "Workshop",
     },
     {
@@ -147,7 +148,7 @@ const Speakers = () => {
       title: "Frontend Engineer at Ape AI",
       topic: "Don't Follow the Vibe - Lead It with Gemini CLI",
       detail:
-        "Practical demo of Gemini CLI: reproducible prompt workflows, local dev loops, templates, and improving developer productivity.",
+        "Practical Gemini CLI demo: creating reproducible prompt workflows, local development loops, template & snippet usage, and tricks to boost frontend/AI developer productivity.",
       track: "Workshop",
     },
     {
@@ -156,7 +157,7 @@ const Speakers = () => {
       title: "UI/UX Designer at Aegislabs",
       topic: "UI Designer? No Worries! Coding as a Designer with Stitch",
       detail:
-        "Showcase Stitch workflows for designers: component-driven prototyping, exporting production-ready code, and rapid iteration tips.",
+        "Stitch workflow for designers: component-based prototyping, production-ready code export, design-to-dev synchronization, and rapid iteration techniques for product teams.",
       track: "Workshop",
     },
     {
@@ -165,15 +166,16 @@ const Speakers = () => {
       title: "Frontend Engineer at INA Digital Edu",
       topic: "Building Modern Frontends and Careers with Firebase Studio",
       detail:
-        "Using Firebase Studio to scaffold frontends: auth, Firestore patterns, CI/CD, and career-building best practices for frontend engineers.",
+        "Building modern frontends with Firebase Studio: authentication & authorization patterns, scalable Firestore structure, rules & security, plus CI/CD and production hosting.",
       track: "Workshop",
     },
     {
       name: "Farhan Naufal Ghani",
       image: "/images/naufal.jpg",
       title: "DevSecOps Engineer at 99 Group",
-      topic: "TBD",
-      detail: "Stay tuned for DevSecOps insights from 99 Group.",
+      topic: "Bringing AI to Observability: AI-Driven Insights in Grafana",
+      detail:
+        "Integrating AI into observability: anomaly detection on metrics/logs, automated root-cause analysis, alert noise reduction, and secure practices for ML-based observability pipelines.",
       track: "Workshop",
     },
   ];
