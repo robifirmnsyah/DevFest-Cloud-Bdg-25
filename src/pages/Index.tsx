@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import Presale from "@/components/Presale";
 import Moments from "@/components/Moments";
 import JobFair from "@/components/JobFair";
+import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 
 const Index = () => {
   return (
@@ -20,6 +21,7 @@ const Index = () => {
       <Partners />
       <Moments />
       <Footer />
+      <PWAInstallPrompt />
     </div>
   );
 };

@@ -9,7 +9,6 @@ const PWAInstallPrompt = () => {
   const [showManualInstructions, setShowManualInstructions] = useState(false);
   const [isDismissedPermanently, setIsDismissedPermanently] = useState(false);
 
-  // Check if user has permanently dismissed the prompt
   useEffect(() => {
     const dismissed = localStorage.getItem('pwa-prompt-dismissed');
     if (dismissed === 'true') {
@@ -18,9 +17,10 @@ const PWAInstallPrompt = () => {
     }
   }, []);
 
-  // Temporarily disable PWA prompt until requirements are met
-  // PWA requires HTTPS in production
-  return null;
+  // Only show on HTTPS (production)
+  if (window.location.protocol !== 'https:') {
+    return null;
+  }
 
   // Don't show if not installable, already installed, or dismissed
   if (!isInstallable || isInstalled || !isVisible || isDismissedPermanently) {
