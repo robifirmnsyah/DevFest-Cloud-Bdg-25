@@ -86,7 +86,7 @@ const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, delay = 300, sty
       const selectedDeviceId = devices[preferredIndex].deviceId;
       
       // Use decodeFromVideoDevice for continuous scanning
-      readerRef.current.decodeFromVideoDevice(
+      const controls = await readerRef.current.decodeFromVideoDevice(
         selectedDeviceId,
         videoRef.current,
         (result, error) => {
@@ -102,6 +102,41 @@ const QrScanner: React.FC<QrScannerProps> = ({ onScan, onError, delay = 300, sty
           }
         }
       );
++
+// Apply zoom after camera initializes (delay to ensure stream is ready)
+setTimeout(async () => {
+  try {
+    const stream = videoRef.current?.srcObject as MediaStream;
+    if (stream && stream.getVideoTracks().length > 0) {
+      const videoTrack = stream.getVideoTracks()[0];
+      const capabilities = videoTrack.getCapabilities() as any;
+      
+      // Check if zoom is supported
+      if (capabilities.zoom) {
+        const { min, max } = capabilities.zoom;
+        // Set modest zoom (1.2x) to help with scanning but not too extreme
+        const zoomValue = Math.min(max, Math.max(min, 1.2));
+        
+        await videoTrack.applyConstraints({
+          advanced: [{ zoom: zoomValue } as any]
+        });
+        
+        console.log(`Zoom applied: ${zoomValue}x`);
+      } else {
+        // Try focus distance if zoom not available
+        if (capabilities.focusDistance) {
+          await videoTrack.applyConstraints({
+            advanced: [{ focusDistance: { ideal: 0.1 } } as any]
+          });
+          console.log('Focus distance applied for closer scanning');
+        }
+      }
+    }
+  } catch (e) {
+    console.log('Could not apply zoom/focus constraints:', e);
+    // Continue without zoom - scanning should still work
+  }
+}, 1000); // Increased delay to ensure camera is fully initialized
 
     } catch (error) {
       console.error('Camera access error:', error);
