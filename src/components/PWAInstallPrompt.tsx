@@ -1,129 +1,103 @@
 import { useState, useEffect } from 'react';
-import { Download, X, Smartphone, Monitor, Info } from 'lucide-react';
+import { Download, X, Smartphone, Monitor } from 'lucide-react';
 import { usePWA } from '@/hooks/usePWA';
 
 const PWAInstallPrompt = () => {
   const { isInstallable, installApp, isInstalled } = usePWA();
-  const [isVisible, setIsVisible] = useState(true);
+  const [isVisible, setIsVisible] = useState(false);
   const [isInstalling, setIsInstalling] = useState(false);
-  const [showManualInstructions, setShowManualInstructions] = useState(false);
-  const [isDismissedPermanently, setIsDismissedPermanently] = useState(false);
+  const [isDismissed, setIsDismissed] = useState(false);
 
   useEffect(() => {
-    const dismissed = localStorage.getItem('pwa-prompt-dismissed');
-    if (dismissed === 'true') {
-      setIsDismissedPermanently(true);
-      setIsVisible(false);
+    // Only show on HTTPS
+    if (window.location.protocol !== 'https:') {
+      return;
     }
-  }, []);
 
-  // Only show on HTTPS (production)
-  if (window.location.protocol !== 'https:') {
+    // Check if dismissed in this session
+    const dismissed = sessionStorage.getItem('pwa-prompt-dismissed');
+    if (dismissed === 'true') {
+      return;
+    }
+
+    // Show after 3 seconds if not installed
+    const timer = setTimeout(() => {
+      if (!isInstalled) {
+        setIsVisible(true);
+      }
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, [isInstalled]);
+
+  // Don't show if installed or dismissed
+  if (isInstalled || isDismissed || !isVisible) {
     return null;
   }
 
-  // Don't show if not installable, already installed, or dismissed
-  if (!isInstallable || isInstalled || !isVisible || isDismissedPermanently) {
-    return null;
-  }
-
-  const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
   const handleInstall = async () => {
     setIsInstalling(true);
-    const success = await installApp();
-    if (!success) {
-      setShowManualInstructions(true);
-    }
+    await installApp();
     setIsInstalling(false);
   };
 
   const handleDismiss = () => {
     setIsVisible(false);
-    // Don't permanently dismiss - allow it to show again on next visit
-  };
-
-  const handlePermanentDismiss = () => {
-    setIsVisible(false);
-    setIsDismissedPermanently(true);
-    localStorage.setItem('pwa-prompt-dismissed', 'true');
+    setIsDismissed(true);
+    sessionStorage.setItem('pwa-prompt-dismissed', 'true');
   };
 
   return (
-    <div className="fixed bottom-4 left-4 right-4 z-50 md:left-auto md:right-4 md:max-w-sm">
-      <div className="bg-white rounded-xl shadow-2xl border border-gray-200 p-4 animate-slide-up">
+    <div className="fixed bottom-4 left-4 right-4 z-50 md:left-auto md:right-4 md:max-w-sm animate-slide-up">
+      <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl shadow-2xl p-4 text-white relative">
         <button
           onClick={handleDismiss}
-          className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 transition-colors"
+          className="absolute top-2 right-2 text-white/80 hover:text-white transition-colors"
+          aria-label="Close"
         >
           <X className="w-5 h-5" />
         </button>
 
-        <div className="flex items-start gap-3">
-          <div className="bg-[#4285F4]/10 p-2 rounded-lg flex-shrink-0">
+        <div className="flex items-start gap-3 pr-6">
+          <div className="bg-white/20 p-2 rounded-lg flex-shrink-0">
             {isMobile ? (
-              <Smartphone className="w-6 h-6 text-[#4285F4]" />
+              <Smartphone className="w-6 h-6" />
             ) : (
-              <Monitor className="w-6 h-6 text-[#4285F4]" />
+              <Monitor className="w-6 h-6" />
             )}
           </div>
           
           <div className="flex-1 min-w-0">
-            <h3 className="font-bold text-gray-900 mb-1">Install DevFest App</h3>
-            <p className="text-sm text-gray-600 mb-3">
-              Get quick access to event info, agenda, and updates directly from your {isMobile ? 'home screen' : 'desktop'}.
+            <h3 className="font-bold text-lg mb-1">Install DevFest App</h3>
+            <p className="text-sm text-white/90 mb-3">
+              Quick access to agenda, networking, and event updates.
             </p>
             
-            {showManualInstructions ? (
-              <div className="mb-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                <div className="flex items-start gap-2">
-                  <Info className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                  <div className="text-xs text-blue-800">
-                    <p className="font-semibold mb-1">Manual Installation:</p>
-                    {isMobile ? (
-                      <>
-                        <p><strong>Chrome Android:</strong> Menu (⋮) → "Add to Home screen"</p>
-                        <p><strong>Safari iOS:</strong> Share button → "Add to Home Screen"</p>
-                        <p><strong>Edge Mobile:</strong> Menu (⋯) → "Add to phone"</p>
-                      </>
-                    ) : (
-                      <>
-                        <p><strong>Chrome:</strong> Address bar install icon or Menu → "Install DevFest 2025"</p>
-                        <p><strong>Edge:</strong> Address bar install icon or Menu → "Apps" → "Install this site as an app"</p>
-                        <p><strong>Firefox:</strong> Address bar → Install icon</p>
-                        <p className="mt-2 text-amber-700"><strong>Note:</strong> Look for install icon ⬇️ in address bar</p>
-                      </>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ) : null}
-            
-            <div className="flex gap-2">
-              <button
-                onClick={handleInstall}
-                disabled={isInstalling}
-                className="flex-1 bg-[#4285F4] hover:bg-[#1a73e8] text-white font-semibold py-2 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                {isInstalling ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                    Installing...
-                  </>
-                ) : (
-                  <>
-                    <Download className="w-4 h-4" />
-                    Install
-                  </>
-                )}
-              </button>
-              <button
-                onClick={handlePermanentDismiss}
-                className="text-xs text-gray-500 hover:text-gray-700 px-2"
-              >
-                Not now
-              </button>
-            </div>
+            <button
+              onClick={handleInstall}
+              disabled={isInstalling}
+              className="w-full bg-white text-blue-600 hover:bg-blue-50 font-semibold py-2.5 px-4 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {isInstalling ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-blue-600 border-t-transparent"></div>
+                  Installing...
+                </>
+              ) : (
+                <>
+                  <Download className="w-4 h-4" />
+                  Install Now
+                </>
+              )}
+            </button>
+
+            <p className="text-xs text-white/70 mt-2 text-center">
+              {isMobile 
+                ? 'Tap Install, then add to home screen' 
+                : 'Or look for install icon in address bar'}
+            </p>
           </div>
         </div>
       </div>
