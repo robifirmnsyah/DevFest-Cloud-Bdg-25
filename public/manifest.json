@@ -1,0 +1,39 @@
+{
+  "name": "Cloud DevFest Bandung 2025",
+  "short_name": "DevFest 2025",
+  "description": "The largest AI & Cloud developer event in Indonesia. Join workshops, techtalks, job fair, and networking with Google Developer Experts.",
+  "start_url": "/?source=pwa",
+  "display": "standalone",
+  "background_color": "#4285F4",
+  "theme_color": "#4285F4",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "lang": "en",
+  "categories": ["education", "business", "productivity"],
+  "icons": [
+    {
+      "src": "/gdg_logo.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "/gdg_logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any"
+    },
+    {
+      "src": "/gdg_logo.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/gdg_logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "maskable"
+    }
+  ]
+}

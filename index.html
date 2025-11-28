@@ -2,14 +2,33 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
     <title>Cloud DevFest Bandung 2025 | AI, Cloud, Tech Conference, Workshop, Developer Event, Bandung</title>
     
     <!-- Favicon -->
     <link rel="icon" type="image/jpeg" href="/gdg_logo.jpg" />
+    
+    <!-- PWA Manifest - Must be first -->
+    <link rel="manifest" href="/manifest.json" crossorigin="use-credentials" />
+    
+    <!-- Apple Touch Icons -->
     <link rel="apple-touch-icon" href="/gdg_logo.jpg" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/gdg_logo.jpg" />
     
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#4285F4" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="DevFest 2025" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="application-name" content="DevFest 2025" />
     
+    <!-- Microsoft Tiles -->
+    <meta name="msapplication-TileImage" content="/gdg_logo.jpg" />
+    <meta name="msapplication-TileColor" content="#4285F4" />
+    <meta name="msapplication-config" content="none" />
+    
+    <!-- SEO Meta Tags -->
     <meta name="description" content="Cloud DevFest Bandung 2025 - The largest AI & Cloud developer event in Indonesia. Join workshops, techtalks, job fair, and networking with Google Developer Experts. December 6, 2025 at Selan Hall, Piset Square, Bandung.">
     <meta name="keywords" content="Cloud DevFest, DevFest Bandung, AI Conference, Cloud Conference, Tech Event Bandung, Google Developer Groups, GDG Cloud Bandung, Developer Workshop, Tech Job Fair, Networking, Google Cloud, Artificial Intelligence, Machine Learning, Software Engineering, IT Event, Indonesia, Bandung, Developer Community, Tech Meetup, Google Experts, Startup, Innovation, Technology, Event 2025, Cloud Computing, Secure Scalable Solutions, Tech Career, Developer Festival, Event Tickets, Tech Talks, Workshops, Job Fair, Swag, Community, Google, Python, Web3, Firebase, n8n, Gemma, NotebookLM, Cyber Security, Frontend, Backend, Data Science, DevSecOps, IT Exhibition">
     <meta name="author" content="GDG Cloud Bandung" />
@@ -77,7 +96,50 @@
 
       gtag('config', 'AW-572429350');
     </script>
-</head>
+    
+    <!-- PWA Service Worker Registration - Before any other scripts -->
+    <script>
+      // Early registration for better PWA detection
+      if ('serviceWorker' in navigator) {
+        // Register immediately
+        navigator.serviceWorker.register('/sw.js', { scope: '/' })
+          .then((registration) => {
+            console.log('✅ SW registered:', registration.scope);
+            
+            // Check for updates
+            registration.addEventListener('updatefound', () => {
+              const newWorker = registration.installing;
+              console.log('🔄 SW update found');
+              if (newWorker) {
+                newWorker.addEventListener('statechange', () => {
+                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    console.log('✨ New SW installed, refresh to update');
+                  }
+                });
+              }
+            });
+          })
+          .catch((error) => {
+            console.error('❌ SW registration failed:', error);
+          });
+      }
+      
+      // Listen for install prompt - CRITICAL for install icon to appear
+      let deferredPrompt;
+      window.addEventListener('beforeinstallprompt', (e) => {
+        console.log('🎉 beforeinstallprompt fired - App is installable!');
+        e.preventDefault();
+        deferredPrompt = e;
+        // Store for later use
+        window.deferredPrompt = e;
+      });
+      
+      window.addEventListener('appinstalled', () => {
+        console.log('✅ App installed successfully');
+        deferredPrompt = null;
+      });
+    </script>
+  </head>
 
   <body>
     <div id="root"></div>
