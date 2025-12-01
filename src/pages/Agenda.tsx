@@ -60,20 +60,11 @@ const Agenda = () => {
     displayedSessions = displayedSessions.filter(s => s.track === selectedTrack);
   }
 
-  // Group by day (assume start_time is ISO string)
-  const sessionsByDay: Record<string, any[]> = {};
-  displayedSessions.forEach((s) => {
-    // Fix: Day 1 untuk tanggal lebih awal, Day 2 untuk tanggal lebih akhir
-    const day = s.start_time?.includes("2025-11-20") ? "Day 2" : "Day 1";
-    if (!sessionsByDay[day]) sessionsByDay[day] = [];
-    sessionsByDay[day].push(s);
-  });
-
-  // Day label mapping (tanpa tanggal)
-  const dayLabels: Record<string, string> = {
-    "Day 1": "Day 1",
-    "Day 2": "Day 2",
-  };
+  // No more day grouping - just show all sessions in chronological order
+  // Sort by start_time
+  displayedSessions.sort((a, b) => 
+    new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
+  );
 
   // Detect role for tab bar
   const role = localStorage.getItem("role");
@@ -255,82 +246,91 @@ const Agenda = () => {
             <p className="text-sm">Try adjusting your search or filters</p>
           </div>
         ) : (
-          Object.entries(sessionsByDay).map(([day, items]) => (
-            <div key={day} className="mb-8 flex flex-col items-center">
-              <div className="mb-4 flex justify-center w-full">
-                <span className="text-xl font-bold text-primary bg-white rounded-full px-6 py-2 shadow border border-[#e0e0e0]">
-                  {dayLabels[day] || day}
-                </span>
-              </div>
-              {items.map((session: any) => (
-                <div
-                  key={session.id}
-                  className="bg-white border border-[#e0e0e0] rounded-xl shadow mb-6 p-5 max-w-2xl w-full flex flex-col relative"
-                  style={{ minWidth: 0 }}
-                >
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="bg-primary/10 rounded-full w-12 h-12 flex items-center justify-center">
-                      <User className="w-7 h-7 text-primary" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="font-bold text-lg">{session.speaker || "No Speaker"}</div>
-                      <div className="text-sm text-[#888]">{session.track || session.description}</div>
-                    </div>
-                    {/* Book/Cancel Button - top right */}
-                    {tab === "all" ? (
-                      <button
-                        className={`rounded-full px-6 py-2 font-bold text-base shadow transition-all
-                          ${session.is_booked
+          <div className="flex flex-col items-center">
+            {displayedSessions.map((session: any) => (
+              <div
+                key={session.id}
+                className="bg-white border border-[#e0e0e0] rounded-xl shadow mb-6 p-5 max-w-2xl w-full flex flex-col relative"
+                style={{ minWidth: 0 }}
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="bg-primary/10 rounded-full w-12 h-12 flex items-center justify-center">
+                    <User className="w-7 h-7 text-primary" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-bold text-lg">{session.speaker || "No Speaker"}</div>
+                    <div className="text-sm text-[#888]">{session.track || session.description}</div>
+                  </div>
+                  {/* Book/Cancel Button - top right */}
+                  {tab === "all" ? (
+                    <button
+                      className={`rounded-full px-6 py-2 font-bold text-base shadow transition-all
+                        ${!session.is_bookable
+                          ? "bg-[#e0e0e0] text-[#888] cursor-not-allowed"
+                          : session.is_booked
                             ? "bg-[#4285F4] text-white"
                             : session.is_full
                               ? "bg-[#e0e0e0] text-[#888] cursor-not-allowed"
                               : "bg-[#4285F4] text-white hover:bg-[#1a73e8]"}
-                        `}
-                        style={{ minWidth: 90 }}
-                        disabled={session.is_full || session.is_booked}
-                        onClick={() => {
-                          if (!session.is_booked && !session.is_full) {
-                            const token = localStorage.getItem("token");
-                            axios.post(`${API_URL}api/v1/participants/sessions/book`, { session_id: session.id }, {
-                              headers: { Authorization: `Bearer ${token}` },
-                            }).then(() => window.location.reload());
-                          }
-                        }}
-                      >
-                        {session.is_booked ? "Booked" : session.is_full ? "Full" : "Book"}
-                      </button>
-                    ) : (
-                      /* Cancel Button for My Agenda */
-                      <button
-                        className="rounded-full px-6 py-2 font-bold text-base shadow transition-all bg-red-500 hover:bg-red-600 text-white"
-                        style={{ minWidth: 90 }}
-                        onClick={() => openCancelModal(session)}
-                      >
-                        Cancel
-                      </button>
-                    )}
-                  </div>
-                  {/* Time, Location, Book Button in one row */}
-                  <div className="flex items-center gap-4 text-sm mb-2">
-                    <Clock className="w-4 h-4 text-primary" />
-                    <span>
-                      {new Date(session.start_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} - {new Date(session.end_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                    </span>
-                    <MapPin className="w-4 h-4 text-primary" />
-                    <span>{session.location}</span>
-                  </div>
-                  <div className="font-bold text-lg mb-1">{session.title}</div>
-                  <div className="text-sm text-[#666] mb-2">{session.description}</div>
-                  <div className="flex gap-2 flex-wrap mb-2">
-                    {session.track && (
-                      <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-semibold">{session.track}</span>
-                    )}
-                    <span className="bg-[#e0e0e0] text-[#222] px-3 py-1 rounded-full text-xs font-semibold">On YouTube</span>
-                  </div>
+                      `}
+                      style={{ minWidth: 90 }}
+                      disabled={!session.is_bookable || session.is_full || session.is_booked}
+                      onClick={() => {
+                        if (session.is_bookable && !session.is_booked && !session.is_full) {
+                          const token = localStorage.getItem("token");
+                          axios.post(`${API_URL}api/v1/participants/sessions/book`, { session_id: session.id }, {
+                            headers: { Authorization: `Bearer ${token}` },
+                          }).then(() => window.location.reload());
+                        }
+                      }}
+                      title={!session.is_bookable ? "Booking not available for this session" : ""}
+                    >
+                      {!session.is_bookable ? "No Booking" : session.is_booked ? "Booked" : session.is_full ? "Full" : "Book"}
+                    </button>
+                  ) : (
+                    /* Cancel Button for My Agenda */
+                    <button
+                      className="rounded-full px-6 py-2 font-bold text-base shadow transition-all bg-red-500 hover:bg-red-600 text-white"
+                      style={{ minWidth: 90 }}
+                      onClick={() => openCancelModal(session)}
+                    >
+                      Cancel
+                    </button>
+                  )}
                 </div>
-              ))}
-            </div>
-          ))
+                {/* Time, Location */}
+                <div className="flex items-center gap-4 text-sm mb-2">
+                  <Clock className="w-4 h-4 text-primary" />
+                  <span>
+                    {new Date(session.start_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} - {new Date(session.end_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  </span>
+                  <MapPin className="w-4 h-4 text-primary" />
+                  <span>{session.location}</span>
+                </div>
+                <div className="font-bold text-lg mb-1">{session.title}</div>
+                <div className="text-sm text-[#666] mb-2">{session.description}</div>
+                <div className="flex gap-2 flex-wrap mb-2">
+                  {session.track && (
+                    <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-semibold">{session.track}</span>
+                  )}
+                  {session.is_hybrid && (
+                    session.live_url ? (
+                      <a
+                        href={session.live_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-red-50 text-red-600 px-3 py-1 rounded-full text-xs font-semibold hover:bg-red-100 transition-colors"
+                      >
+                        📺 Watch on YouTube
+                      </a>
+                    ) : (
+                      <span className="bg-red-50 text-red-600 px-3 py-1 rounded-full text-xs font-semibold">On YouTube</span>
+                    )
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </div>
 

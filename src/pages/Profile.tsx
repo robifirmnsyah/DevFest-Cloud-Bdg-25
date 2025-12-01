@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
 import TabBar from "@/components/TabBar";
 import OrganizerTabBar from "@/components/OrganizerTabBar";
 import { LogOut, Pencil } from "lucide-react";

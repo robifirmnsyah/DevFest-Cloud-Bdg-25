@@ -62,18 +62,11 @@ const OrganizerAgenda = () => {
     filteredSessions = filteredSessions.filter(s => s.track === selectedTrack);
   }
 
-  // Group by day
-  const sessionsByDay: Record<string, any[]> = {};
-  filteredSessions.forEach((s) => {
-    const day = s.start_time?.includes("2025-11-20") ? "Day 2" : "Day 1";
-    if (!sessionsByDay[day]) sessionsByDay[day] = [];
-    sessionsByDay[day].push(s);
-  });
-
-  const dayLabels: Record<string, string> = {
-    "Day 1": "Day 1",
-    "Day 2": "Day 2",
-  };
+  // No more day grouping - just show all sessions in chronological order
+  // Sort by start_time
+  filteredSessions.sort((a, b) => 
+    new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
+  );
 
   const handleScanAction = (session: any, action: "checkin" | "checkin-waiting" | "checkout") => {
     setSelectedSession(session);
@@ -226,83 +219,91 @@ const OrganizerAgenda = () => {
             <p className="text-sm">Try adjusting your search or filters</p>
           </div>
         ) : (
-          Object.entries(sessionsByDay).map(([day, items]) => (
-            <div key={day} className="mb-8 flex flex-col items-center">
-              <div className="mb-4 flex justify-center w-full">
-                <span className="text-xl font-bold text-blue-500 bg-white rounded-full px-6 py-2 shadow border border-gray-100">
-                  {dayLabels[day] || day}
-                </span>
-              </div>
-              
-              {items.map((session: any) => (
-                <div
-                  key={session.id}
-                  className="bg-white border border-gray-100 rounded-xl shadow-sm mb-6 p-5 max-w-2xl w-full flex flex-col"
-                >
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="bg-blue-50 rounded-full w-12 h-12 flex items-center justify-center">
-                      <User className="w-6 h-6 text-blue-500" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="font-bold text-lg text-gray-900">{session.speaker || "No Speaker"}</div>
-                      <div className="text-sm text-gray-500">{session.track || session.description}</div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-sm text-gray-500">Capacity</div>
-                      <div className="font-bold text-blue-500">{session.booked_count}/{session.capacity}</div>
-                    </div>
+          <div className="flex flex-col items-center">
+            {filteredSessions.map((session: any) => (
+              <div
+                key={session.id}
+                className="bg-white border border-gray-100 rounded-xl shadow-sm mb-6 p-5 max-w-2xl w-full flex flex-col"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="bg-blue-50 rounded-full w-12 h-12 flex items-center justify-center">
+                    <User className="w-6 h-6 text-blue-500" />
                   </div>
-                  
-                  <div className="flex items-center gap-4 text-sm mb-3 text-gray-600">
-                    <Clock className="w-4 h-4 text-blue-500" />
-                    <span>
-                      {new Date(session.start_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} - {new Date(session.end_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-                    </span>
-                    <MapPin className="w-4 h-4 text-blue-500" />
-                    <span>{session.location}</span>
+                  <div className="flex-1">
+                    <div className="font-bold text-lg text-gray-900">{session.speaker || "No Speaker"}</div>
+                    <div className="text-sm text-gray-500">{session.track || session.description}</div>
                   </div>
-                  
-                  <div className="font-bold text-lg mb-2 text-gray-900">{session.title}</div>
-                  <div className="text-sm text-gray-600 mb-3">{session.description}</div>
-                  
-                  <div className="flex gap-2 flex-wrap mb-4">
-                    {session.track && (
-                      <span className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-xs font-semibold">{session.track}</span>
-                    )}
-                    <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-semibold">On YouTube</span>
-                  </div>
-                  
-                  {/* Action Buttons */}
-                  <div className="grid grid-cols-3 gap-2">
-                    <button
-                      className="flex items-center justify-center gap-1 bg-green-500 hover:bg-green-600 text-white px-2 py-1.5 md:px-3 md:py-2 rounded-lg text-xs md:text-sm font-semibold transition-colors"
-                      onClick={() => handleScanAction(session, "checkin")}
-                    >
-                      <UserCheck className="w-4 h-4" />
-                      <span className="hidden sm:inline">Check-in</span>
-                      <span className="sm:hidden">In</span>
-                    </button>
-                    <button
-                      className="flex items-center justify-center gap-1 bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1.5 md:px-3 md:py-2 rounded-lg text-xs md:text-sm font-semibold transition-colors"
-                      onClick={() => handleScanAction(session, "checkin-waiting")}
-                    >
-                      <Users className="w-4 h-4" />
-                      <span className="hidden sm:inline">Waiting List</span>
-                      <span className="sm:hidden">Wait</span>
-                    </button>
-                    <button
-                      className="flex items-center justify-center gap-1 bg-red-500 hover:bg-red-600 text-white px-2 py-1.5 md:px-3 md:py-2 rounded-lg text-xs md:text-sm font-semibold transition-colors"
-                      onClick={() => handleScanAction(session, "checkout")}
-                    >
-                      <UserX className="w-4 h-4" />
-                      <span className="hidden sm:inline">Check-out</span>
-                      <span className="sm:hidden">Out</span>
-                    </button>
+                  <div className="text-right">
+                    <div className="text-sm text-gray-500">Capacity</div>
+                    <div className="font-bold text-blue-500">{session.booked_count}/{session.capacity}</div>
                   </div>
                 </div>
-              ))}
-            </div>
-          ))
+                
+                <div className="flex items-center gap-4 text-sm mb-3 text-gray-600">
+                  <Clock className="w-4 h-4 text-blue-500" />
+                  <span>
+                    {new Date(session.start_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} - {new Date(session.end_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  </span>
+                  <MapPin className="w-4 h-4 text-blue-500" />
+                  <span>{session.location}</span>
+                </div>
+                
+                <div className="font-bold text-lg mb-2 text-gray-900">{session.title}</div>
+                <div className="text-sm text-gray-600 mb-3">{session.description}</div>
+                
+                <div className="flex gap-2 flex-wrap mb-4">
+                  {session.track && (
+                    <span className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-xs font-semibold">{session.track}</span>
+                  )}
+                  {session.is_hybrid && (
+                    session.live_url ? (
+                      <a
+                        href={session.live_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="bg-red-50 text-red-600 px-3 py-1 rounded-full text-xs font-semibold hover:bg-red-100 transition-colors"
+                      >
+                        📺 Watch on YouTube
+                      </a>
+                    ) : (
+                      <span className="bg-red-50 text-red-600 px-3 py-1 rounded-full text-xs font-semibold">On YouTube</span>
+                    )
+                  )}
+                  {!session.is_bookable && (
+                    <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-semibold">No Booking Required</span>
+                  )}
+                </div>
+                
+                {/* Action Buttons */}
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    className="flex items-center justify-center gap-1 bg-green-500 hover:bg-green-600 text-white px-2 py-1.5 md:px-3 md:py-2 rounded-lg text-xs md:text-sm font-semibold transition-colors"
+                    onClick={() => handleScanAction(session, "checkin")}
+                  >
+                    <UserCheck className="w-4 h-4" />
+                    <span className="hidden sm:inline">Check-in</span>
+                    <span className="sm:hidden">In</span>
+                  </button>
+                  <button
+                    className="flex items-center justify-center gap-1 bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1.5 md:px-3 md:py-2 rounded-lg text-xs md:text-sm font-semibold transition-colors"
+                    onClick={() => handleScanAction(session, "checkin-waiting")}
+                  >
+                    <Users className="w-4 h-4" />
+                    <span className="hidden sm:inline">Waiting List</span>
+                    <span className="sm:hidden">Wait</span>
+                  </button>
+                  <button
+                    className="flex items-center justify-center gap-1 bg-red-500 hover:bg-red-600 text-white px-2 py-1.5 md:px-3 md:py-2 rounded-lg text-xs md:text-sm font-semibold transition-colors"
+                    onClick={() => handleScanAction(session, "checkout")}
+                  >
+                    <UserX className="w-4 h-4" />
+                    <span className="hidden sm:inline">Check-out</span>
+                    <span className="sm:hidden">Out</span>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </div>
 
