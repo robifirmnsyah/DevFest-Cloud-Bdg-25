@@ -29,9 +29,10 @@ const Auth = () => {
 
   // Helper to handle login success and redirect by role
   const handleAuthSuccess = (data: any) => {
-    const userRole = data?.user?.role;
+    const userRoles = data?.user?.roles || [];
+    const userRole = userRoles.includes("organizer") ? "organizer" : "participant";
     localStorage.setItem("token", data.access_token);
-    if (userRole) localStorage.setItem("role", userRole);
+    localStorage.setItem("role", userRole);
     if (userRole === "organizer") {
       window.location.href = "/organizer";
     } else {
