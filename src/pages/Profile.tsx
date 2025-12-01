@@ -24,9 +24,9 @@ const Profile = () => {
       return;
     }
     try {
-      const res = await import("axios").then(ax => ax.default.get(`${API_URL}api/v1/participants/profile`, {
+      const res = await axios.get(`${API_URL}api/v1/participants/profile`, {
         headers: { Authorization: `Bearer ${token}` },
-      }));
+      });
       setProfile(res.data);
     } catch (err: any) {
       // Show error and logout if unauthorized
@@ -89,8 +89,17 @@ const Profile = () => {
     setEditLoading(false);
   };
 
+  // Generate QR code image URL from qr_code string
+  const getQrCodeImageUrl = (qrCode: string) => {
+    if (!qrCode) return null;
+    // Use public QR code API - you can also use other services
+    return `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(qrCode)}`;
+  };
+
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#f6f8fa] text-[#222]">Loading...</div>;
   if (!profile) return null;
+
+  const qrCodeImageUrl = profile.qr_code_image_url || getQrCodeImageUrl(profile.qr_code);
 
   if (role === "organizer") {
     return (
@@ -169,19 +178,36 @@ const Profile = () => {
             Show this to booth staff and organizers to connect and participate in activities.
           </div>
           <div className="flex justify-center mb-2">
-            <img
-              src={profile.qr_code_image_url && profile.qr_code_image_url !== "" ? profile.qr_code_image_url : "/qr-placeholder.png"}
-              alt="QR Code"
-              className="w-40 h-40 bg-[#f6f8fa] rounded-lg border cursor-pointer"
-              onClick={() => setQrOpen(true)}
-            />
+            {qrCodeImageUrl ? (
+              <img
+                src={qrCodeImageUrl}
+                alt="QR Code"
+                className="w-40 h-40 bg-[#f6f8fa] rounded-lg border cursor-pointer"
+                onClick={() => setQrOpen(true)}
+                onError={(e) => {
+                  console.error("QR image load error");
+                  e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Crect fill='%23e0e0e0' width='160' height='160'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23888' font-size='14'%3ENo QR Code%3C/text%3E%3C/svg%3E";
+                }}
+              />
+            ) : (
+              <div className="w-40 h-40 bg-[#f6f8fa] rounded-lg border flex items-center justify-center">
+                <span className="text-[#888] text-sm">No QR Code</span>
+              </div>
+            )}
           </div>
           <div className="flex justify-center gap-4">
             <button
               className="text-center text-primary text-sm cursor-pointer flex items-center gap-2"
-              onClick={() => setQrOpen(true)}
+              onClick={() => {
+                if (qrCodeImageUrl) {
+                  setQrOpen(true);
+                } else {
+                  console.warn("No QR code available");
+                }
+              }}
+              disabled={!qrCodeImageUrl}
             >
-              Tap to Enlarge
+              {qrCodeImageUrl ? "Tap to Enlarge" : "QR Not Available"}
             </button>
           </div>
         </div>
@@ -191,13 +217,17 @@ const Profile = () => {
         </div>
       </div>
       {/* QR Popup */}
-      {qrOpen && (
+      {qrOpen && qrCodeImageUrl && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl p-8 shadow-xl flex flex-col items-center">
             <img
-              src={profile.qr_code_image_url && profile.qr_code_image_url !== "" ? profile.qr_code_image_url : "/qr-placeholder.png"}
+              src={qrCodeImageUrl}
               alt="QR Code"
               className="w-64 h-64 bg-[#f6f8fa] rounded-lg border"
+              onError={(e) => {
+                console.error("QR popup image load error");
+                e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Crect fill='%23e0e0e0' width='256' height='256'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23888' font-size='16'%3ENo QR Code%3C/text%3E%3C/svg%3E";
+              }}
             />
             <button
               className="mt-6 px-6 py-2 rounded-full bg-primary text-white font-bold"
