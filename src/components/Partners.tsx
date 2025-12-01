@@ -2,6 +2,34 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Handshake } from "lucide-react";
 
 const Partners = () => {
+  const sponsors = [
+    { 
+      name: "Durianpay", 
+      logo: "/images/sponsors/durianpay.png",
+      tier: "main"
+    },
+    { 
+      name: "Qwords", 
+      logo: "/images/sponsors/qwords.png",
+      tier: "secondary"
+    },
+    { 
+      name: "Goers", 
+      logo: "/images/sponsors/goers.png",
+      tier: "secondary"
+    },
+    { 
+      name: "Cleo", 
+      logo: "/images/sponsors/cleo.png",
+      tier: "secondary"
+    },
+    { 
+      name: "Fiora", 
+      logo: "/images/sponsors/iora.png",
+      tier: "secondary"
+    }
+  ];
+
   const collaborators = [
     { name: "Google", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/1200px-Google_2015_logo.svg.png" },
     { name: "Todak", logo: "https://cdn-main.todak.com/todak-com/brand/logo-black/Todak-Logo-Black.png" },
@@ -21,6 +49,58 @@ const Partners = () => {
   return (
     <section className="py-20 md:py-32 bg-muted/30" id="partners">
       <div className="container mx-auto px-4">
+        {/* Sponsored By Section */}
+        <div className="text-center mb-20">
+          <h2 className="text-3xl md:text-4xl font-bold mb-12 text-foreground">
+            Sponsored By
+          </h2>
+          
+          {/* Main Sponsor - Much Larger */}
+          <div className="flex justify-center mb-12">
+            <img
+              src={sponsors[0].logo}
+              alt={sponsors[0].name}
+              className="h-32 md:h-40 lg:h-48 w-auto object-contain max-w-[90vw]"
+              onError={(e) => {
+                console.error('Failed to load main sponsor logo:', sponsors[0].name);
+                e.currentTarget.src = '/gdg_logo.jpg';
+              }}
+            />
+          </div>
+          
+          {/* Secondary Sponsors - Much Larger, Perfectly Aligned */}
+          <div className="flex justify-center items-center gap-8 md:gap-12 lg:gap-16 flex-wrap max-w-6xl mx-auto">
+            {sponsors.slice(1).map((sponsor, index) => (
+              <div 
+                key={index}
+                className="flex items-center justify-center"
+                style={{ 
+                  width: '180px',
+                  height: '100px'
+                }}
+              >
+                <img
+                  src={sponsor.logo}
+                  alt={sponsor.name}
+                  className="max-w-full max-h-full object-contain hover:scale-110 transition-transform duration-300"
+                  onError={(e) => {
+                    console.error('Failed to load sponsor logo:', sponsor.name);
+                    // Try alternative extensions
+                    const currentSrc = e.currentTarget.src;
+                    if (currentSrc.includes('.png')) {
+                      e.currentTarget.src = currentSrc.replace('.png', '.jpg');
+                    } else if (currentSrc.includes('.jpg')) {
+                      e.currentTarget.src = currentSrc.replace('.jpg', '.jpeg');
+                    } else {
+                      e.currentTarget.src = '/gdg_logo.jpg';
+                    }
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Become a Partner CTA */}
         <div className="text-center mb-20">
           <Card className="max-w-3xl mx-auto gradient-card border-primary/30">
@@ -48,16 +128,38 @@ const Partners = () => {
           </h2>
         </div>
 
-        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-8 items-center max-w-6xl mx-auto">
-          {collaborators.map((collaborator, index) => (
-            <div key={index} className="flex justify-center items-center h-12 md:h-16 p-2">
-              <img
-                src={collaborator.logo}
-                alt={collaborator.name}
-                className="max-h-full max-w-full object-contain hover:scale-110 transition-all duration-300"
-              />
-            </div>
-          ))}
+        {/* Infinite Scrolling Logos */}
+        <div className="relative overflow-hidden">
+          <div className="flex animate-scroll-infinite">
+            {/* First set of logos */}
+            {collaborators.map((collaborator, index) => (
+              <div 
+                key={`first-${index}`} 
+                className="flex-shrink-0 flex justify-center items-center mx-8 md:mx-12"
+                style={{ width: '150px', height: '80px' }}
+              >
+                <img
+                  src={collaborator.logo}
+                  alt={collaborator.name}
+                  className="max-h-full max-w-full object-contain opacity-70 hover:opacity-100 transition-opacity duration-300"
+                />
+              </div>
+            ))}
+            {/* Duplicate set for seamless loop */}
+            {collaborators.map((collaborator, index) => (
+              <div 
+                key={`second-${index}`} 
+                className="flex-shrink-0 flex justify-center items-center mx-8 md:mx-12"
+                style={{ width: '150px', height: '80px' }}
+              >
+                <img
+                  src={collaborator.logo}
+                  alt={collaborator.name}
+                  className="max-h-full max-w-full object-contain opacity-70 hover:opacity-100 transition-opacity duration-300"
+                />
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
