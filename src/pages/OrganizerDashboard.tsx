@@ -140,7 +140,7 @@ const OrganizerDashboard = () => {
             <title>Badge - ${printData.name}</title>
             <style>
               @page { 
-                size: A6 landscape; 
+                size: B4 portrait;
                 margin: 0; 
               }
               * {
@@ -150,7 +150,7 @@ const OrganizerDashboard = () => {
               }
               body { 
                 margin: 0; 
-                padding: 20px; 
+                padding: 30px; 
                 font-family: 'Arial', 'Helvetica', sans-serif;
                 display: flex;
                 justify-content: center;
@@ -160,33 +160,30 @@ const OrganizerDashboard = () => {
               }
               .badge {
                 text-align: center;
-                border: 3px solid #4285F4;
-                padding: 40px 30px;
-                border-radius: 20px;
+                border: 4px solid #4285F4;
+                padding: 50px 40px;
+                border-radius: 24px;
                 background: white;
                 box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-                max-width: 500px;
-              }
-              .logo {
-                margin-bottom: 15px;
+                max-width: 600px;
               }
               .name {
-                font-size: 32px;
+                font-size: 42px;
                 font-weight: bold;
-                margin-bottom: 8px;
+                margin-bottom: 12px;
                 color: #222;
                 word-wrap: break-word;
               }
               .info {
-                font-size: 18px;
+                font-size: 24px;
                 color: #666;
-                margin-bottom: 8px;
+                margin-bottom: 10px;
               }
               .qr-code {
-                margin: 25px auto;
-                padding: 15px;
+                margin: 30px auto;
+                padding: 20px;
                 background: white;
-                border-radius: 12px;
+                border-radius: 16px;
                 display: inline-block;
               }
               .qr-code img {
@@ -195,8 +192,8 @@ const OrganizerDashboard = () => {
                 height: 300px;
               }
               .footer {
-                margin-top: 20px;
-                font-size: 14px;
+                margin-top: 25px;
+                font-size: 18px;
                 color: #999;
               }
               @media print {
@@ -206,26 +203,20 @@ const OrganizerDashboard = () => {
                 }
                 .badge {
                   box-shadow: none;
-                  border: 3px solid #4285F4;
+                  border: 4px solid #4285F4;
                 }
               }
             </style>
           </head>
           <body>
             <div class="badge">
-              <div class="logo">
-                <svg width="80" height="80" viewBox="0 0 24 24" fill="none">
-                  <circle cx="12" cy="12" r="10" stroke="#4285F4" stroke-width="2"/>
-                  <path d="M12 6v6l4 2" stroke="#4285F4" stroke-width="2" stroke-linecap="round"/>
-                </svg>
-              </div>
               <div class="name">${printData.name}</div>
               ${printData.title ? `<div class="info">${printData.title}</div>` : ''}
               ${printData.company ? `<div class="info">${printData.company}</div>` : ''}
               <div class="qr-code">
                 <img src="${qrCodeUrl}" alt="QR Code" onload="window.qrLoaded=true" onerror="window.qrError=true" />
               </div>
-              <div class="footer">Cloud DevFest Bandung 2024</div>
+              <div class="footer">Cloud DevFest Bandung 2025</div>
             </div>
           </body>
         </html>
