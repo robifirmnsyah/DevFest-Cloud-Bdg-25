@@ -10,6 +10,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 const BoothStaffScan = () => {
   const [scanError, setScanError] = useState("");
   const [scannedProfile, setScannedProfile] = useState<any>(null);
+  const [scannedQrCode, setScannedQrCode] = useState<string>(""); // Store the QR code
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
@@ -26,6 +27,7 @@ const BoothStaffScan = () => {
       );
       
       setScannedProfile(res.data);
+      setScannedQrCode(qr); // Save the QR code
       setScanError("");
     } catch (err: any) {
       setScanError(
@@ -37,19 +39,23 @@ const BoothStaffScan = () => {
   };
 
   const handleAddContact = async () => {
-    if (!scannedProfile?.user) return;
+    if (!scannedProfile?.user || !scannedQrCode) return;
 
     setSaving(true);
     const token = localStorage.getItem("token");
     try {
       // Prepare payload - only include notes if it has a value
       const payload: any = {
-        participant_qr_code: scannedProfile.user.qr_code
+        participant_qr_code: scannedQrCode  // Use the stored QR code, not from profile
       };
       
       if (notes && notes.trim()) {
         payload.notes = notes.trim();
       }
+
+      console.log('Sending payload:', payload);
+      console.log('QR Code:', scannedQrCode);
+      console.log('Full profile:', scannedProfile);
 
       await axios.post(
         `${API_URL}api/v1/booth-staff/contacts/add`,
@@ -67,11 +73,15 @@ const BoothStaffScan = () => {
       navigate("/booth-staff/contacts");
     } catch (err: any) {
       console.error('Add contact error:', err);
-      alert(
-        err?.response?.data?.message ||
-        err?.response?.data?.detail?.[0]?.msg ||
-        "Failed to add contact"
-      );
+      console.error('Error response:', err?.response);
+      console.error('Error data:', err?.response?.data);
+      console.error('Error detail:', err?.response?.data?.detail);
+      
+      const errorMsg = err?.response?.data?.detail 
+        ? JSON.stringify(err.response.data.detail, null, 2)
+        : err?.response?.data?.message || "Failed to add contact";
+      
+      alert(`Error: ${errorMsg}`);
     }
     setSaving(false);
   };
@@ -126,6 +136,7 @@ const BoothStaffScan = () => {
                 <button
                   onClick={() => {
                     setScannedProfile(null);
+                    setScannedQrCode("");
                     setNotes("");
                     setScanError("");
                   }}
@@ -179,6 +190,7 @@ const BoothStaffScan = () => {
                 <button
                   onClick={() => {
                     setScannedProfile(null);
+                    setScannedQrCode("");
                     setNotes("");
                     setScanError("");
                   }}
