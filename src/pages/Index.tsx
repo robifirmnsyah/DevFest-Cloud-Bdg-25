@@ -4,10 +4,10 @@ import About from "@/components/About";
 import Speakers from "@/components/Speakers";
 import Partners from "@/components/Partners";
 import Footer from "@/components/Footer";
-import Presale from "@/components/Presale";
-import Moments from "@/components/Moments";
+// import Presale from "@/components/Presale";
+// import Moments from "@/components/Moments";
 import JobFair from "@/components/JobFair";
-import PWAInstallPrompt from "@/components/PWAInstallPrompt";
+// import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 
 const Index = () => {
   return (
@@ -15,13 +15,13 @@ const Index = () => {
       <Navigation />
       <Hero />
       <About />
-      <Presale />
+      {/* <Presale /> */}
       <Speakers />
       <JobFair />
       <Partners />
-      <Moments />
+      {/* <Moments /> */}
       <Footer />
-      <PWAInstallPrompt />
+      {/* <PWAInstallPrompt /> */}
     </div>
   );
 };
