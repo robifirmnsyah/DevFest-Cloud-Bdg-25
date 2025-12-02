@@ -26,29 +26,64 @@ const BoothStaffDashboard = () => {
       return;
     }
 
+    setLoading(true);
+
     // Fetch booth info and stats
     Promise.all([
       axios.get(`${API_URL}api/v1/booth-staff/booth`, {
         headers: { Authorization: `Bearer ${token}` },
+      }).catch(err => {
+        console.error("Booth fetch error:", err);
+        // Fallback booth data
+        return { data: { 
+          name: "Your Booth", 
+          description: "Welcome to your booth dashboard",
+          location: "Event Hall"
+        }};
       }),
       axios.get(`${API_URL}api/v1/booth-staff/stats`, {
         headers: { Authorization: `Bearer ${token}` },
+      }).catch(err => {
+        console.error("Stats fetch error:", err);
+        // Fallback stats data
+        return { data: { 
+          total_contacts: 0,
+          scans_today: 0
+        }};
       })
     ])
       .then(([boothRes, statsRes]) => {
+        console.log("Booth data:", boothRes.data);
+        console.log("Stats data:", statsRes.data);
         setBooth(boothRes.data);
         setStats(statsRes.data);
       })
       .catch((err) => {
         console.error("Failed to fetch data:", err);
+        // Set default fallback data if everything fails
+        setBooth({ 
+          name: "Your Booth", 
+          description: "Welcome to your booth dashboard",
+          location: "Event Hall"
+        });
+        setStats({ 
+          total_contacts: 0,
+          scans_today: 0
+        });
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        console.log("Loading complete");
+        setLoading(false);
+      });
   }, []);
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 text-[#222]">
-        Loading...
+        <div className="flex flex-col items-center gap-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500"></div>
+          <p>Loading booth dashboard...</p>
+        </div>
       </div>
     );
   }
