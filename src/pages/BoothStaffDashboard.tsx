@@ -22,7 +22,7 @@ const BoothStaffDashboard = () => {
     }
     
     if (role !== "booth_staff") {
-      window.location.href = "/dashboard";
+      window.location.href = "/booth-staff";
       return;
     }
 
