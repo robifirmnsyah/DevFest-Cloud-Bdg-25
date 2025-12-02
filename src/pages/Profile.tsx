@@ -16,6 +16,8 @@ const Profile = () => {
   const [editTitle, setEditTitle] = useState("");
   const [editBio, setEditBio] = useState("");
   const [editLoading, setEditLoading] = useState(false);
+  const [userRoles, setUserRoles] = useState<string[]>([]);
+  const [currentRole, setCurrentRole] = useState<string>("");
 
   const fetchProfile = async () => {
     const token = localStorage.getItem("token");
@@ -28,11 +30,18 @@ const Profile = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setProfile(res.data);
+      
+      // Load user roles from localStorage or API response
+      const storedRoles = localStorage.getItem("user_roles");
+      const roles = storedRoles ? JSON.parse(storedRoles) : (res.data?.roles || ["participant"]);
+      setUserRoles(roles);
+      setCurrentRole(localStorage.getItem("role") || "participant");
     } catch (err: any) {
       // Show error and logout if unauthorized
       if (err?.response?.status === 401 || err?.response?.status === 403) {
         localStorage.removeItem("token");
         localStorage.removeItem("role");
+        localStorage.removeItem("user_roles");
         window.location.href = "/auth";
       } else {
         setProfile(null);
@@ -50,10 +59,28 @@ const Profile = () => {
         title: "Lead Organizer, GDG Bandung",
         bio: "Passionate about building communities and empowering developers with cloud technologies. Coffee enthusiast and a proud dog parent.",
       });
+      const storedRoles = localStorage.getItem("user_roles");
+      const roles = storedRoles ? JSON.parse(storedRoles) : ["organizer"];
+      setUserRoles(roles);
+      setCurrentRole("organizer");
       return;
     }
     fetchProfile();
   }, []);
+
+  // Switch role handler
+  const handleRoleSwitch = (newRole: string) => {
+    localStorage.setItem("role", newRole);
+    
+    // Redirect based on new role
+    if (newRole === "organizer") {
+      window.location.href = "/organizer";
+    } else if (newRole === "booth_staff") {
+      window.location.href = "/booth-staff";
+    } else {
+      window.location.href = "/dashboard";
+    }
+  };
 
   // Open edit popup and fill current profile
   const handleEditClick = () => {
@@ -112,6 +139,7 @@ const Profile = () => {
               onClick={() => {
                 localStorage.removeItem("token");
                 localStorage.removeItem("role");
+                localStorage.removeItem("user_roles");
                 window.location.href = "/auth";
               }}
               title="Logout"
@@ -119,6 +147,29 @@ const Profile = () => {
               <LogOut className="w-6 h-6" />
             </button>
           </div>
+          
+          {/* Role Switcher - Only show if user has multiple roles */}
+          {userRoles.length > 1 && (
+            <div className="bg-white rounded-xl shadow border border-[#e0e0e0] p-4 mb-6">
+              <div className="font-bold text-sm mb-3 text-gray-700">Switch Role</div>
+              <div className="flex flex-wrap gap-2">
+                {userRoles.map((r) => (
+                  <button
+                    key={r}
+                    onClick={() => handleRoleSwitch(r)}
+                    className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
+                      currentRole === r
+                        ? "bg-[#4285F4] text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                  >
+                    {r === "participant" ? "Participant" : r === "organizer" ? "Organizer" : "Booth Staff"}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          
           <div className="flex flex-col items-center mb-6">
             <div className="w-24 h-24 rounded-full bg-[#e0e0e0] flex items-center justify-center text-4xl font-bold text-primary mb-3 border-4 border-[#4285F4]">
               {profile.name?.charAt(0) || "?"}
@@ -149,6 +200,8 @@ const Profile = () => {
             className="ml-2 text-[#4285F4] hover:text-[#1a73e8] p-2"
             onClick={() => {
               localStorage.removeItem("token");
+              localStorage.removeItem("role");
+              localStorage.removeItem("user_roles");
               window.location.href = "/auth";
             }}
             title="Logout"
@@ -156,6 +209,29 @@ const Profile = () => {
             <LogOut className="w-6 h-6" />
           </button>
         </div>
+        
+        {/* Role Switcher - Only show if user has multiple roles */}
+        {userRoles.length > 1 && (
+          <div className="bg-white rounded-xl shadow border border-[#e0e0e0] p-4 mb-6">
+            <div className="font-bold text-sm mb-3 text-gray-700">Switch Role</div>
+            <div className="flex flex-wrap gap-2">
+              {userRoles.map((r) => (
+                <button
+                  key={r}
+                  onClick={() => handleRoleSwitch(r)}
+                  className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
+                    currentRole === r
+                      ? "bg-[#4285F4] text-white"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+                >
+                  {r === "participant" ? "Participant" : r === "organizer" ? "Organizer" : "Booth Staff"}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        
         <div className="flex flex-col items-center mb-6">
           <div className="w-24 h-24 rounded-full bg-[#e0e0e0] flex items-center justify-center text-4xl font-bold text-primary mb-3">
             {profile.name?.charAt(0) || "?"}

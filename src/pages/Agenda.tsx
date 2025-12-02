@@ -263,30 +263,29 @@ const Agenda = () => {
                   </div>
                   {/* Book/Cancel Button - top right */}
                   {tab === "all" ? (
-                    <button
-                      className={`rounded-full px-6 py-2 font-bold text-base shadow transition-all
-                        ${!session.is_bookable
-                          ? "bg-[#e0e0e0] text-[#888] cursor-not-allowed"
-                          : session.is_booked
+                    session.is_bookable ? (
+                      <button
+                        className={`rounded-full px-6 py-2 font-bold text-base shadow transition-all
+                          ${session.is_booked
                             ? "bg-[#4285F4] text-white"
                             : session.is_full
                               ? "bg-[#e0e0e0] text-[#888] cursor-not-allowed"
                               : "bg-[#4285F4] text-white hover:bg-[#1a73e8]"}
-                      `}
-                      style={{ minWidth: 90 }}
-                      disabled={!session.is_bookable || session.is_full || session.is_booked}
-                      onClick={() => {
-                        if (session.is_bookable && !session.is_booked && !session.is_full) {
-                          const token = localStorage.getItem("token");
-                          axios.post(`${API_URL}api/v1/participants/sessions/book`, { session_id: session.id }, {
-                            headers: { Authorization: `Bearer ${token}` },
-                          }).then(() => window.location.reload());
-                        }
-                      }}
-                      title={!session.is_bookable ? "Booking not available for this session" : ""}
-                    >
-                      {!session.is_bookable ? "No Booking" : session.is_booked ? "Booked" : session.is_full ? "Full" : "Book"}
-                    </button>
+                        `}
+                        style={{ minWidth: 90 }}
+                        disabled={session.is_full || session.is_booked}
+                        onClick={() => {
+                          if (!session.is_booked && !session.is_full) {
+                            const token = localStorage.getItem("token");
+                            axios.post(`${API_URL}api/v1/participants/sessions/book`, { session_id: session.id }, {
+                              headers: { Authorization: `Bearer ${token}` },
+                            }).then(() => window.location.reload());
+                          }
+                        }}
+                      >
+                        {session.is_booked ? "Booked" : session.is_full ? "Full" : "Book"}
+                      </button>
+                    ) : null
                   ) : (
                     /* Cancel Button for My Agenda */
                     <button

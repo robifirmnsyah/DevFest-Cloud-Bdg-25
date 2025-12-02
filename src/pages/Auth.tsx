@@ -30,11 +30,22 @@ const Auth = () => {
   // Helper to handle login success and redirect by role
   const handleAuthSuccess = (data: any) => {
     const userRoles = data?.user?.roles || [];
-    const userRole = userRoles.includes("organizer") ? "organizer" : "participant";
+    
+    // Store all roles
     localStorage.setItem("token", data.access_token);
-    localStorage.setItem("role", userRole);
-    if (userRole === "organizer") {
+    localStorage.setItem("user_roles", JSON.stringify(userRoles));
+    
+    // Determine initial role (prioritize organizer if available)
+    const initialRole = userRoles.includes("organizer") ? "organizer" : 
+                       userRoles.includes("booth_staff") ? "booth_staff" : 
+                       "participant";
+    localStorage.setItem("role", initialRole);
+    
+    // Redirect based on role
+    if (initialRole === "organizer") {
       window.location.href = "/organizer";
+    } else if (initialRole === "booth_staff") {
+      window.location.href = "/booth-staff";
     } else {
       window.location.href = "/dashboard";
     }

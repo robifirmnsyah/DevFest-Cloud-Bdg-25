@@ -18,6 +18,7 @@ const OrganizerDashboard = () => {
   const [pendingQuests, setPendingQuests] = useState<any[]>([]);
   const [questLoading, setQuestLoading] = useState(false);
   const [cameraActive, setCameraActive] = useState(false);
+  const [printData, setPrintData] = useState<any>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -79,12 +80,23 @@ const OrganizerDashboard = () => {
       // Show success message
       setScanResult(`${scanMode === "checkin" ? "Check-in" : "Check-out"} successful: ${res.data.user?.name || "Unknown"}`);
       
+      // If check-in, offer to print badge
+      if (scanMode === "checkin" && res.data.user) {
+        setPrintData({
+          name: res.data.user.name,
+          qr_code: qr,
+          company: res.data.user.company || "",
+          title: res.data.user.title || ""
+        });
+      }
+      
       // Auto close after 3 seconds
       setTimeout(() => {
         setScanMode(null);
         setScanResult("");
         setScanError("");
         setCameraActive(false);
+        setPrintData(null);
       }, 3000);
       
     } catch (err: any) {
@@ -96,6 +108,79 @@ const OrganizerDashboard = () => {
       );
     }
     setScanLoading(false);
+  };
+
+  // Print badge
+  const handlePrintBadge = () => {
+    if (!printData) return;
+    
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+    
+    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(printData.qr_code)}`;
+    
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Print Badge</title>
+          <style>
+            @page { size: A6 landscape; margin: 0; }
+            body { 
+              margin: 0; 
+              padding: 20px; 
+              font-family: Arial, sans-serif;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              min-height: 100vh;
+            }
+            .badge {
+              text-align: center;
+              border: 2px solid #4285F4;
+              padding: 30px;
+              border-radius: 16px;
+              background: white;
+            }
+            .name {
+              font-size: 28px;
+              font-weight: bold;
+              margin-bottom: 10px;
+              color: #222;
+            }
+            .info {
+              font-size: 16px;
+              color: #666;
+              margin-bottom: 20px;
+            }
+            .qr-code {
+              margin: 20px auto;
+            }
+            @media print {
+              body { background: white; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="badge">
+            <div class="name">${printData.name}</div>
+            ${printData.title ? `<div class="info">${printData.title}</div>` : ''}
+            ${printData.company ? `<div class="info">${printData.company}</div>` : ''}
+            <div class="qr-code">
+              <img src="${qrCodeUrl}" alt="QR Code" width="200" height="200" />
+            </div>
+          </div>
+        </body>
+      </html>
+    `);
+    
+    printWindow.document.close();
+    
+    // Wait for image to load then print
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 500);
   };
 
   // Handle approve/reject quest
@@ -315,7 +400,19 @@ const OrganizerDashboard = () => {
 
             <div className="text-[#888] text-sm mt-2">Point your camera at a participant's QR code to scan.</div>
             {scanLoading && <div className="text-blue-500 mt-2 font-semibold">Processing...</div>}
-            {scanResult && <div className="text-green-600 mt-2 font-semibold">{scanResult}</div>}
+            {scanResult && (
+              <div className="mt-2">
+                <div className="text-green-600 font-semibold">{scanResult}</div>
+                {printData && (
+                  <button
+                    onClick={handlePrintBadge}
+                    className="mt-3 px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold transition-colors"
+                  >
+                    Print Badge
+                  </button>
+                )}
+              </div>
+            )}
             {scanError && <div className="text-red-500 mt-2 font-semibold">{scanError}</div>}
           </div>
         </div>
