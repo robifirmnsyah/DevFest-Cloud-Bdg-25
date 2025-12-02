@@ -19,6 +19,7 @@ const OrganizerDashboard = () => {
   const [questLoading, setQuestLoading] = useState(false);
   const [cameraActive, setCameraActive] = useState(false);
   const [printData, setPrintData] = useState<any>(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -78,26 +79,32 @@ const OrganizerDashboard = () => {
       );
       
       // Show success message
-      setScanResult(`${scanMode === "checkin" ? "Check-in" : "Check-out"} successful: ${res.data.user?.name || "Unknown"}`);
+      const successMessage = `${scanMode === "checkin" ? "Check-in" : "Check-out"} successful: ${res.data.user?.name || "Unknown"}`;
+      setScanResult(successMessage);
       
-      // If check-in, offer to print badge
+      // If check-in, prepare print data and show success modal
       if (scanMode === "checkin" && res.data.user) {
         setPrintData({
           name: res.data.user.name,
           qr_code: qr,
           company: res.data.user.company || "",
-          title: res.data.user.title || ""
+          title: res.data.user.title || "",
+          message: successMessage
         });
-      }
-      
-      // Auto close after 3 seconds
-      setTimeout(() => {
+        
+        // Close scanner and show success modal
         setScanMode(null);
-        setScanResult("");
-        setScanError("");
         setCameraActive(false);
-        setPrintData(null);
-      }, 3000);
+        setShowSuccessModal(true);
+      } else {
+        // For check-out, auto close after 2 seconds
+        setTimeout(() => {
+          setScanMode(null);
+          setScanResult("");
+          setScanError("");
+          setCameraActive(false);
+        }, 2000);
+      }
       
     } catch (err: any) {
       console.error("Scan error:", err);
@@ -110,77 +117,161 @@ const OrganizerDashboard = () => {
     setScanLoading(false);
   };
 
-  // Print badge
+  // Print badge with improved reliability
   const handlePrintBadge = () => {
-    if (!printData) return;
+    if (!printData) {
+      alert("No data available for printing");
+      return;
+    }
     
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) return;
-    
-    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(printData.qr_code)}`;
-    
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>Print Badge</title>
-          <style>
-            @page { size: A6 landscape; margin: 0; }
-            body { 
-              margin: 0; 
-              padding: 20px; 
-              font-family: Arial, sans-serif;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              min-height: 100vh;
-            }
-            .badge {
-              text-align: center;
-              border: 2px solid #4285F4;
-              padding: 30px;
-              border-radius: 16px;
-              background: white;
-            }
-            .name {
-              font-size: 28px;
-              font-weight: bold;
-              margin-bottom: 10px;
-              color: #222;
-            }
-            .info {
-              font-size: 16px;
-              color: #666;
-              margin-bottom: 20px;
-            }
-            .qr-code {
-              margin: 20px auto;
-            }
-            @media print {
-              body { background: white; }
-            }
-          </style>
-        </head>
-        <body>
-          <div class="badge">
-            <div class="name">${printData.name}</div>
-            ${printData.title ? `<div class="info">${printData.title}</div>` : ''}
-            ${printData.company ? `<div class="info">${printData.company}</div>` : ''}
-            <div class="qr-code">
-              <img src="${qrCodeUrl}" alt="QR Code" width="200" height="200" />
+    try {
+      const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(printData.qr_code)}`;
+      
+      const printWindow = window.open('', '_blank', 'width=800,height=600');
+      if (!printWindow) {
+        alert("Please allow popups to print badge");
+        return;
+      }
+      
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>Badge - ${printData.name}</title>
+            <style>
+              @page { 
+                size: A6 landscape; 
+                margin: 0; 
+              }
+              * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+              }
+              body { 
+                margin: 0; 
+                padding: 20px; 
+                font-family: 'Arial', 'Helvetica', sans-serif;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                background: #f0f0f0;
+              }
+              .badge {
+                text-align: center;
+                border: 3px solid #4285F4;
+                padding: 40px 30px;
+                border-radius: 20px;
+                background: white;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                max-width: 500px;
+              }
+              .logo {
+                margin-bottom: 15px;
+              }
+              .name {
+                font-size: 32px;
+                font-weight: bold;
+                margin-bottom: 8px;
+                color: #222;
+                word-wrap: break-word;
+              }
+              .info {
+                font-size: 18px;
+                color: #666;
+                margin-bottom: 8px;
+              }
+              .qr-code {
+                margin: 25px auto;
+                padding: 15px;
+                background: white;
+                border-radius: 12px;
+                display: inline-block;
+              }
+              .qr-code img {
+                display: block;
+                width: 300px;
+                height: 300px;
+              }
+              .footer {
+                margin-top: 20px;
+                font-size: 14px;
+                color: #999;
+              }
+              @media print {
+                body { 
+                  background: white;
+                  padding: 0;
+                }
+                .badge {
+                  box-shadow: none;
+                  border: 3px solid #4285F4;
+                }
+              }
+            </style>
+          </head>
+          <body>
+            <div class="badge">
+              <div class="logo">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none">
+                  <circle cx="12" cy="12" r="10" stroke="#4285F4" stroke-width="2"/>
+                  <path d="M12 6v6l4 2" stroke="#4285F4" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div class="name">${printData.name}</div>
+              ${printData.title ? `<div class="info">${printData.title}</div>` : ''}
+              ${printData.company ? `<div class="info">${printData.company}</div>` : ''}
+              <div class="qr-code">
+                <img src="${qrCodeUrl}" alt="QR Code" onload="window.qrLoaded=true" onerror="window.qrError=true" />
+              </div>
+              <div class="footer">Cloud DevFest Bandung 2024</div>
             </div>
-          </div>
-        </body>
-      </html>
-    `);
-    
-    printWindow.document.close();
-    
-    // Wait for image to load then print
-    setTimeout(() => {
-      printWindow.print();
-      printWindow.close();
-    }, 500);
+          </body>
+        </html>
+      `);
+      
+      printWindow.document.close();
+      
+      // Wait for QR code to load before printing
+      const checkLoaded = setInterval(() => {
+        if (printWindow.closed) {
+          clearInterval(checkLoaded);
+          return;
+        }
+        
+        if ((printWindow as any).qrLoaded) {
+          clearInterval(checkLoaded);
+          setTimeout(() => {
+            printWindow.print();
+          }, 300);
+        } else if ((printWindow as any).qrError) {
+          clearInterval(checkLoaded);
+          alert("Failed to load QR code image. Please try again.");
+          printWindow.close();
+        }
+      }, 100);
+      
+      // Timeout after 10 seconds
+      setTimeout(() => {
+        clearInterval(checkLoaded);
+        if (!printWindow.closed && !(printWindow as any).qrLoaded) {
+          alert("QR code loading timeout. Please try again.");
+          printWindow.close();
+        }
+      }, 10000);
+      
+    } catch (error) {
+      console.error("Print error:", error);
+      alert("Failed to open print window. Please check your browser settings.");
+    }
+  };
+
+  // Close success modal
+  const closeSuccessModal = () => {
+    setShowSuccessModal(false);
+    setPrintData(null);
+    setScanResult("");
   };
 
   // Handle approve/reject quest
@@ -193,7 +284,10 @@ const OrganizerDashboard = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       await fetchPendingQuests();
-    } catch {}
+    } catch (err) {
+      console.error("Failed to review quest:", err);
+      alert("Failed to review quest. Please try again.");
+    }
   };
 
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-gray-50 text-[#222]">Loading...</div>;
@@ -349,7 +443,7 @@ const OrganizerDashboard = () => {
             <div className="mx-auto w-[86vw] max-w-[360px] md:w-[360px] md:h-[360px] h-[86vw] relative mb-4">
               <div className="w-full h-full bg-[#000] rounded-lg overflow-hidden relative">
               <QrScanner
-                key={scanMode} // Force remount when scan mode changes
+                key={scanMode}
                 delay={300}
                 onError={(error) => setScanError(error)}
                 onScan={handleScan}
@@ -392,7 +486,7 @@ const OrganizerDashboard = () => {
               className="absolute top-3 right-3 w-9 h-9 flex items-center justify-center rounded-full bg-white border border-red-100 text-red-600 hover:bg-red-50"
               type="button"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="inline">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="18" y1="6" x2="6" y2="18" />
                 <line x1="6" y1="6" x2="18" y2="18" />
               </svg>
@@ -400,20 +494,52 @@ const OrganizerDashboard = () => {
 
             <div className="text-[#888] text-sm mt-2">Point your camera at a participant's QR code to scan.</div>
             {scanLoading && <div className="text-blue-500 mt-2 font-semibold">Processing...</div>}
-            {scanResult && (
-              <div className="mt-2">
-                <div className="text-green-600 font-semibold">{scanResult}</div>
-                {printData && (
-                  <button
-                    onClick={handlePrintBadge}
-                    className="mt-3 px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold transition-colors"
-                  >
-                    Print Badge
-                  </button>
-                )}
-              </div>
-            )}
             {scanError && <div className="text-red-500 mt-2 font-semibold">{scanError}</div>}
+          </div>
+        </div>
+      )}
+
+      {/* Success Modal with Print Button */}
+      {showSuccessModal && printData && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-8 shadow-2xl w-full max-w-md text-center">
+            {/* Success Icon */}
+            <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
+              <svg className="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+
+            {/* Success Message */}
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">Check-in Successful!</h3>
+            <p className="text-lg text-gray-700 mb-2">{printData.name}</p>
+            {printData.title && <p className="text-sm text-gray-500 mb-1">{printData.title}</p>}
+            {printData.company && <p className="text-sm text-gray-500 mb-6">{printData.company}</p>}
+
+            {/* Action Buttons */}
+            <div className="flex flex-col gap-3 mt-8">
+              <button
+                onClick={handlePrintBadge}
+                className="w-full bg-blue-500 hover:bg-blue-600 text-white px-8 py-4 rounded-xl font-bold text-lg transition-colors shadow-lg flex items-center justify-center gap-3"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                </svg>
+                Print Badge
+              </button>
+              
+              <button
+                onClick={closeSuccessModal}
+                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-8 py-3 rounded-xl font-semibold text-base transition-colors"
+              >
+                Close
+              </button>
+            </div>
+
+            {/* Hint Text */}
+            <p className="text-xs text-gray-400 mt-6">
+              You can print the badge now or close this window
+            </p>
           </div>
         </div>
       )}
