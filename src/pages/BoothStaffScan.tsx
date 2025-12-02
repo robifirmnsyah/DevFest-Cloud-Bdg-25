@@ -42,19 +42,31 @@ const BoothStaffScan = () => {
     setSaving(true);
     const token = localStorage.getItem("token");
     try {
+      // Prepare payload - only include notes if it has a value
+      const payload: any = {
+        participant_qr_code: scannedProfile.user.qr_code
+      };
+      
+      if (notes && notes.trim()) {
+        payload.notes = notes.trim();
+      }
+
       await axios.post(
         `${API_URL}api/v1/booth-staff/contacts/add`,
-        {
-          participant_qr_code: scannedProfile.user.qr_code,
-          notes: notes || null
-        },
-        { headers: { Authorization: `Bearer ${token}` } }
+        payload,
+        { 
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          } 
+        }
       );
 
       // Show success and navigate to contacts
       alert(`Contact added: ${scannedProfile.user.name}`);
       navigate("/booth-staff/contacts");
     } catch (err: any) {
+      console.error('Add contact error:', err);
       alert(
         err?.response?.data?.message ||
         err?.response?.data?.detail?.[0]?.msg ||
