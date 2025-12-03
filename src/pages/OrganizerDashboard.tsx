@@ -125,7 +125,7 @@ const OrganizerDashboard = () => {
     }
     
     try {
-      const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(printData.qr_code)}`;
+      const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(printData.qr_code)}`;
       
       const printWindow = window.open('', '_blank', 'width=800,height=600');
       if (!printWindow) {
@@ -140,7 +140,7 @@ const OrganizerDashboard = () => {
             <title>Badge - ${printData.name}</title>
             <style>
               @page { 
-                size: B4 portrait;
+                size: A4 portrait;
                 margin: 0; 
               }
               * {
@@ -150,7 +150,7 @@ const OrganizerDashboard = () => {
               }
               body { 
                 margin: 0; 
-                padding: 30px; 
+                padding: 20px; 
                 font-family: 'Arial', 'Helvetica', sans-serif;
                 display: flex;
                 justify-content: center;
@@ -158,65 +158,124 @@ const OrganizerDashboard = () => {
                 min-height: 100vh;
                 background: #f0f0f0;
               }
-              .badge {
-                text-align: center;
-                border: 4px solid #4285F4;
-                padding: 50px 40px;
-                border-radius: 24px;
-                background: white;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+              .badge-container {
+                width: 100%;
                 max-width: 600px;
+                background: white;
+                position: relative;
               }
-              .name {
-                font-size: 42px;
+              .badge-header {
+                background: linear-gradient(135deg, #2E3192 0%, #1BFFFF 100%);
+                padding: 80px 40px 60px;
+                text-align: center;
+                position: relative;
+                overflow: hidden;
+              }
+              .badge-header::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiPjxwYXRoIGQ9Ik0gMTAwIDAgTCAwIDAgMCAxMDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMC41IiBvcGFjaXR5PSIwLjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+');
+                opacity: 0.3;
+              }
+              .attendee-badge {
+                background: white;
+                color: #2E3192;
+                padding: 12px 40px;
+                border-radius: 30px;
+                font-size: 28px;
                 font-weight: bold;
-                margin-bottom: 12px;
-                color: #222;
+                letter-spacing: 2px;
+                display: inline-block;
+                position: relative;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+              }
+              .badge-content {
+                background: white;
+                padding: 60px 40px;
+                text-align: center;
+              }
+              .attendee-name {
+                font-size: 48px;
+                font-weight: bold;
+                color: #2E3192;
+                margin-bottom: 20px;
                 word-wrap: break-word;
+                line-height: 1.2;
               }
-              .info {
-                font-size: 24px;
+              .attendee-info {
+                font-size: 22px;
                 color: #666;
-                margin-bottom: 10px;
+                margin-bottom: 12px;
+                min-height: 26px;
               }
-              .qr-code {
-                margin: 30px auto;
+              .qr-section {
+                margin: 40px auto 30px;
                 padding: 20px;
                 background: white;
-                border-radius: 16px;
                 display: inline-block;
+                border: 3px solid #2E3192;
+                border-radius: 20px;
               }
-              .qr-code img {
+              .qr-section img {
                 display: block;
                 width: 300px;
                 height: 300px;
               }
-              .footer {
-                margin-top: 25px;
-                font-size: 18px;
-                color: #999;
+              .event-footer {
+                background: linear-gradient(135deg, #1BFFFF 0%, #2E3192 100%);
+                padding: 40px;
+                text-align: center;
+                color: white;
+              }
+              .event-title {
+                font-size: 32px;
+                font-weight: bold;
+                margin-bottom: 10px;
+                text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+              }
+              .event-date {
+                font-size: 20px;
+                opacity: 0.95;
               }
               @media print {
                 body { 
                   background: white;
                   padding: 0;
                 }
-                .badge {
+                .badge-container {
                   box-shadow: none;
-                  border: 4px solid #4285F4;
                 }
               }
             </style>
           </head>
           <body>
-            <div class="badge">
-              <div class="name">${printData.name}</div>
-              ${printData.title ? `<div class="info">${printData.title}</div>` : ''}
-              ${printData.company ? `<div class="info">${printData.company}</div>` : ''}
-              <div class="qr-code">
-                <img src="${qrCodeUrl}" alt="QR Code" onload="window.qrLoaded=true" onerror="window.qrError=true" />
+            <div class="badge-container">
+              <!-- Header with Attendee Badge -->
+              <div class="badge-header">
+                <div class="attendee-badge">ATTENDEE</div>
               </div>
-              <div class="footer">Cloud DevFest Bandung 2025</div>
+              
+              <!-- Main Content -->
+              <div class="badge-content">
+                <div class="attendee-name">${printData.name}</div>
+                ${printData.title ? `<div class="attendee-info">${printData.title}</div>` : '<div class="attendee-info">&nbsp;</div>'}
+                ${printData.company ? `<div class="attendee-info">${printData.company}</div>` : '<div class="attendee-info">&nbsp;</div>'}
+                
+                <!-- QR Code -->
+                <div class="qr-section">
+                  <img src="${qrCodeUrl}" alt="QR Code" onload="window.qrLoaded=true" onerror="window.qrError=true" />
+                </div>
+              </div>
+              
+              <!-- Footer -->
+              <div class="event-footer">
+                <div class="event-title">Cloud DevFest Bandung 2025</div>
+                <div class="event-date">December 6, 2025</div>
+              </div>
             </div>
           </body>
         </html>
