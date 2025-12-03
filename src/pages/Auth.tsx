@@ -24,6 +24,7 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [gsiReady, setGsiReady] = useState(false);
+  const [hasDuplicateEmail, setHasDuplicateEmail] = useState(false);
   const gsiButtonRef = useRef<HTMLDivElement | null>(null);
   const gsiScriptInjected = useRef(false);
 
@@ -125,6 +126,7 @@ const Auth = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setHasDuplicateEmail(false);
     setLoading(true);
     try {
       if (mode === "login") {
@@ -132,6 +134,13 @@ const Auth = () => {
           email: form.email,
           password: form.password,
         });
+        
+        // Check if user has duplicate email
+        if (res.data.user?.has_duplicate_email) {
+          setHasDuplicateEmail(true);
+          setError("Your email has duplicate accounts. Please use email/password login or contact support to change your email.");
+        }
+        
         handleAuthSuccess(res.data);
       } else {
         await axios.post(`${API_URL}api/v1/auth/register`, {
@@ -188,13 +197,13 @@ const Auth = () => {
           </div>
           <div className="mb-2">
             <label className="block text-sm font-semibold mb-2 text-[#222]">
-              Password
+              Password or Ticket Code
             </label>
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
                 name="password"
-                placeholder="Enter your password"
+                placeholder="Enter password or ticket code"
                 value={form.password}
                 onChange={handleChange}
                 className="w-full px-4 py-3 rounded-lg border border-[#e0e0e0] bg-[#f6f8fa] focus:outline-none focus:ring-2 focus:ring-primary text-base"
@@ -218,7 +227,7 @@ const Auth = () => {
               <a href="#" className="text-sm text-[#4285F4] hover:underline">Forgot Password?</a>
             </div>
           </div>
-          {error && <div className="text-red-500 mb-4 text-center">{error}</div>}
+          {error && <div className="text-red-500 mb-4 text-center text-sm">{error}</div>}
           <button
             type="submit"
             className="w-full bg-[#4285F4] hover:bg-[#1a73e8] text-white font-bold py-3 rounded-xl text-lg mt-6 transition-all disabled:opacity-50"
@@ -231,18 +240,33 @@ const Auth = () => {
             <span className="mx-4 text-[#888] font-semibold">OR</span>
             <hr className="flex-grow border-t border-[#e0e0e0]" />
           </div>
-          <div className="mt-2 flex justify-center">
-            <div ref={gsiButtonRef} className="w-full flex justify-center" />
-          </div>
-          {!gsiReady && (
-            <button
-              type="button"
-              className="w-full mt-4 flex items-center justify-center gap-3 bg-white border border-[#e0e0e0] text-[#888] font-bold py-3 rounded-xl text-base shadow"
-              disabled
-            >
-              Loading Google Sign-In...
-            </button>
+          
+          {/* Only show Google Sign-In if no duplicate email detected */}
+          {!hasDuplicateEmail && (
+            <>
+              <div className="mt-2 flex justify-center">
+                <div ref={gsiButtonRef} className="w-full flex justify-center" />
+              </div>
+              {!gsiReady && (
+                <button
+                  type="button"
+                  className="w-full mt-4 flex items-center justify-center gap-3 bg-white border border-[#e0e0e0] text-[#888] font-bold py-3 rounded-xl text-base shadow"
+                  disabled
+                >
+                  Loading Google Sign-In...
+                </button>
+              )}
+            </>
           )}
+          
+          {hasDuplicateEmail && (
+            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p className="text-sm text-yellow-800 text-center">
+                <strong>Note:</strong> Google Sign-In is disabled for accounts with duplicate emails. Please use email/password login.
+              </p>
+            </div>
+          )}
+          
           <div className="mt-8 text-center text-[#222]">
             <span>No account yet? Register and buy your tickets at </span>
             <a

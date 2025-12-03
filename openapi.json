@@ -196,7 +196,7 @@
           "Participants"
         ],
         "summary": "Get My Profile",
-        "description": "Get current user's profile.\n[P-PROFILE-1] Show My Profile",
+        "description": "Get current user's profile.\n[P-PROFILE-1] Show My Profile\n\nIncludes `has_duplicate_email` flag indicating if multiple accounts share this email.",
         "operationId": "get_my_profile_api_v1_participants_profile_get",
         "responses": {
           "200": {
@@ -228,6 +228,53 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/UserUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserInDB"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/participants/email": {
+      "put": {
+        "tags": [
+          "Participants"
+        ],
+        "summary": "Change My Email",
+        "description": "Change email address (only allowed for duplicate emails).\n[P-PROFILE-2] Change Email for Duplicate Resolution\n\nValidation:\n- Only works if current email has duplicates\n- New email must be unique and different",
+        "operationId": "change_my_email_api_v1_participants_email_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeEmailRequest"
               }
             }
           },
@@ -1349,7 +1396,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProfileViewResponse"
+                  "$ref": "#/components/schemas/BoothStaffProfileViewResponse"
                 }
               }
             }
@@ -1608,6 +1655,19 @@
   },
   "components": {
     "schemas": {
+      "BoothStaffProfileViewResponse": {
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/UserPublicProfile"
+          }
+        },
+        "type": "object",
+        "required": [
+          "user"
+        ],
+        "title": "BoothStaffProfileViewResponse",
+        "description": "View participant profile for booth staff (basic contact info only)."
+      },
       "CancelledSessionInfo": {
         "properties": {
           "session_id": {
@@ -1638,6 +1698,20 @@
         ],
         "title": "CancelledSessionInfo",
         "description": "Info about an auto-cancelled session."
+      },
+      "ChangeEmailRequest": {
+        "properties": {
+          "new_email": {
+            "type": "string",
+            "format": "email",
+            "title": "New Email"
+          }
+        },
+        "type": "object",
+        "required": [
+          "new_email"
+        ],
+        "title": "ChangeEmailRequest"
       },
       "CheckInCreate": {
         "properties": {
@@ -1998,6 +2072,28 @@
               }
             ],
             "title": "Link Url"
+          },
+          "order": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Order"
+          },
+          "ref_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ref Id"
           },
           "id": {
             "type": "integer",
@@ -2857,6 +2953,17 @@
             "type": "string",
             "title": "Name"
           },
+          "phone_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone Number"
+          },
           "title": {
             "anyOf": [
               {
@@ -2932,6 +3039,17 @@
           "name": {
             "type": "string",
             "title": "Name"
+          },
+          "phone_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone Number"
           },
           "title": {
             "anyOf": [
@@ -3043,6 +3161,17 @@
               }
             ],
             "title": "Checked Out At"
+          },
+          "has_duplicate_email": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Has Duplicate Email"
           }
         },
         "type": "object",
@@ -3068,6 +3197,28 @@
           "name": {
             "type": "string",
             "title": "Name"
+          },
+          "email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Email"
+          },
+          "phone_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone Number"
           },
           "title": {
             "anyOf": [
@@ -3168,6 +3319,17 @@
               }
             ],
             "title": "Name"
+          },
+          "phone_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone Number"
           },
           "title": {
             "anyOf": [

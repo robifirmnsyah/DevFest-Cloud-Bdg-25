@@ -316,8 +316,12 @@ const OrganizerDashboard = () => {
               <Users className="w-4 h-4 text-blue-500" />
               <span className="text-xs font-medium text-blue-500">Checked-in</span>
             </div>
-            <div className="text-2xl font-bold text-blue-500 mb-0.5">{stats?.checked_in_participants ?? 0}</div>
-            <div className="text-xs text-gray-400">of {stats?.total_participants ?? "-"} total</div>
+            <div className="text-2xl font-bold text-blue-500 mb-0.5">
+              {stats?.checked_in_participants ?? 0}
+            </div>
+            <div className="text-xs text-gray-400">
+              of {stats?.total_participants ?? 0} total
+            </div>
           </div>
 
           <div className="bg-white rounded-xl p-4 border border-gray-100">
@@ -325,7 +329,9 @@ const OrganizerDashboard = () => {
               <Calendar className="w-4 h-4 text-green-500" />
               <span className="text-xs font-medium text-green-500">Sessions</span>
             </div>
-            <div className="text-2xl font-bold text-green-500">{stats?.total_sessions ?? 0}</div>
+            <div className="text-2xl font-bold text-green-500">
+              {stats?.total_sessions ?? 0}
+            </div>
             <div className="text-xs text-gray-400">total sessions</div>
           </div>
 
@@ -334,7 +340,9 @@ const OrganizerDashboard = () => {
               <BarChart2 className="w-4 h-4 text-purple-500" />
               <span className="text-xs font-medium text-purple-500">Bookings</span>
             </div>
-            <div className="text-2xl font-bold text-purple-500">{stats?.total_bookings ?? 0}</div>
+            <div className="text-2xl font-bold text-purple-500">
+              {stats?.total_bookings ?? 0}
+            </div>
             <div className="text-xs text-gray-400">session bookings</div>
           </div>
 
@@ -343,7 +351,9 @@ const OrganizerDashboard = () => {
               <Gift className="w-4 h-4 text-orange-500" />
               <span className="text-xs font-medium text-orange-500">Swag Claims</span>
             </div>
-            <div className="text-2xl font-bold text-orange-500">{stats?.total_swag_claims ?? 0}</div>
+            <div className="text-2xl font-bold text-orange-500">
+              {stats?.total_swag_claims ?? 0}
+            </div>
             <div className="text-xs text-gray-400">items claimed</div>
           </div>
 
@@ -352,7 +362,9 @@ const OrganizerDashboard = () => {
               <Award className="w-4 h-4 text-yellow-500" />
               <span className="text-xs font-medium text-yellow-500">Quest Submissions</span>
             </div>
-            <div className="text-2xl font-bold text-yellow-500">{stats?.total_quest_submissions ?? 0}</div>
+            <div className="text-2xl font-bold text-yellow-500">
+              {stats?.total_quest_submissions ?? 0}
+            </div>
             <div className="text-xs text-gray-400">submissions</div>
           </div>
 
@@ -361,7 +373,9 @@ const OrganizerDashboard = () => {
               <User className="w-4 h-4 text-indigo-500" />
               <span className="text-xs font-medium text-indigo-500">Total Participants</span>
             </div>
-            <div className="text-2xl font-bold text-indigo-500">{stats?.total_participants ?? 0}</div>
+            <div className="text-2xl font-bold text-indigo-500">
+              {stats?.total_participants ?? 0}
+            </div>
             <div className="text-xs text-gray-400">registered users</div>
           </div>
         </div>
