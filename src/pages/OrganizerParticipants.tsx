@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Search, User, X, Mail, Phone, Building2 } from "lucide-react";
+import { Search, User, X, Mail, Phone, Building2, QrCode, Download } from "lucide-react";
 import OrganizerTabBar from "@/components/OrganizerTabBar";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -9,6 +9,7 @@ const OrganizerParticipants = () => {
   const [participants, setParticipants] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedQrCode, setSelectedQrCode] = useState<{qr_code: string, name: string} | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -46,12 +47,70 @@ const OrganizerParticipants = () => {
     );
   });
 
+  // Generate QR code image URL
+  const getQrCodeImageUrl = (qrCode: string) => {
+    if (!qrCode) return null;
+    return `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(qrCode)}`;
+  };
+
+  // Export to Excel
+  const handleExportExcel = () => {
+    // Prepare data for export
+    const exportData = filteredParticipants.map(p => ({
+      'Name': p.name || '',
+      'Email': p.email || '',
+      'Phone': p.phone_number || '',
+      'Title': p.title || '',
+      'Company': p.company || '',
+      'Points': p.points || 0,
+      'Check-in Status': p.is_checked_in ? 'Checked In' : 'Not Checked In',
+      'QR Code': p.qr_code || ''
+    }));
+
+    // Convert to CSV
+    const headers = Object.keys(exportData[0]);
+    const csvContent = [
+      headers.join(','),
+      ...exportData.map(row => 
+        headers.map(header => {
+          const value = row[header as keyof typeof row];
+          // Escape values containing commas or quotes
+          if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+            return `"${value.replace(/"/g, '""')}"`;
+          }
+          return value;
+        }).join(',')
+      )
+    ].join('\n');
+
+    // Create download link
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `participants_${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 pb-20">
       <header className="bg-white border-b border-gray-100 px-6 py-4">
-        <h1 className="text-2xl font-bold text-blue-500 text-center mb-4">
-          All Participants
-        </h1>
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-2xl font-bold text-blue-500">
+            All Participants
+          </h1>
+          <button
+            onClick={handleExportExcel}
+            className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors shadow-sm"
+            disabled={loading || participants.length === 0}
+          >
+            <Download className="w-4 h-4" />
+            Export CSV
+          </button>
+        </div>
         
         {/* Search */}
         <div className="relative">
@@ -146,6 +205,18 @@ const OrganizerParticipants = () => {
                         <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
                           {participant.points ?? 0} Points
                         </span>
+
+                        {/* QR Code Button */}
+                        {participant.qr_code && (
+                          <button
+                            onClick={() => setSelectedQrCode({ qr_code: participant.qr_code, name: participant.name })}
+                            className="ml-auto px-3 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-700 hover:bg-purple-200 transition-colors flex items-center gap-1"
+                            title="View QR Code"
+                          >
+                            <QrCode className="w-3 h-3" />
+                            QR
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -155,6 +226,34 @@ const OrganizerParticipants = () => {
           </div>
         )}
       </main>
+
+      {/* QR Code Modal */}
+      {selectedQrCode && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-8 shadow-2xl w-full max-w-md text-center">
+            <h3 className="text-xl font-bold text-gray-900 mb-2">{selectedQrCode.name}</h3>
+            <p className="text-sm text-gray-500 mb-6">Participant QR Code</p>
+            
+            <div className="flex justify-center mb-6">
+              <img
+                src={getQrCodeImageUrl(selectedQrCode.qr_code) || ''}
+                alt="QR Code"
+                className="w-64 h-64 bg-gray-50 rounded-lg border border-gray-200"
+                onError={(e) => {
+                  e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Crect fill='%23e0e0e0' width='256' height='256'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23888' font-size='16'%3ENo QR Code%3C/text%3E%3C/svg%3E";
+                }}
+              />
+            </div>
+
+            <button
+              onClick={() => setSelectedQrCode(null)}
+              className="w-full bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-bold transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
 
       <OrganizerTabBar activeTab="participants" />
     </div>
