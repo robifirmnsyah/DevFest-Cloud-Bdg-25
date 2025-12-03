@@ -150,7 +150,7 @@ const OrganizerDashboard = () => {
               }
               body { 
                 margin: 0; 
-                padding: 20px; 
+                padding: 0;
                 font-family: 'Arial', 'Helvetica', sans-serif;
                 display: flex;
                 justify-content: center;
@@ -159,87 +159,43 @@ const OrganizerDashboard = () => {
                 background: #f0f0f0;
               }
               .badge-container {
-                width: 100%;
-                max-width: 600px;
-                background: white;
                 position: relative;
+                width: 800px;
+                height: 1200px;
+                background-image: url('/badge.png');
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-position: center;
               }
-              .badge-header {
-                background: linear-gradient(135deg, #2E3192 0%, #1BFFFF 100%);
-                padding: 80px 40px 60px;
-                text-align: center;
-                position: relative;
-                overflow: hidden;
-              }
-              .badge-header::before {
-                content: '';
+              .badge-content {
                 position: absolute;
                 top: 0;
                 left: 0;
-                right: 0;
-                bottom: 0;
-                background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cGF0dGVybiBpZD0iZ3JpZCIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiPjxwYXRoIGQ9Ik0gMTAwIDAgTCAwIDAgMCAxMDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS13aWR0aD0iMC41IiBvcGFjaXR5PSIwLjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAiIGhlaWdodD0iMTAwIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+');
-                opacity: 0.3;
+                width: 100%;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding-top: 400px;
               }
-              .attendee-badge {
-                background: white;
-                color: #2E3192;
-                padding: 12px 40px;
-                border-radius: 30px;
-                font-size: 28px;
+              .name {
+                font-size: 56px;
                 font-weight: bold;
-                letter-spacing: 2px;
-                display: inline-block;
-                position: relative;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-              }
-              .badge-content {
-                background: white;
-                padding: 60px 40px;
+                color: #222;
                 text-align: center;
-              }
-              .attendee-name {
-                font-size: 48px;
-                font-weight: bold;
-                color: #2E3192;
-                margin-bottom: 20px;
+                margin-bottom: 40px;
                 word-wrap: break-word;
+                max-width: 600px;
                 line-height: 1.2;
               }
-              .attendee-info {
-                font-size: 22px;
-                color: #666;
-                margin-bottom: 12px;
-                min-height: 26px;
+              .qr-code {
+                margin-top: 20px;
               }
-              .qr-section {
-                margin: 40px auto 30px;
-                padding: 20px;
-                background: white;
-                display: inline-block;
-                border: 3px solid #2E3192;
-                border-radius: 20px;
-              }
-              .qr-section img {
+              .qr-code img {
                 display: block;
-                width: 300px;
-                height: 300px;
-              }
-              .event-footer {
-                background: linear-gradient(135deg, #1BFFFF 0%, #2E3192 100%);
-                padding: 40px;
-                text-align: center;
-                color: white;
-              }
-              .event-title {
-                font-size: 32px;
-                font-weight: bold;
-                margin-bottom: 10px;
-                text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-              }
-              .event-date {
-                font-size: 20px;
-                opacity: 0.95;
+                width: 400px;
+                height: 400px;
               }
               @media print {
                 body { 
@@ -247,34 +203,18 @@ const OrganizerDashboard = () => {
                   padding: 0;
                 }
                 .badge-container {
-                  box-shadow: none;
+                  page-break-after: always;
                 }
               }
             </style>
           </head>
           <body>
             <div class="badge-container">
-              <!-- Header with Attendee Badge -->
-              <div class="badge-header">
-                <div class="attendee-badge">ATTENDEE</div>
-              </div>
-              
-              <!-- Main Content -->
               <div class="badge-content">
-                <div class="attendee-name">${printData.name}</div>
-                ${printData.title ? `<div class="attendee-info">${printData.title}</div>` : '<div class="attendee-info">&nbsp;</div>'}
-                ${printData.company ? `<div class="attendee-info">${printData.company}</div>` : '<div class="attendee-info">&nbsp;</div>'}
-                
-                <!-- QR Code -->
-                <div class="qr-section">
+                <div class="name">${printData.name}</div>
+                <div class="qr-code">
                   <img src="${qrCodeUrl}" alt="QR Code" onload="window.qrLoaded=true" onerror="window.qrError=true" />
                 </div>
-              </div>
-              
-              <!-- Footer -->
-              <div class="event-footer">
-                <div class="event-title">Cloud DevFest Bandung 2025</div>
-                <div class="event-date">December 6, 2025</div>
               </div>
             </div>
           </body>
@@ -294,7 +234,7 @@ const OrganizerDashboard = () => {
           clearInterval(checkLoaded);
           setTimeout(() => {
             printWindow.print();
-          }, 300);
+          }, 500);
         } else if ((printWindow as any).qrError) {
           clearInterval(checkLoaded);
           alert("Failed to load QR code image. Please try again.");
