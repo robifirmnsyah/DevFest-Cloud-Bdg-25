@@ -179,14 +179,19 @@ const OrganizerDashboard = () => {
                 padding-top: 610px;
                 padding-left: 120px;
               }
+              .text-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin-bottom: 40px;
+                max-width: 500px;
+              }
               .name {
                 font-size: 36px;
                 font-weight: bold;
                 color: #222;
                 text-align: center;
-                margin-bottom: 12px;
                 word-wrap: break-word;
-                max-width: 500px;
                 line-height: 1.3;
               }
               .title {
@@ -194,23 +199,21 @@ const OrganizerDashboard = () => {
                 font-weight: 600;
                 color: #444;
                 text-align: center;
-                margin-bottom: 8px;
                 word-wrap: break-word;
-                max-width: 500px;
                 line-height: 1.2;
+                margin-top: 6px;
               }
               .company {
                 font-size: 22px;
                 font-weight: 500;
                 color: #666;
                 text-align: center;
-                margin-bottom: 30px;
                 word-wrap: break-word;
-                max-width: 500px;
                 line-height: 1.2;
+                margin-top: 4px;
               }
               .qr-code {
-                margin-top: 15px;
+                margin-top: 0;
               }
               .qr-code img {
                 display: block;
@@ -231,9 +234,11 @@ const OrganizerDashboard = () => {
           <body>
             <div class="badge-container">
               <div class="badge-content">
-                <div class="name">${printData.name}</div>
-                ${printData.title ? `<div class="title">${printData.title}</div>` : ''}
-                ${printData.company ? `<div class="company">${printData.company}</div>` : ''}
+                <div class="text-container">
+                  <div class="name">${printData.name}</div>
+                  ${printData.title ? `<div class="title">${printData.title}</div>` : ''}
+                  ${printData.company ? `<div class="company">${printData.company}</div>` : ''}
+                </div>
                 <div class="qr-code">
                   <img src="${qrCodeUrl}" alt="QR Code" onload="window.qrLoaded=true" onerror="window.qrError=true" />
                 </div>
