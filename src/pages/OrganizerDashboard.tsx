@@ -176,8 +176,8 @@ const OrganizerDashboard = () => {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                padding-top: 580px;
-                padding-left: 80px;
+                padding-top: 610px;
+                padding-left: 120px;
               }
               .name {
                 font-size: 36px;
