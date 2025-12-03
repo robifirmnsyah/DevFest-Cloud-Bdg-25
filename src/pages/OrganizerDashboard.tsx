@@ -183,11 +183,11 @@ const OrganizerDashboard = () => {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                margin-bottom: 40px;
+                margin-bottom: 35px;
                 max-width: 500px;
               }
               .name {
-                font-size: 36px;
+                font-size: 28px;
                 font-weight: bold;
                 color: #222;
                 text-align: center;
@@ -195,16 +195,16 @@ const OrganizerDashboard = () => {
                 line-height: 1.3;
               }
               .title {
-                font-size: 24px;
+                font-size: 20px;
                 font-weight: 600;
                 color: #444;
                 text-align: center;
                 word-wrap: break-word;
                 line-height: 1.2;
-                margin-top: 6px;
+                margin-top: 5px;
               }
               .company {
-                font-size: 22px;
+                font-size: 18px;
                 font-weight: 500;
                 color: #666;
                 text-align: center;
@@ -217,8 +217,8 @@ const OrganizerDashboard = () => {
               }
               .qr-code img {
                 display: block;
-                width: 240px;
-                height: 240px;
+                width: 200px;
+                height: 200px;
               }
               @media print {
                 body { 
