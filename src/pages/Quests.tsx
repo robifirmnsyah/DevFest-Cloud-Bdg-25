@@ -23,14 +23,14 @@ const Quests = () => {
     }
     setLoading(true);
     axios
-      .get(`${API_URL}api/v1/participants/quests`, {
+      .get(`${API_URL}api/v1/quests`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setQuests(res.data))
       .catch(() => setQuests([]));
 
     axios
-      .get(`${API_URL}api/v1/participants/quests/my-submissions`, {
+      .get(`${API_URL}api/v1/quests/submissions`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setSubmissions(res.data))
@@ -64,7 +64,7 @@ const Quests = () => {
     setSubmitting(true);
     const token = localStorage.getItem("token");
     try {
-      await axios.post(`${API_URL}api/v1/participants/quests/submit`, {
+      await axios.post(`${API_URL}api/v1/quests/submit`, {
         quest_id: activeQuest.id,
         answer_text: answer,
       }, {
@@ -73,7 +73,7 @@ const Quests = () => {
       setActiveQuest(null);
       setAnswer("");
       // Refresh submissions
-      const res = await axios.get(`${API_URL}api/v1/participants/quests/my-submissions`, {
+      const res = await axios.get(`${API_URL}api/v1/quests/submissions`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setSubmissions(res.data);
@@ -92,7 +92,7 @@ const Quests = () => {
     formData.append("quest_id", activeQuest.id);
     formData.append("photo", photo);
     try {
-      await axios.post(`${API_URL}api/v1/participants/quests/submit`, formData, {
+      await axios.post(`${API_URL}api/v1/quests/submit`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
@@ -101,7 +101,7 @@ const Quests = () => {
       setActiveQuest(null);
       setPhoto(null);
       // Refresh submissions
-      const res = await axios.get(`${API_URL}api/v1/participants/quests/my-submissions`, {
+      const res = await axios.get(`${API_URL}api/v1/quests/submissions`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setSubmissions(res.data);

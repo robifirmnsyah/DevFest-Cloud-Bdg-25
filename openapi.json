@@ -549,7 +549,7 @@
           "Participants"
         ],
         "summary": "Get Available Quests",
-        "description": "Get all available quests.",
+        "description": "Get all available quests with per-user progress.\n\nProgress includes:\n- is_completed: Whether user has approved submission\n- For NETWORKING: current_count, target_count, progress_percentage",
         "operationId": "get_available_quests_api_v1_participants_quests_get",
         "responses": {
           "200": {
@@ -558,7 +558,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "$ref": "#/components/schemas/QuestInDB"
+                    "$ref": "#/components/schemas/QuestWithProgress"
                   },
                   "type": "array",
                   "title": "Response Get Available Quests Api V1 Participants Quests Get"
@@ -580,7 +580,7 @@
           "Participants"
         ],
         "summary": "Submit Quest",
-        "description": "Submit quest completion.\n[P-QUEST-1] Submit Quest Completion\n\nSupports:\n- Text answers\n- Photo uploads\n- NETWORKING quests (auto-checked based on friend count)",
+        "description": "Submit quest completion.\n[P-QUEST-1] Submit Quest Completion\n\nSupports:\n- Text answers\n- Photo uploads\n- NETWORKING quests (auto-checked based on friend count)\n- LINK_CLICK quests via dedicated click endpoint",
         "operationId": "submit_quest_api_v1_participants_quests_submit_post",
         "requestBody": {
           "content": {
@@ -619,6 +619,54 @@
             "HTTPBearer": []
           }
         ]
+      }
+    },
+    "/api/v1/participants/quests/{quest_id}/click": {
+      "post": {
+        "tags": [
+          "Participants"
+        ],
+        "summary": "Click Quest Link",
+        "description": "Record a link click to auto-complete LINK_CLICK quests.\n[P-QUEST-2] Click Link Quest\n\nValidation:\n- Quest must be active and of type LINK_CLICK\n- Prevent duplicate submissions\n- Awards points immediately (requires_approval should be False)",
+        "operationId": "click_quest_link_api_v1_participants_quests__quest_id__click_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "quest_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Quest Id"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/v1/participants/quests/my-submissions": {
@@ -1130,6 +1178,37 @@
         ]
       }
     },
+    "/api/v1/organizers/participants": {
+      "get": {
+        "tags": [
+          "Organizers"
+        ],
+        "summary": "Get All Participants",
+        "description": "List all participants.\n[O-PARTICIPANTS-1] Organizer: Get All Participants\n\nNotes:\n- Uses service layer; no business logic in endpoint\n- Filters by `roles` JSON containing \"participant\"",
+        "operationId": "get_all_participants_api_v1_organizers_participants_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/UserInDB"
+                  },
+                  "type": "array",
+                  "title": "Response Get All Participants Api V1 Organizers Participants Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/organizers/stats": {
       "get": {
         "tags": [
@@ -1461,6 +1540,59 @@
               "application/json": {
                 "schema": {
 
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/booth-staff/quests/complete": {
+      "post": {
+        "tags": [
+          "Booth Staff"
+        ],
+        "summary": "Complete Booth Quest",
+        "description": "Complete a BOOTH_SCAN quest by scanning participant QR.\n[B-QUEST-1] Booth: Complete Quest by Scan\n\nAwards points immediately. Only allowed for quests designated for booth scanning.",
+        "operationId": "complete_booth_quest_api_v1_booth_staff_quests_complete_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": true,
+                "type": "object",
+                "title": "Payload"
+              },
+              "example": {
+                "participant_qr_code": "QR_STRING",
+                "quest_id": 1
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -1845,6 +1977,28 @@
             ],
             "title": "Target Count"
           },
+          "image_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Url"
+          },
+          "link_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Link Url"
+          },
           "id": {
             "type": "integer",
             "title": "Id"
@@ -2056,9 +2210,64 @@
           "photo_upload",
           "scavenger_hunt",
           "workshop_completion",
-          "networking"
+          "networking",
+          "link_click",
+          "url_submission",
+          "booth_scan",
+          "organizer_scan"
         ],
         "title": "QuestType"
+      },
+      "QuestWithProgress": {
+        "properties": {
+          "quest": {
+            "$ref": "#/components/schemas/QuestInDB"
+          },
+          "is_completed": {
+            "type": "boolean",
+            "title": "Is Completed"
+          },
+          "current_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Count"
+          },
+          "target_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Count"
+          },
+          "progress_percentage": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Progress Percentage"
+          }
+        },
+        "type": "object",
+        "required": [
+          "quest",
+          "is_completed"
+        ],
+        "title": "QuestWithProgress",
+        "description": "Quest with computed progress for the current user.\nUse for listing available quests with status and progress info."
       },
       "ScanQRRequest": {
         "properties": {
@@ -2362,6 +2571,21 @@
             "title": "Capacity",
             "default": 100
           },
+          "is_hybrid": {
+            "type": "boolean",
+            "title": "Is Hybrid"
+          },
+          "live_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Live Url"
+          },
           "id": {
             "type": "integer",
             "title": "Id"
@@ -2373,6 +2597,10 @@
           "is_active": {
             "type": "boolean",
             "title": "Is Active"
+          },
+          "is_bookable": {
+            "type": "boolean",
+            "title": "Is Bookable"
           },
           "created_at": {
             "type": "string",
@@ -2398,9 +2626,11 @@
           "location",
           "start_time",
           "end_time",
+          "is_hybrid",
           "id",
           "booked_count",
           "is_active",
+          "is_bookable",
           "created_at"
         ],
         "title": "SessionInDB"
@@ -2463,6 +2693,21 @@
             "title": "Capacity",
             "default": 100
           },
+          "is_hybrid": {
+            "type": "boolean",
+            "title": "Is Hybrid"
+          },
+          "live_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Live Url"
+          },
           "id": {
             "type": "integer",
             "title": "Id"
@@ -2474,6 +2719,10 @@
           "is_active": {
             "type": "boolean",
             "title": "Is Active"
+          },
+          "is_bookable": {
+            "type": "boolean",
+            "title": "Is Bookable"
           },
           "created_at": {
             "type": "string",
@@ -2514,9 +2763,11 @@
           "location",
           "start_time",
           "end_time",
+          "is_hybrid",
           "id",
           "booked_count",
           "is_active",
+          "is_bookable",
           "created_at"
         ],
         "title": "SessionWithBookingStatus",
@@ -2643,8 +2894,12 @@
             "type": "string",
             "title": "Password"
           },
-          "role": {
-            "$ref": "#/components/schemas/UserRole"
+          "roles": {
+            "items": {
+              "$ref": "#/components/schemas/UserRole"
+            },
+            "type": "array",
+            "title": "Roles"
           },
           "booth_id": {
             "anyOf": [
@@ -2663,7 +2918,7 @@
           "email",
           "name",
           "password",
-          "role"
+          "roles"
         ],
         "title": "UserCreate"
       },
@@ -2715,8 +2970,12 @@
             "type": "integer",
             "title": "Id"
           },
-          "role": {
-            "$ref": "#/components/schemas/UserRole"
+          "roles": {
+            "items": {
+              "$ref": "#/components/schemas/UserRole"
+            },
+            "type": "array",
+            "title": "Roles"
           },
           "is_active": {
             "type": "boolean",
@@ -2729,17 +2988,6 @@
           "qr_code": {
             "type": "string",
             "title": "Qr Code"
-          },
-          "qr_code_image_url": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Qr Code Image Url"
           },
           "profile_photo_url": {
             "anyOf": [
@@ -2802,7 +3050,7 @@
           "email",
           "name",
           "id",
-          "role",
+          "roles",
           "is_active",
           "is_checked_in",
           "qr_code",
@@ -2854,15 +3102,19 @@
             ],
             "title": "Profile Photo Url"
           },
-          "role": {
-            "$ref": "#/components/schemas/UserRole"
+          "roles": {
+            "items": {
+              "$ref": "#/components/schemas/UserRole"
+            },
+            "type": "array",
+            "title": "Roles"
           }
         },
         "type": "object",
         "required": [
           "id",
           "name",
-          "role"
+          "roles"
         ],
         "title": "UserPublicProfile",
         "description": "Public profile visible to other users."
@@ -2872,17 +3124,6 @@
           "qr_code": {
             "type": "string",
             "title": "Qr Code"
-          },
-          "qr_code_image_url": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Qr Code Image Url"
           },
           "user_id": {
             "type": "integer",
