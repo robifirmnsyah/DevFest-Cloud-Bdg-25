@@ -184,18 +184,38 @@ const OrganizerDashboard = () => {
                 font-weight: bold;
                 color: #222;
                 text-align: center;
-                margin-bottom: 40px;
+                margin-bottom: 12px;
                 word-wrap: break-word;
                 max-width: 500px;
                 line-height: 1.3;
               }
+              .title {
+                font-size: 24px;
+                font-weight: 600;
+                color: #444;
+                text-align: center;
+                margin-bottom: 8px;
+                word-wrap: break-word;
+                max-width: 500px;
+                line-height: 1.2;
+              }
+              .company {
+                font-size: 22px;
+                font-weight: 500;
+                color: #666;
+                text-align: center;
+                margin-bottom: 30px;
+                word-wrap: break-word;
+                max-width: 500px;
+                line-height: 1.2;
+              }
               .qr-code {
-                margin-top: 20px;
+                margin-top: 15px;
               }
               .qr-code img {
                 display: block;
-                width: 280px;
-                height: 280px;
+                width: 240px;
+                height: 240px;
               }
               @media print {
                 body { 
@@ -212,6 +232,8 @@ const OrganizerDashboard = () => {
             <div class="badge-container">
               <div class="badge-content">
                 <div class="name">${printData.name}</div>
+                ${printData.title ? `<div class="title">${printData.title}</div>` : ''}
+                ${printData.company ? `<div class="company">${printData.company}</div>` : ''}
                 <div class="qr-code">
                   <img src="${qrCodeUrl}" alt="QR Code" onload="window.qrLoaded=true" onerror="window.qrError=true" />
                 </div>
