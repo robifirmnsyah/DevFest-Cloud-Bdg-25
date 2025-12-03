@@ -26,14 +26,45 @@ const Quests = () => {
       .get(`${API_URL}api/v1/quests`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => setQuests(res.data))
+      .then((res) => {
+        // Response is QuestWithProgress[]
+        const questsData = res.data.map((item: any) => ({
+          id: item.quest?.id || item.id,
+          title: item.quest?.title || item.title,
+          description: item.quest?.description || item.description,
+          quest_type: item.quest?.quest_type || item.quest_type,
+          points: item.quest?.points || item.points,
+          requires_approval: item.quest?.requires_approval || item.requires_approval,
+          banner_url: item.quest?.image_url || item.image_url,
+          is_completed: item.is_completed || false,
+          current_count: item.current_count,
+          target_count: item.target_count || item.quest?.target_count,
+          progress_percentage: item.progress_percentage,
+        }));
+        setQuests(questsData);
+      })
       .catch(() => setQuests([]));
 
     axios
       .get(`${API_URL}api/v1/quests/submissions`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => setSubmissions(res.data))
+      .then((res) => {
+        // Response is QuestSubmissionWithDetails[]
+        const submissionsData = res.data.map((item: any) => ({
+          id: item.id,
+          quest_id: item.quest_id,
+          user_id: item.user_id,
+          answer_text: item.answer_text,
+          photo_url: item.photo_url,
+          status: item.status,
+          points_awarded: item.points_awarded,
+          submitted_at: item.submitted_at,
+          reviewed_at: item.reviewed_at,
+          quest: item.quest,
+        }));
+        setSubmissions(submissionsData);
+      })
       .catch(() => setSubmissions([]))
       .finally(() => setLoading(false));
   }, []);
@@ -76,7 +107,19 @@ const Quests = () => {
       const res = await axios.get(`${API_URL}api/v1/quests/submissions`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setSubmissions(res.data);
+      const submissionsData = res.data.map((item: any) => ({
+        id: item.id,
+        quest_id: item.quest_id,
+        user_id: item.user_id,
+        answer_text: item.answer_text,
+        photo_url: item.photo_url,
+        status: item.status,
+        points_awarded: item.points_awarded,
+        submitted_at: item.submitted_at,
+        reviewed_at: item.reviewed_at,
+        quest: item.quest,
+      }));
+      setSubmissions(submissionsData);
     } catch {
       // handle error
     }
@@ -104,7 +147,19 @@ const Quests = () => {
       const res = await axios.get(`${API_URL}api/v1/quests/submissions`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setSubmissions(res.data);
+      const submissionsData = res.data.map((item: any) => ({
+        id: item.id,
+        quest_id: item.quest_id,
+        user_id: item.user_id,
+        answer_text: item.answer_text,
+        photo_url: item.photo_url,
+        status: item.status,
+        points_awarded: item.points_awarded,
+        submitted_at: item.submitted_at,
+        reviewed_at: item.reviewed_at,
+        quest: item.quest,
+      }));
+      setSubmissions(submissionsData);
     } catch {
       // handle error
     }

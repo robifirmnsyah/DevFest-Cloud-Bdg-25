@@ -26,7 +26,7 @@ const Profile = () => {
       return;
     }
     try {
-      const res = await axios.get(`${API_URL}api/v1/participants/profile`, {
+      const res = await axios.get(`${API_URL}api/v1/profile`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setProfile(res.data);
@@ -96,7 +96,7 @@ const Profile = () => {
     const token = localStorage.getItem("token");
     try {
       await axios.put(
-        `${API_URL}api/v1/participants/profile`,
+        `${API_URL}api/v1/profile`,
         {
           name: editName,
           title: editTitle,

@@ -47,7 +47,7 @@ const OrganizerDashboard = () => {
     setQuestLoading(true);
     const token = localStorage.getItem("token");
     try {
-      const res = await axios.get(`${API_URL}api/v1/organizers/quests/pending`, {
+      const res = await axios.get(`${API_URL}api/v1/quests/pending`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setPendingQuests(res.data ?? []);
@@ -270,7 +270,7 @@ const OrganizerDashboard = () => {
     const token = localStorage.getItem("token");
     try {
       await axios.put(
-        `${API_URL}api/v1/organizers/quests/${submissionId}/review`,
+        `${API_URL}api/v1/quests/${submissionId}/review`,
         { status },
         { headers: { Authorization: `Bearer ${token}` } }
       );
