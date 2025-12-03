@@ -125,7 +125,7 @@ const OrganizerDashboard = () => {
     }
     
     try {
-      const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(printData.qr_code)}`;
+      const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(printData.qr_code)}`;
       
       const printWindow = window.open('', '_blank', 'width=800,height=600');
       if (!printWindow) {
@@ -176,26 +176,25 @@ const OrganizerDashboard = () => {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                justify-content: center;
-                padding-top: 400px;
+                padding-top: 520px;
               }
               .name {
-                font-size: 56px;
+                font-size: 36px;
                 font-weight: bold;
                 color: #222;
                 text-align: center;
-                margin-bottom: 40px;
+                margin-bottom: 30px;
                 word-wrap: break-word;
-                max-width: 600px;
-                line-height: 1.2;
+                max-width: 500px;
+                line-height: 1.3;
               }
               .qr-code {
-                margin-top: 20px;
+                margin-top: 10px;
               }
               .qr-code img {
                 display: block;
-                width: 400px;
-                height: 400px;
+                width: 280px;
+                height: 280px;
               }
               @media print {
                 body { 
