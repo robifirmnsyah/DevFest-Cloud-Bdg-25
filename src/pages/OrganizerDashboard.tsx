@@ -47,7 +47,7 @@ const OrganizerDashboard = () => {
     setQuestLoading(true);
     const token = localStorage.getItem("token");
     try {
-      const res = await axios.get(`${API_URL}api/v1/quests/pending`, {
+      const res = await axios.get(`${API_URL}api/v1/organizers/quests/pending`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setPendingQuests(res.data ?? []);
@@ -270,7 +270,7 @@ const OrganizerDashboard = () => {
     const token = localStorage.getItem("token");
     try {
       await axios.put(
-        `${API_URL}api/v1/quests/${submissionId}/review`,
+        `${API_URL}api/v1/organizers/quests/${submissionId}/review`,
         { status },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -570,7 +570,9 @@ const OrganizerDashboard = () => {
                       Pending
                     </span>
                   </div>
-                  <div className="text-sm text-[#6366f1] mb-2">{submission.quest?.description}</div>
+                  {submission.quest?.description && (
+                    <div className="text-sm text-[#6366f1] mb-2">{submission.quest.description}</div>
+                  )}
                   <div className="bg-white rounded-lg p-3 flex items-center gap-4 mb-2 border border-[#e0e0e0]">
                     <User className="w-5 h-5 text-primary" />
                     <span className="text-xs">User ID: {submission.user_id}</span>

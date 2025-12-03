@@ -23,7 +23,7 @@ const Dashboard = () => {
     }
     // Fetch profile
     axios
-      .get(`${API_URL}api/v1/profile`, {
+      .get(`${API_URL}api/v1/participants/profile`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setProfile(res.data))
@@ -32,18 +32,15 @@ const Dashboard = () => {
 
     // Fetch quests
     axios
-      .get(`${API_URL}api/v1/quests`, {
+      .get(`${API_URL}api/v1/participants/quests`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => {
-        // Response is QuestWithProgress[]
-        setTotalQuests(res.data.length);
-      })
+      .then((res) => setTotalQuests(res.data.length))
       .catch(() => setTotalQuests(0));
 
     // Fetch completed quests
     axios
-      .get(`${API_URL}api/v1/quests/submissions`, {
+      .get(`${API_URL}api/v1/participants/quests/my-submissions`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {

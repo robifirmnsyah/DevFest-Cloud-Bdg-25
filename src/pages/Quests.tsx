@@ -23,48 +23,30 @@ const Quests = () => {
     }
     setLoading(true);
     axios
-      .get(`${API_URL}api/v1/quests`, {
+      .get(`${API_URL}api/v1/participants/quests`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
-        // Response is QuestWithProgress[]
-        const questsData = res.data.map((item: any) => ({
-          id: item.quest?.id || item.id,
-          title: item.quest?.title || item.title,
-          description: item.quest?.description || item.description,
-          quest_type: item.quest?.quest_type || item.quest_type,
-          points: item.quest?.points || item.points,
-          requires_approval: item.quest?.requires_approval || item.requires_approval,
-          banner_url: item.quest?.image_url || item.image_url,
-          is_completed: item.is_completed || false,
-          current_count: item.current_count,
-          target_count: item.target_count || item.quest?.target_count,
-          progress_percentage: item.progress_percentage,
+        // Adjust to new response: QuestWithProgress { quest: {...}, is_completed, current_count, target_count, progress_percentage }
+        const data = Array.isArray(res.data) ? res.data : [];
+        const flattened = data.map((qwp: any) => ({
+          // flatten quest fields to top-level for UI
+          ...qwp.quest,
+          // keep progress fields
+          is_completed: qwp.is_completed,
+          current_count: qwp.current_count,
+          target_count: qwp.target_count,
+          progress_percentage: qwp.progress_percentage,
         }));
-        setQuests(questsData);
+        setQuests(flattened);
       })
       .catch(() => setQuests([]));
 
     axios
-      .get(`${API_URL}api/v1/quests/submissions`, {
+      .get(`${API_URL}api/v1/participants/quests/my-submissions`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => {
-        // Response is QuestSubmissionWithDetails[]
-        const submissionsData = res.data.map((item: any) => ({
-          id: item.id,
-          quest_id: item.quest_id,
-          user_id: item.user_id,
-          answer_text: item.answer_text,
-          photo_url: item.photo_url,
-          status: item.status,
-          points_awarded: item.points_awarded,
-          submitted_at: item.submitted_at,
-          reviewed_at: item.reviewed_at,
-          quest: item.quest,
-        }));
-        setSubmissions(submissionsData);
-      })
+      .then((res) => setSubmissions(res.data))
       .catch(() => setSubmissions([]))
       .finally(() => setLoading(false));
   }, []);
@@ -95,7 +77,7 @@ const Quests = () => {
     setSubmitting(true);
     const token = localStorage.getItem("token");
     try {
-      await axios.post(`${API_URL}api/v1/quests/submit`, {
+      await axios.post(`${API_URL}api/v1/participants/quests/submit`, {
         quest_id: activeQuest.id,
         answer_text: answer,
       }, {
@@ -104,22 +86,10 @@ const Quests = () => {
       setActiveQuest(null);
       setAnswer("");
       // Refresh submissions
-      const res = await axios.get(`${API_URL}api/v1/quests/submissions`, {
+      const res = await axios.get(`${API_URL}api/v1/participants/quests/my-submissions`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const submissionsData = res.data.map((item: any) => ({
-        id: item.id,
-        quest_id: item.quest_id,
-        user_id: item.user_id,
-        answer_text: item.answer_text,
-        photo_url: item.photo_url,
-        status: item.status,
-        points_awarded: item.points_awarded,
-        submitted_at: item.submitted_at,
-        reviewed_at: item.reviewed_at,
-        quest: item.quest,
-      }));
-      setSubmissions(submissionsData);
+      setSubmissions(res.data);
     } catch {
       // handle error
     }
@@ -135,7 +105,7 @@ const Quests = () => {
     formData.append("quest_id", activeQuest.id);
     formData.append("photo", photo);
     try {
-      await axios.post(`${API_URL}api/v1/quests/submit`, formData, {
+      await axios.post(`${API_URL}api/v1/participants/quests/submit`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
@@ -144,22 +114,10 @@ const Quests = () => {
       setActiveQuest(null);
       setPhoto(null);
       // Refresh submissions
-      const res = await axios.get(`${API_URL}api/v1/quests/submissions`, {
+      const res = await axios.get(`${API_URL}api/v1/participants/quests/my-submissions`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const submissionsData = res.data.map((item: any) => ({
-        id: item.id,
-        quest_id: item.quest_id,
-        user_id: item.user_id,
-        answer_text: item.answer_text,
-        photo_url: item.photo_url,
-        status: item.status,
-        points_awarded: item.points_awarded,
-        submitted_at: item.submitted_at,
-        reviewed_at: item.reviewed_at,
-        quest: item.quest,
-      }));
-      setSubmissions(submissionsData);
+      setSubmissions(res.data);
     } catch {
       // handle error
     }
@@ -200,8 +158,8 @@ const Quests = () => {
                     className="bg-white border border-[#e0e0e0] rounded-xl shadow p-5 flex flex-col"
                   >
                     {/* Optional image/banner */}
-                    {quest.banner_url && (
-                      <img src={quest.banner_url} alt="" className="rounded-xl mb-3 max-h-40 object-cover w-full" />
+                    {quest.image_url && (
+                      <img src={quest.image_url} alt="" className="rounded-xl mb-3 max-h-40 object-cover w-full" />
                     )}
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-bold text-lg text-primary">{quest.title}</span>
