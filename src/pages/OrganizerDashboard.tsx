@@ -176,20 +176,21 @@ const OrganizerDashboard = () => {
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                padding-top: 520px;
+                padding-top: 580px;
+                padding-left: 80px;
               }
               .name {
                 font-size: 36px;
                 font-weight: bold;
                 color: #222;
                 text-align: center;
-                margin-bottom: 30px;
+                margin-bottom: 40px;
                 word-wrap: break-word;
                 max-width: 500px;
                 line-height: 1.3;
               }
               .qr-code {
-                margin-top: 10px;
+                margin-top: 20px;
               }
               .qr-code img {
                 display: block;
