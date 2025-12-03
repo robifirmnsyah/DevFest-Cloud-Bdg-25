@@ -124,6 +124,29 @@ const Quests = () => {
     setSubmitting(false);
   };
 
+  // Click LINK_CLICK quest: open link and notify server
+  const handleClickLinkQuest = async (quest: any) => {
+    if (!quest?.id || !quest?.link_url) return;
+    const token = localStorage.getItem("token");
+    try {
+      // open link in new tab
+      window.open(quest.link_url, "_blank", "noopener,noreferrer");
+      // record click
+      await axios.post(
+        `${API_URL}api/v1/participants/quests/${quest.id}/click`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      // refresh submissions to reflect completion
+      const res = await axios.get(`${API_URL}api/v1/participants/quests/my-submissions`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setSubmissions(res.data);
+    } catch {
+      // silently fail to avoid blocking UX
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#f6f8fa] text-[#222] pb-16">
       <div className="px-6 py-6">
@@ -152,6 +175,16 @@ const Quests = () => {
             <div className="grid gap-6 max-w-2xl mx-auto">
               {quests.map((quest: any) => {
                 const submission = submissionMap[quest.id];
+                const type = quest.quest_type;
+
+                // helper flags
+                const isAutoByScan = type === "booth_scan" || type === "organizer_scan";
+                const isNetworking = type === "networking";
+                const isLinkClick = type === "link_click";
+                const isUrlSubmission = type === "url_submission";
+                const isText = type === "text_answer";
+                const isPhoto = type === "photo_upload";
+
                 return (
                   <div
                     key={quest.id}
@@ -170,16 +203,58 @@ const Quests = () => {
                     <div className="text-sm text-[#666] mb-2">{quest.description}</div>
                     <div className="flex items-center gap-2 mb-2">
                       <span className="bg-[#e0e0e0] text-[#222] px-3 py-1 rounded-full text-xs font-semibold">
-                        {quest.quest_type.replace(/_/g, " ")}
+                        {type.replace(/_/g, " ")}
                       </span>
                       {quest.requires_approval && (
                         <span className="bg-[#EA4335]/10 text-[#EA4335] px-3 py-1 rounded-full text-xs font-semibold">
                           Needs Approval
                         </span>
                       )}
+                      {/* progress chip for networking */}
+                      {isNetworking && typeof quest.progress_percentage === "number" && (
+                        <span className="bg-[#34A853]/10 text-[#34A853] px-3 py-1 rounded-full text-xs font-semibold">
+                          {quest.current_count ?? 0}/{quest.target_count ?? 0}
+                        </span>
+                      )}
                     </div>
+
+                    {/* Networking progress bar */}
+                    {isNetworking && (
+                      <div className="mb-3">
+                        <div className="h-2 bg-[#eee] rounded">
+                          <div
+                            className="h-2 bg-primary rounded"
+                            style={{ width: `${Math.min(100, quest.progress_percentage ?? 0)}%` }}
+                          />
+                        </div>
+                        <div className="text-xs text-[#888] mt-1">
+                          Progress: {quest.progress_percentage ?? 0}%
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Hint for scan-based quests */}
+                    {isAutoByScan && (
+                      <div className="text-xs text-[#888] mb-2">
+                        Show your QR to {type === "booth_scan" ? "booth staff" : "organizer"} to complete.
+                      </div>
+                    )}
+
+                    {/* Link click CTA */}
+                    {isLinkClick && quest.link_url && !submission && (
+                      <div className="flex justify-end">
+                        <button
+                          className="bg-primary text-white px-5 py-2 rounded font-bold shadow hover:bg-[#1a73e8] transition-all"
+                          onClick={() => handleClickLinkQuest(quest)}
+                        >
+                          Open & Complete
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Start/Status */}
                     <div className="flex justify-end">
-                      {!submission && (
+                      {!submission && !isAutoByScan && !isNetworking && !isLinkClick && (
                         <button
                           className="bg-primary text-white px-5 py-2 rounded font-bold shadow hover:bg-[#1a73e8] transition-all"
                           onClick={() => setActiveQuest(quest)}
@@ -263,6 +338,7 @@ const Quests = () => {
           </div>
         )}
       </div>
+
       {/* Popup for Start Quest */}
       {activeQuest && (
         <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
@@ -270,8 +346,8 @@ const Quests = () => {
             <h3 className="text-2xl font-bold mb-2">{activeQuest.title}</h3>
             <div className="mb-2 text-[#222]">{activeQuest.description}</div>
             <div className="mb-2 font-bold text-[#FBBC05]">Points: {activeQuest.points}</div>
-            {/* If quest title is Share Your Experience, show photo button, else show text form */}
-            {activeQuest.title === "Share Your Experience" ? (
+            {/* Render by quest type */}
+            {activeQuest.quest_type === "photo_upload" ? (
               <>
                 <div className="mb-4 text-[#222]">Take a photo to complete this quest</div>
                 <label className="flex flex-col items-center mb-4">
@@ -304,7 +380,7 @@ const Quests = () => {
                   </button>
                 </div>
               </>
-            ) : (
+            ) : activeQuest.quest_type === "text_answer" ? (
               <>
                 <div className="mb-4 text-[#222]">Enter your answer below</div>
                 <textarea
@@ -330,6 +406,46 @@ const Quests = () => {
                     Submit
                   </button>
                 </div>
+              </>
+            ) : activeQuest.quest_type === "url_submission" ? (
+              <>
+                <div className="mb-4 text-[#222]">Submit your post URL below</div>
+                <textarea
+                  className="w-full rounded-xl border border-[#e0e0e0] p-4 text-base mb-4"
+                  rows={3}
+                  placeholder="https://example.com/your-post"
+                  value={answer}
+                  onChange={handleAnswerChange}
+                />
+                <div className="flex justify-between mt-2">
+                  <button
+                    className="text-[#4285F4] font-bold px-4 py-2 rounded"
+                    onClick={() => { setActiveQuest(null); setAnswer(""); }}
+                    disabled={submitting}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="bg-primary text-white font-bold px-6 py-2 rounded-full shadow hover:bg-[#1a73e8] transition-all"
+                    onClick={handleSubmitTextQuest}
+                    disabled={!answer}
+                  >
+                    Submit
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                {/* Fallback for unsupported manual types */}
+                <div className="mb-4 text-[#888]">
+                  This quest is completed via scanning or link click.
+                </div>
+                <button
+                  className="mt-2 text-[#4285F4] font-bold px-4 py-2 rounded"
+                  onClick={() => { setActiveQuest(null); setAnswer(""); setPhoto(null); }}
+                >
+                  Close
+                </button>
               </>
             )}
           </div>
