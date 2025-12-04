@@ -16,6 +16,7 @@ import Profile from "./pages/Profile";
 import OrganizerDashboard from "./pages/OrganizerDashboard";
 import OrganizerAgenda from "./pages/OrganizerAgenda";
 import OrganizerParticipants from "./pages/OrganizerParticipants";
+import OrganizerRewards from "./pages/OrganizerRewards";
 import BoothStaffDashboard from "./pages/BoothStaffDashboard";
 import BoothStaffScan from "./pages/BoothStaffScan";
 import BoothStaffContacts from "./pages/BoothStaffContacts";
@@ -47,6 +48,7 @@ const App = () => (
           <Route path="/organizer" element={<OrganizerDashboard />} />
           <Route path="/organizer/agenda" element={<OrganizerAgenda />} />
           <Route path="/organizer/participants" element={<OrganizerParticipants />} />
+          <Route path="/organizer/rewards" element={<OrganizerRewards />} />
           
           {/* Booth Staff Routes */}
           <Route path="/booth-staff" element={<BoothStaffDashboard />} />

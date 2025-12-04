@@ -24,6 +24,12 @@ const OrganizerDashboard = () => {
   const [rewardLoading, setRewardLoading] = useState(false);
   const [rewardResult, setRewardResult] = useState("");
   const [rewardError, setRewardError] = useState("");
+  const [scannedQrForReward, setScannedQrForReward] = useState<string>("");
+  const [availableRewards, setAvailableRewards] = useState<any[]>([]);
+  const [selectedRewardId, setSelectedRewardId] = useState<number | null>(null);
+  const [rewardQty, setRewardQty] = useState(1);
+  const [rewardNotes, setRewardNotes] = useState("");
+  const [showRewardForm, setShowRewardForm] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -121,28 +127,62 @@ const OrganizerDashboard = () => {
     setScanLoading(false);
   };
 
-  // Handle reward redemption scan
+  // Fetch available rewards when opening reward scan
+  const fetchAvailableRewards = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await axios.get(`${API_URL}api/v1/organizers/rewards`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setAvailableRewards(res.data || []);
+    } catch (err) {
+      console.error("Failed to fetch rewards:", err);
+      setAvailableRewards([]);
+    }
+  };
+
+  // Handle reward redemption scan - just capture QR, then show form
   const handleRewardScan = async (qr: string | null) => {
     if (!qr) return;
     
+    setScannedQrForReward(qr);
+    setShowRewardForm(true);
+    setRewardScanOpen(false);
+  };
+
+  // Submit reward redemption with selected reward
+  const handleSubmitRewardRedemption = async () => {
+    if (!scannedQrForReward || !selectedRewardId) {
+      alert("Please select a reward");
+      return;
+    }
+
     setRewardLoading(true);
     setRewardError("");
     setRewardResult("");
     
     const token = localStorage.getItem("token");
     try {
-      // Use correct endpoint for reward redemption
       const res = await axios.post(
         `${API_URL}api/v1/organizers/rewards/redeem`,
         { 
-          participant_qr_code: qr
+          participant_qr_code: scannedQrForReward,
+          reward_id: selectedRewardId,
+          qty: rewardQty,
+          notes: rewardNotes || undefined
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
       setRewardResult(res.data.message || "Reward redeemed successfully!");
+      
+      // Reset form after 2 seconds
       setTimeout(() => {
-        setRewardScanOpen(false);
+        setShowRewardForm(false);
+        setScannedQrForReward("");
+        setSelectedRewardId(null);
+        setRewardQty(1);
+        setRewardNotes("");
         setRewardResult("");
         setRewardError("");
       }, 2000);
@@ -164,7 +204,7 @@ const OrganizerDashboard = () => {
     }
     
     try {
-      const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(printData.qr_code)}`;
+      const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(printData.qr_code)}`;
       
       const printWindow = window.open('', '_blank', 'width=800,height=600');
       if (!printWindow) {
@@ -194,78 +234,102 @@ const OrganizerDashboard = () => {
                 display: flex;
                 justify-content: center;
                 align-items: center;
-                min-height: 100vh;
+                height: 100vh;
                 background: #f0f0f0;
+                overflow: hidden;
               }
               .badge-container {
                 position: relative;
-                width: 800px;
-                height: 1200px;
+                width: 794px;
+                height: 1123px;
                 background-image: url('/badge.png');
-                background-size: contain;
+                background-size: cover;
                 background-repeat: no-repeat;
                 background-position: center;
+                page-break-inside: avoid;
+                page-break-after: avoid;
               }
               .badge-content {
                 position: absolute;
-                top: 0;
-                left: 0;
+                top: 51%;
+                left: 47%;
+                transform: translate(-50%, -50%);
                 width: 100%;
-                height: 100%;
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                padding-top: 610px;
-                padding-left: 120px;
+                padding: 0 80px;
               }
               .text-container {
                 display: flex;
                 flex-direction: column;
-                align-items: center;
-                margin-bottom: 35px;
-                max-width: 500px;
+                align-items: flex-start;
+                margin-bottom: 25px;
+                max-width: 450px;
+                width: 100%;
               }
               .name {
-                font-size: 28px;
+                font-size: 38px;
                 font-weight: bold;
-                color: #222;
-                text-align: center;
+                color: #1a1a1a;
+                text-align: left;
+                word-wrap: break-word;
+                line-height: 1.2;
+                margin-bottom: 8px;
+              }
+              .title {
+                font-size: 24px;
+                font-weight: 600;
+                color: #333;
+                text-align: left;
+                word-wrap: break-word;
+                line-height: 1.3;
+                margin-bottom: 5px;
+              }
+              .company {
+                font-size: 20px;
+                font-weight: 500;
+                color: #555;
+                text-align: left;
                 word-wrap: break-word;
                 line-height: 1.3;
               }
-              .title {
-                font-size: 20px;
-                font-weight: 600;
-                color: #444;
-                text-align: center;
-                word-wrap: break-word;
-                line-height: 1.2;
-                margin-top: 5px;
-              }
-              .company {
-                font-size: 18px;
-                font-weight: 500;
-                color: #666;
-                text-align: center;
-                word-wrap: break-word;
-                line-height: 1.2;
-                margin-top: 4px;
-              }
               .qr-code {
-                margin-top: 0;
+                display: flex;
+                justify-content: flex-end;
+                margin-top: 30px;
+                width: 100%;
+                padding-right: 70px;
               }
               .qr-code img {
                 display: block;
-                width: 200px;
-                height: 200px;
+                width: 250px;
+                height: 250px;
+                border: 6px solid white;
+                border-radius: 10px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
               }
               @media print {
+                @page {
+                  size: A4 portrait;
+                  margin: 0;
+                }
+                html, body { 
+                  width: 210mm;
+                  height: 297mm;
+                  margin: 0;
+                  padding: 0;
+                  overflow: hidden;
+                }
                 body { 
                   background: white;
-                  padding: 0;
                 }
                 .badge-container {
-                  page-break-after: always;
+                  width: 210mm;
+                  height: 297mm;
+                  page-break-after: avoid;
+                  page-break-inside: avoid;
+                  page-break-before: avoid;
                 }
               }
             </style>
@@ -475,7 +539,7 @@ const OrganizerDashboard = () => {
 
           <button
             className="bg-white hover:bg-gray-50 rounded-xl p-5 flex flex-col items-center justify-center gap-2 shadow-sm border border-gray-100 transition-all aspect-square max-w-[140px] mx-auto"
-            onClick={() => { setRewardScanOpen(true); setRewardResult(""); setRewardError(""); }}
+            onClick={() => navigate("/organizer/rewards")}
           >
             <div className="bg-green-50 p-2 rounded-full">
               <Gift className="w-6 h-6 text-green-500" />
@@ -682,55 +746,6 @@ const OrganizerDashboard = () => {
                 </div>
               ))
             )}
-          </div>
-        </div>
-      )}
-
-      {/* Reward Redemption Modal */}
-      {rewardScanOpen && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl p-4 shadow-lg w-full max-w-md text-center relative">
-            <h3 className="text-xl font-bold mb-4">Redeem Reward</h3>
-
-            {/* Square scanner container */}
-            <div className="mx-auto w-[86vw] max-w-[360px] md:w-[360px] md:h-[360px] h-[86vw] relative mb-4">
-              <div className="w-full h-full bg-[#000] rounded-lg overflow-hidden relative">
-              <QrScanner
-                key="reward-redeem"
-                delay={300}
-                onError={(error) => setRewardError(error)}
-                onScan={handleRewardScan}
-                style={{ width: "100%", height: "100%" }}
-              />
-
-              {/* Corner guides */}
-              <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 10 }}>
-                <div className="absolute inset-0 bg-black/36" />
-                <span className="absolute left-4 top-4 w-6 h-6 border-t-4 border-l-4 border-white opacity-90" />
-                <span className="absolute right-4 top-4 w-6 h-6 border-t-4 border-r-4 border-white opacity-90" />
-                <span className="absolute left-4 bottom-4 w-6 h-6 border-b-4 border-l-4 border-white opacity-90" />
-                <span className="absolute right-4 bottom-4 w-6 h-6 border-b-4 border-r-4 border-white opacity-90" />
-              </div>
-              </div>
-            </div>
-
-            {/* Close button */}
-            <button
-              aria-label="Close"
-              onClick={() => { setRewardScanOpen(false); setRewardResult(""); setRewardError(""); }}
-              className="absolute top-3 right-3 w-9 h-9 flex items-center justify-center rounded-full bg-white border border-red-100 text-red-600 hover:bg-red-50"
-              type="button"
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
-            </button>
-
-            <div className="text-[#888] text-sm mt-2">Point camera at participant's QR code to redeem reward</div>
-            {rewardLoading && <div className="text-blue-500 mt-2 font-semibold">Processing...</div>}
-            {rewardResult && <div className="text-green-600 mt-2 font-semibold">{rewardResult}</div>}
-            {rewardError && <div className="text-red-500 mt-2 font-semibold">{rewardError}</div>}
           </div>
         </div>
       )}

@@ -38,14 +38,15 @@ const Rewards = () => {
         setRewards([]);
       });
 
-    // Fetch my redemptions
+    // Fetch my redemptions - langsung dari API
     axios
       .get(`${API_URL}api/v1/participants/rewards/my-redemptions`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
         console.log("Redemptions response:", res.data);
-        setMyRedemptions(res.data);
+        // API returns array of redemption objects directly
+        setMyRedemptions(res.data || []);
       })
       .catch((err) => {
         console.error("Failed to fetch redemptions:", err);
@@ -228,62 +229,58 @@ const Rewards = () => {
           <div className="text-[#888] text-center py-12">No redemptions yet.</div>
         ) : (
           <div className="grid gap-4 max-w-2xl mx-auto">
-            {myRedemptions.map((redemption: any) => (
-              <div
-                key={redemption.id}
-                className="bg-white border border-[#e0e0e0] rounded-xl shadow p-5"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="font-bold text-lg text-primary">
-                    {redemption.reward?.title || "Reward"}
-                  </h3>
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                      redemption.is_claimed
-                        ? "bg-[#34A853]/10 text-[#34A853]"
-                        : "bg-[#FBBC05]/10 text-[#FBBC05]"
-                    }`}
-                  >
-                    {redemption.is_claimed ? "Claimed" : "Pending"}
-                  </span>
-                </div>
-
-                {redemption.reward?.description && (
-                  <p className="text-sm text-[#666] mb-2">
-                    {redemption.reward.description}
-                  </p>
-                )}
-
-                <div className="flex items-center gap-2 text-xs text-[#888]">
-                  <span>Redeemed: {new Date(redemption.redeemed_at).toLocaleDateString()}</span>
-                  {redemption.is_claimed && redemption.claimed_at && (
-                    <span>• Claimed: {new Date(redemption.claimed_at).toLocaleDateString()}</span>
-                  )}
-                </div>
-
-                {!redemption.is_claimed && (
-                  <div className="mt-3">
-                    <div className="p-3 bg-[#FBBC05]/10 rounded-lg mb-3">
-                      <p className="text-xs text-[#FBBC05] font-semibold mb-2">
-                        Show your QR code to organizer to claim this reward
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => {
-                        setSelectedReward(redemption.reward);
-                        setShowQrModal(true);
-                      }}
-                      className="w-full bg-primary text-white px-4 py-2 rounded-lg font-bold flex items-center justify-center gap-2 hover:bg-[#1a73e8] transition"
-                    >
-                      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                        <path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm15 0h3v3h-3v-3zm-2 2h2v2h-2v-2zm-2-2h2v2h-2v-2zm4 4h2v2h-2v-2zm-2 0h2v2h-2v-2z"/>
-                      </svg>
-                      Show My QR Code
-                    </button>
+            {myRedemptions.map((redemption: any) => {
+              // Map status to display
+              const statusConfig = {
+                completed: { bg: "bg-[#34A853]/10", text: "text-[#34A853]", label: "Completed" },
+                pending: { bg: "bg-[#FBBC05]/10", text: "text-[#FBBC05]", label: "Pending" },
+                cancelled: { bg: "bg-[#EA4335]/10", text: "text-[#EA4335]", label: "Cancelled" },
+              };
+              
+              const status = statusConfig[redemption.status as keyof typeof statusConfig] || statusConfig.pending;
+              
+              return (
+                <div
+                  key={redemption.id}
+                  className="bg-white border border-[#e0e0e0] rounded-xl shadow p-5"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="font-bold text-lg text-primary">
+                      Reward #{redemption.reward_id}
+                    </h3>
+                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${status.bg} ${status.text}`}>
+                      {status.label}
+                    </span>
                   </div>
-                )}
-              </div>
-            ))}
+
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[#888]">Quantity:</span>
+                      <span className="font-semibold text-[#222]">{redemption.qty}</span>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <span className="text-[#888]">Points Spent:</span>
+                      <span className="font-semibold text-primary">{redemption.points_spent}</span>
+                    </div>
+                    
+                    {redemption.notes && (
+                      <div className="pt-2 border-t border-gray-100">
+                        <span className="text-[#888] text-xs">Notes:</span>
+                        <p className="text-[#222] mt-1">{redemption.notes}</p>
+                      </div>
+                    )}
+                    
+                    <div className="pt-2 border-t border-gray-100 text-xs text-[#888]">
+                      <div>Redeemed: {new Date(redemption.redeemed_at).toLocaleString()}</div>
+                      {redemption.completed_at && (
+                        <div>Completed: {new Date(redemption.completed_at).toLocaleString()}</div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
