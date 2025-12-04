@@ -1,5 +1,5 @@
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
+import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -18,6 +18,10 @@ import OrganizerParticipants from "./pages/OrganizerParticipants";
 import BoothStaffDashboard from "./pages/BoothStaffDashboard";
 import BoothStaffScan from "./pages/BoothStaffScan";
 import BoothStaffContacts from "./pages/BoothStaffContacts";
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminSessions from "./pages/AdminSessions";
+import AdminQuests from "./pages/AdminQuests";
+import AdminRewards from "./pages/AdminRewards";
 
 const queryClient = new QueryClient();
 
@@ -25,7 +29,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
-      <Sonner />
+      <SonnerToaster />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
@@ -46,6 +50,12 @@ const App = () => (
           <Route path="/booth-staff" element={<BoothStaffDashboard />} />
           <Route path="/booth-staff/scan" element={<BoothStaffScan />} />
           <Route path="/booth-staff/contacts" element={<BoothStaffContacts />} />
+          
+          {/* Admin Routes */}
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/sessions" element={<AdminSessions />} />
+          <Route path="/admin/quests" element={<AdminQuests />} />
+          <Route path="/admin/rewards" element={<AdminRewards />} />
           
           {/* Catch-all route - MUST BE LAST */}
           <Route path="*" element={<NotFound />} />

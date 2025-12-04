@@ -18,6 +18,9 @@ const Profile = () => {
   const [editLoading, setEditLoading] = useState(false);
   const [userRoles, setUserRoles] = useState<string[]>([]);
   const [currentRole, setCurrentRole] = useState<string>("");
+  const [showEmailEdit, setShowEmailEdit] = useState(false);
+  const [newEmail, setNewEmail] = useState("");
+  const [emailEditLoading, setEmailEditLoading] = useState(false);
 
   const fetchProfile = async () => {
     const token = localStorage.getItem("token");
@@ -73,7 +76,9 @@ const Profile = () => {
     localStorage.setItem("role", newRole);
     
     // Redirect based on new role
-    if (newRole === "organizer") {
+    if (newRole === "admin") {
+      window.location.href = "/admin";
+    } else if (newRole === "organizer") {
       window.location.href = "/organizer";
     } else if (newRole === "booth_staff") {
       window.location.href = "/booth-staff";
@@ -114,6 +119,37 @@ const Profile = () => {
       setEditOpen(false);
     } catch {}
     setEditLoading(false);
+  };
+
+  // Handle email change
+  const handleEmailChange = async () => {
+    if (!newEmail || newEmail === profile.email) {
+      alert("Please enter a different email");
+      return;
+    }
+    
+    setEmailEditLoading(true);
+    const token = localStorage.getItem("token");
+    try {
+      await axios.put(
+        `${API_URL}api/v1/participants/email`,
+        { new_email: newEmail },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      await fetchProfile();
+      setShowEmailEdit(false);
+      setNewEmail("");
+      alert("Email updated successfully!");
+    } catch (err: any) {
+      alert(err?.response?.data?.message || "Failed to update email");
+    }
+    setEmailEditLoading(false);
   };
 
   // Generate QR code image URL from qr_code string
@@ -163,7 +199,7 @@ const Profile = () => {
                         : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                     }`}
                   >
-                    {r === "participant" ? "Participant" : r === "organizer" ? "Organizer" : "Booth Staff"}
+                    {r === "participant" ? "Participant" : r === "organizer" ? "Organizer" : r === "booth_staff" ? "Booth Staff" : "Admin"}
                   </button>
                 ))}
               </div>
@@ -225,7 +261,7 @@ const Profile = () => {
                       : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                   }`}
                 >
-                  {r === "participant" ? "Participant" : r === "organizer" ? "Organizer" : "Booth Staff"}
+                  {r === "participant" ? "Participant" : r === "organizer" ? "Organizer" : r === "booth_staff" ? "Booth Staff" : "Admin"}
                 </button>
               ))}
             </div>
@@ -238,6 +274,22 @@ const Profile = () => {
           </div>
           <div className="text-2xl font-bold mb-1">{profile.name}</div>
           <div className="text-base text-[#666] mb-2">{profile.title || profile.role}</div>
+          
+          {/* Show email with edit option if has_duplicate_email */}
+          {profile.has_duplicate_email && (
+            <div className="w-full bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-3">
+              <div className="text-sm text-yellow-800 mb-2">
+                <strong>Email:</strong> {profile.email}
+              </div>
+              <button
+                onClick={() => setShowEmailEdit(true)}
+                className="text-sm text-yellow-700 hover:text-yellow-900 font-semibold underline"
+              >
+                Change Email (Duplicate Detected)
+              </button>
+            </div>
+          )}
+          
           <div className="text-sm text-[#888] mb-4 text-center">{profile.bio || "No bio yet."}</div>
           <button
             className="w-full flex items-center justify-center gap-2 border border-[#e0e0e0] rounded-lg py-2 font-bold text-primary hover:bg-primary/10 transition mb-4"
@@ -355,6 +407,41 @@ const Profile = () => {
                 disabled={editLoading || !editName}
               >
                 {editLoading ? "Saving..." : "Save"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Email Edit Modal */}
+      {showEmailEdit && (
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-8 shadow-xl flex flex-col items-center max-w-xs w-full">
+            <h3 className="text-xl font-bold mb-4">Change Email</h3>
+            <p className="text-sm text-gray-600 mb-4 text-center">
+              Enter your new email address to resolve duplicate account issue
+            </p>
+            <input
+              className="w-full mb-3 px-4 py-2 border rounded text-base"
+              placeholder="New Email"
+              type="email"
+              value={newEmail}
+              onChange={e => setNewEmail(e.target.value)}
+              disabled={emailEditLoading}
+            />
+            <div className="flex gap-4 mt-2 w-full">
+              <button
+                className="flex-1 px-4 py-2 rounded bg-[#e0e0e0] text-[#222] font-bold"
+                onClick={() => { setShowEmailEdit(false); setNewEmail(""); }}
+                disabled={emailEditLoading}
+              >
+                Cancel
+              </button>
+              <button
+                className="flex-1 px-4 py-2 rounded bg-primary text-white font-bold"
+                onClick={handleEmailChange}
+                disabled={emailEditLoading || !newEmail}
+              >
+                {emailEditLoading ? "Saving..." : "Save"}
               </button>
             </div>
           </div>

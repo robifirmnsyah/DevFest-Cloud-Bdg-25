@@ -36,14 +36,17 @@ const Auth = () => {
     localStorage.setItem("token", data.access_token);
     localStorage.setItem("user_roles", JSON.stringify(userRoles));
     
-    // Determine initial role (prioritize organizer if available)
-    const initialRole = userRoles.includes("organizer") ? "organizer" : 
+    // Determine initial role (prioritize admin > organizer > booth_staff > participant)
+    const initialRole = userRoles.includes("admin") ? "admin" :
+                       userRoles.includes("organizer") ? "organizer" : 
                        userRoles.includes("booth_staff") ? "booth_staff" : 
                        "participant";
     localStorage.setItem("role", initialRole);
     
     // Redirect based on role
-    if (initialRole === "organizer") {
+    if (initialRole === "admin") {
+      window.location.href = "/admin";
+    } else if (initialRole === "organizer") {
       window.location.href = "/organizer";
     } else if (initialRole === "booth_staff") {
       window.location.href = "/booth-staff";

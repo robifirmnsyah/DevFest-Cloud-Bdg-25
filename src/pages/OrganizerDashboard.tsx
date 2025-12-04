@@ -20,6 +20,10 @@ const OrganizerDashboard = () => {
   const [cameraActive, setCameraActive] = useState(false);
   const [printData, setPrintData] = useState<any>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [rewardScanOpen, setRewardScanOpen] = useState(false);
+  const [rewardLoading, setRewardLoading] = useState(false);
+  const [rewardResult, setRewardResult] = useState("");
+  const [rewardError, setRewardError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -115,6 +119,39 @@ const OrganizerDashboard = () => {
       );
     }
     setScanLoading(false);
+  };
+
+  // Handle reward redemption scan
+  const handleRewardScan = async (qr: string | null) => {
+    if (!qr) return;
+    
+    setRewardLoading(true);
+    setRewardError("");
+    setRewardResult("");
+    
+    const token = localStorage.getItem("token");
+    try {
+      const res = await axios.post(
+        `${API_URL}api/v1/organizers/rewards/redeem`,
+        { participant_qr_code: qr },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      setRewardResult(res.data.message || "Reward redeemed successfully!");
+      setTimeout(() => {
+        setRewardScanOpen(false);
+        setRewardResult("");
+        setRewardError("");
+      }, 2000);
+    } catch (err: any) {
+      console.error("Reward redemption error:", err);
+      setRewardError(
+        err?.response?.data?.message ||
+        err?.response?.data?.detail?.[0]?.msg ||
+        "Failed to redeem reward. Please try again."
+      );
+    }
+    setRewardLoading(false);
   };
 
   // Print badge with improved reliability
@@ -436,7 +473,7 @@ const OrganizerDashboard = () => {
 
           <button
             className="bg-white hover:bg-gray-50 rounded-xl p-5 flex flex-col items-center justify-center gap-2 shadow-sm border border-gray-100 transition-all aspect-square max-w-[140px] mx-auto"
-            onClick={() => alert("Coming soon")}
+            onClick={() => { setRewardScanOpen(true); setRewardResult(""); setRewardError(""); }}
           >
             <div className="bg-green-50 p-2 rounded-full">
               <Gift className="w-6 h-6 text-green-500" />
@@ -444,6 +481,8 @@ const OrganizerDashboard = () => {
             <div className="text-center">
               <div className="font-bold text-sm text-green-500 mb-0.5">Swag Collection</div>
               <div className="text-xs text-gray-400">Coming soon</div>
+              <div className="font-bold text-sm text-green-500 mb-0.5">Reward Redeem</div>
+              <div className="text-xs text-gray-400">Scan to redeem</div>
             </div>
           </button>
 
@@ -643,6 +682,55 @@ const OrganizerDashboard = () => {
                 </div>
               ))
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Reward Redemption Modal */}
+      {rewardScanOpen && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-4 shadow-lg w-full max-w-md text-center relative">
+            <h3 className="text-xl font-bold mb-4">Redeem Reward</h3>
+
+            {/* Square scanner container */}
+            <div className="mx-auto w-[86vw] max-w-[360px] md:w-[360px] md:h-[360px] h-[86vw] relative mb-4">
+              <div className="w-full h-full bg-[#000] rounded-lg overflow-hidden relative">
+              <QrScanner
+                key="reward-redeem"
+                delay={300}
+                onError={(error) => setRewardError(error)}
+                onScan={handleRewardScan}
+                style={{ width: "100%", height: "100%" }}
+              />
+
+              {/* Corner guides */}
+              <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 10 }}>
+                <div className="absolute inset-0 bg-black/36" />
+                <span className="absolute left-4 top-4 w-6 h-6 border-t-4 border-l-4 border-white opacity-90" />
+                <span className="absolute right-4 top-4 w-6 h-6 border-t-4 border-r-4 border-white opacity-90" />
+                <span className="absolute left-4 bottom-4 w-6 h-6 border-b-4 border-l-4 border-white opacity-90" />
+                <span className="absolute right-4 bottom-4 w-6 h-6 border-b-4 border-r-4 border-white opacity-90" />
+              </div>
+              </div>
+            </div>
+
+            {/* Close button */}
+            <button
+              aria-label="Close"
+              onClick={() => { setRewardScanOpen(false); setRewardResult(""); setRewardError(""); }}
+              className="absolute top-3 right-3 w-9 h-9 flex items-center justify-center rounded-full bg-white border border-red-100 text-red-600 hover:bg-red-50"
+              type="button"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+
+            <div className="text-[#888] text-sm mt-2">Point camera at participant's QR code to redeem reward</div>
+            {rewardLoading && <div className="text-blue-500 mt-2 font-semibold">Processing...</div>}
+            {rewardResult && <div className="text-green-600 mt-2 font-semibold">{rewardResult}</div>}
+            {rewardError && <div className="text-red-500 mt-2 font-semibold">{rewardError}</div>}
           </div>
         </div>
       )}
