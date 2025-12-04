@@ -264,21 +264,21 @@ const OrganizerDashboard = () => {
                 display: flex;
                 flex-direction: column;
                 align-items: flex-start;
-                margin-bottom: 25px;
+                margin-top: 50px;
                 max-width: 450px;
                 width: 100%;
               }
               .name {
-                font-size: 38px;
+                font-size: 40px;
                 font-weight: bold;
                 color: #1a1a1a;
                 text-align: left;
                 word-wrap: break-word;
                 line-height: 1.2;
-                margin-bottom: 8px;
+                margin-bottom: 15px;
               }
               .title {
-                font-size: 24px;
+                font-size: 30px;
                 font-weight: 600;
                 color: #333;
                 text-align: left;
@@ -287,7 +287,7 @@ const OrganizerDashboard = () => {
                 margin-bottom: 5px;
               }
               .company {
-                font-size: 20px;
+                font-size: 28px;
                 font-weight: 500;
                 color: #555;
                 text-align: left;
@@ -299,19 +299,20 @@ const OrganizerDashboard = () => {
                 justify-content: flex-end;
                 margin-top: 30px;
                 width: 100%;
-                padding-right: 70px;
+                padding-right: 90px;
+                position: relative;
+                top: 110px;
               }
               .qr-code img {
                 display: block;
-                width: 250px;
-                height: 250px;
+                width: 280px;
+                height: 280px;
                 border: 6px solid white;
                 border-radius: 10px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
               }
               @media print {
                 @page {
-                  size: A4 portrait;
+                  size: B2 portrait;
                   margin: 0;
                 }
                 html, body { 
