@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard";
 import Agenda from "./pages/Agenda";
 import Friends from "./pages/Friends";
 import Quests from "./pages/Quests";
+import Rewards from "./pages/Rewards";
 import Profile from "./pages/Profile";
 import OrganizerDashboard from "./pages/OrganizerDashboard";
 import OrganizerAgenda from "./pages/OrganizerAgenda";
@@ -39,6 +40,7 @@ const App = () => (
           <Route path="/agenda" element={<Agenda />} />
           <Route path="/friends" element={<Friends />} />
           <Route path="/quests" element={<Quests />} />
+          <Route path="/rewards" element={<Rewards />} />
           <Route path="/profile" element={<Profile />} />
           
           {/* Organizer Routes */}

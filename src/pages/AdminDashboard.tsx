@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Calendar, Award, Gift, Users, Settings } from "lucide-react";
+import { Calendar, Award, Gift } from "lucide-react";
+import AdminTabBar from "@/components/AdminTabBar";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -72,34 +73,10 @@ const AdminDashboard = () => {
               <div className="text-xs text-gray-500">Manage prizes</div>
             </div>
           </button>
-
-          <button
-            onClick={() => navigate("/organizer/participants")}
-            className="bg-white hover:bg-gray-50 rounded-xl p-6 flex flex-col items-center justify-center gap-3 shadow-sm border border-gray-100 transition-all aspect-square"
-          >
-            <div className="bg-purple-50 p-3 rounded-full">
-              <Users className="w-8 h-8 text-purple-500" />
-            </div>
-            <div className="text-center">
-              <div className="font-bold text-base text-gray-900 mb-1">Participants</div>
-              <div className="text-xs text-gray-500">View attendees</div>
-            </div>
-          </button>
-
-          <button
-            onClick={() => navigate("/profile")}
-            className="bg-white hover:bg-gray-50 rounded-xl p-6 flex flex-col items-center justify-center gap-3 shadow-sm border border-gray-100 transition-all aspect-square"
-          >
-            <div className="bg-gray-50 p-3 rounded-full">
-              <Settings className="w-8 h-8 text-gray-500" />
-            </div>
-            <div className="text-center">
-              <div className="font-bold text-base text-gray-900 mb-1">Profile</div>
-              <div className="text-xs text-gray-500">Settings</div>
-            </div>
-          </button>
         </div>
       </main>
+
+      <AdminTabBar activeTab="hub" />
     </div>
   );
 };

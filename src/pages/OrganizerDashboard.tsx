@@ -131,9 +131,12 @@ const OrganizerDashboard = () => {
     
     const token = localStorage.getItem("token");
     try {
+      // Use correct endpoint for reward redemption
       const res = await axios.post(
         `${API_URL}api/v1/organizers/rewards/redeem`,
-        { participant_qr_code: qr },
+        { 
+          participant_qr_code: qr
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
@@ -145,11 +148,10 @@ const OrganizerDashboard = () => {
       }, 2000);
     } catch (err: any) {
       console.error("Reward redemption error:", err);
-      setRewardError(
-        err?.response?.data?.message ||
-        err?.response?.data?.detail?.[0]?.msg ||
-        "Failed to redeem reward. Please try again."
-      );
+      const errorMessage = err?.response?.data?.detail?.[0]?.msg || 
+                          err?.response?.data?.message || 
+                          "Failed to redeem reward. Please try again.";
+      setRewardError(errorMessage);
     }
     setRewardLoading(false);
   };
@@ -453,7 +455,7 @@ const OrganizerDashboard = () => {
               <QrCode className="w-6 h-6" />
             </div>
             <div className="text-center">
-              <div className="font-bold text-sm mb-0.5">Event Check-in/Check-out</div>
+              <div className="font-bold text-sm mb-0.5">Event Check-in</div>
               <div className="text-xs opacity-80">Scan tickets</div>
             </div>
           </button>
@@ -479,8 +481,6 @@ const OrganizerDashboard = () => {
               <Gift className="w-6 h-6 text-green-500" />
             </div>
             <div className="text-center">
-              <div className="font-bold text-sm text-green-500 mb-0.5">Swag Collection</div>
-              <div className="text-xs text-gray-400">Coming soon</div>
               <div className="font-bold text-sm text-green-500 mb-0.5">Reward Redeem</div>
               <div className="text-xs text-gray-400">Scan to redeem</div>
             </div>
@@ -494,7 +494,7 @@ const OrganizerDashboard = () => {
               <Award className="w-6 h-6 text-yellow-500" />
             </div>
             <div className="text-center">
-              <div className="font-bold text-sm text-yellow-500 mb-0.5">Quest Scan</div>
+              <div className="font-bold text-sm text-yellow-500 mb-0.5">Quest Review</div>
               <div className="text-xs text-gray-400">Verify completion</div>
             </div>
           </button>
@@ -593,7 +593,7 @@ const OrganizerDashboard = () => {
                 className="w-full bg-blue-500 hover:bg-blue-600 text-white px-8 py-4 rounded-xl font-bold text-lg transition-colors shadow-lg flex items-center justify-center gap-3"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                 </svg>
                 Print Badge
               </button>

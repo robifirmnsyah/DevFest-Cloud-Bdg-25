@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Megaphone, Bell } from "lucide-react";
+import { Megaphone, Bell, Gift } from "lucide-react";
 import TabBar from "@/components/TabBar";
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -80,7 +80,7 @@ const Dashboard = () => {
         {/* Progress */}
         <div className="mb-8">
           <h3 className="text-xl font-bold mb-3">Your Progress</h3>
-          <div className="flex gap-4">
+          <div className="grid grid-cols-2 gap-3 mb-4">
             <div className="flex-1 border border-[#e0e0e0] bg-white rounded-xl p-5 flex flex-col items-start shadow">
               <span className="text-base mb-2">Points</span>
               <span className="text-2xl font-bold text-primary">{profile.points ?? 0}</span>
@@ -90,6 +90,14 @@ const Dashboard = () => {
               <span className="text-2xl font-bold text-primary">{questsCompleted}/{totalQuests}</span>
             </div>
           </div>
+          
+          {/* Redeem Rewards Button */}
+          <a href="/rewards" className="block">
+            <button className="w-full bg-gradient-to-r from-[#4285F4] to-[#34A853] hover:from-[#1a73e8] hover:to-[#2d8a47] text-white rounded-xl py-4 px-6 font-bold text-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-3">
+              <Gift className="w-6 h-6" />
+              <span>Redeem Rewards</span>
+            </button>
+          </a>
         </div>
       </main>
 

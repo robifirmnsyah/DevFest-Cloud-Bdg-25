@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { ArrowLeft, Plus, Edit, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import AdminTabBar from "@/components/AdminTabBar";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -130,23 +131,20 @@ const AdminSessions = () => {
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       <header className="bg-white border-b border-gray-100 px-6 py-4">
-        <div className="flex items-center gap-4 mb-4">
-          <button onClick={() => navigate("/admin")} className="text-blue-500">
-            <ArrowLeft className="w-6 h-6" />
-          </button>
-          <h1 className="text-2xl font-bold text-blue-500">Manage Sessions</h1>
-        </div>
-        
-        <button
-          onClick={() => { setShowForm(true); setEditingSession(null); resetForm(); }}
-          className="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-3 rounded-xl font-bold flex items-center justify-center gap-2 transition-colors"
-        >
-          <Plus className="w-5 h-5" />
-          Add New Session
-        </button>
+        <h1 className="text-2xl font-bold text-blue-500 text-center mb-4">Manage Sessions</h1>
       </header>
 
       <main className="px-6 py-6">
+        <div className="flex justify-end mb-4 max-w-2xl mx-auto">
+          <button
+            onClick={() => { setShowForm(true); setEditingSession(null); resetForm(); }}
+            className="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold flex items-center gap-2 transition-colors shadow-sm"
+          >
+            <Plus className="w-4 h-4" />
+            Add New Session
+          </button>
+        </div>
+
         {loading ? (
           <div className="text-center py-12">Loading...</div>
         ) : sessions.length === 0 ? (
@@ -309,6 +307,8 @@ const AdminSessions = () => {
           </div>
         </div>
       )}
+
+      <AdminTabBar activeTab="sessions" />
     </div>
   );
 };
