@@ -17,12 +17,12 @@ const BoothStaffDashboard = () => {
     const role = localStorage.getItem("role");
     
     if (!token) {
-      window.location.href = "/auth";
+      window.location.hash = "/auth";
       return;
     }
     
     if (role !== "booth_staff") {
-      window.location.href = "/dashboard";
+      window.location.hash = "/dashboard";
       return;
     }
 
@@ -103,7 +103,7 @@ const BoothStaffDashboard = () => {
             localStorage.removeItem("token");
             localStorage.removeItem("role");
             localStorage.removeItem("user_roles");
-            window.location.href = "/auth";
+            window.location.hash = "/auth";
           }}
           title="Logout"
         >

@@ -37,11 +37,11 @@ const OrganizerDashboard = () => {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
     if (!token) {
-      window.location.href = "/auth";
+      window.location.hash = "/auth";
       return;
     }
     if (role !== "organizer") {
-      window.location.href = "/dashboard";
+      window.location.hash = "/dashboard";
       return;
     }
     axios
@@ -255,7 +255,7 @@ const OrganizerDashboard = () => {
           onClick={() => {
             localStorage.removeItem("token");
             localStorage.removeItem("role");
-            window.location.href = "/auth";
+            window.location.hash = "/auth";
           }}
           title="Logout"
         >

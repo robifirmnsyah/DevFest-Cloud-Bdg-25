@@ -10,9 +10,10 @@ const API_URL = import.meta.env.VITE_API_URL;
 const BoothStaffScan = () => {
   const [scanError, setScanError] = useState("");
   const [scannedProfile, setScannedProfile] = useState<any>(null);
-  const [scannedQrCode, setScannedQrCode] = useState<string>(""); // Store the QR code
+  const [scannedQrCode, setScannedQrCode] = useState<string>("");
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false); // NEW
   const navigate = useNavigate();
 
   const handleScan = async (qr: string | null) => {
@@ -44,18 +45,8 @@ const BoothStaffScan = () => {
     setSaving(true);
     const token = localStorage.getItem("token");
     try {
-      // Prepare payload - only include notes if it has a value
-      const payload: any = {
-        participant_qr_code: scannedQrCode  // Use the stored QR code, not from profile
-      };
-      
-      if (notes && notes.trim()) {
-        payload.notes = notes.trim();
-      }
-
-      console.log('Sending payload:', payload);
-      console.log('QR Code:', scannedQrCode);
-      console.log('Full profile:', scannedProfile);
+      const payload: any = { participant_qr_code: scannedQrCode };
+      if (notes && notes.trim()) payload.notes = notes.trim();
 
       await axios.post(
         `${API_URL}api/v1/booth-staff/contacts/add`,
@@ -68,9 +59,8 @@ const BoothStaffScan = () => {
         }
       );
 
-      // Show success and navigate to contacts
-      alert(`Contact added: ${scannedProfile.user.name}`);
-      navigate("/booth-staff/contacts");
+      // NEW: Show custom success modal
+      setShowSuccessModal(true);
     } catch (err: any) {
       console.error('Add contact error:', err);
       console.error('Error response:', err?.response);
@@ -206,6 +196,53 @@ const BoothStaffScan = () => {
       </main>
 
       <BoothStaffTabBar activeTab="scan" />
+
+      {/* NEW: Success Modal */}
+      {showSuccessModal && scannedProfile?.user && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 shadow-2xl w-full max-w-md text-center relative">
+            <button
+              onClick={() => setShowSuccessModal(false)}
+              className="absolute top-3 right-3 w-9 h-9 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+              aria-label="Close"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+              <svg className="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-1">Contact Added</h3>
+            <p className="text-sm text-gray-600 mb-4">{scannedProfile.user.name}</p>
+
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={() => {
+                  setShowSuccessModal(false);
+                  navigate("/booth-staff/contacts");
+                }}
+                className="w-full bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl font-bold text-base transition-colors"
+              >
+                View Contacts
+              </button>
+              <button
+                onClick={() => {
+                  setShowSuccessModal(false);
+                  setScannedProfile(null);
+                  setScannedQrCode("");
+                  setNotes("");
+                  setScanError("");
+                }}
+                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-xl font-semibold text-base transition-colors"
+              >
+                Scan Another
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

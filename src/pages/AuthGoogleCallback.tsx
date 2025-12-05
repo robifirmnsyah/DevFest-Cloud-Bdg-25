@@ -12,7 +12,7 @@ const AuthGoogleCallback = () => {
 
     if (!idToken) {
       setMessage("Google login failed. Missing token.");
-      setTimeout(() => (window.location.href = "/auth"), 1500);
+      setTimeout(() => (window.location.hash = "/auth"), 1500);
       return;
     }
 
@@ -30,19 +30,18 @@ const AuthGoogleCallback = () => {
                            userRoles.includes("booth_staff") ? "booth_staff" : 
                            "participant";
         localStorage.setItem("role", initialRole);
-        
-        // Redirect based on role
+        // Redirect based on role via HashRouter
         if (initialRole === "organizer") {
-          window.location.href = "/organizer";
+          window.location.hash = "/organizer";
         } else if (initialRole === "booth_staff") {
-          window.location.href = "/booth-staff";
+          window.location.hash = "/booth-staff";
         } else {
-          window.location.href = "/dashboard";
+          window.location.hash = "/dashboard";
         }
       })
       .catch(() => {
         setMessage("Google login failed. Redirecting...");
-        setTimeout(() => (window.location.href = "/auth"), 1500);
+        setTimeout(() => (window.location.hash = "/auth"), 1500);
       });
   }, []);
 

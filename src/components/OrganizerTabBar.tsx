@@ -18,7 +18,7 @@ const OrganizerTabBar = ({ activeTab }: { activeTab: OrganizerTab }) => {
     { id: "hub", label: "Organizer Hub", icon: Home, path: "/organizer" },
     { id: "agenda", label: "Agenda", icon: Calendar, path: "/organizer/agenda" },
     { id: "participants", label: "Participants", icon: Users, path: "/organizer/participants" },
-    { id: "profile", label: "Profile", icon: User, path: "/profile" },
+    { id: "profile", label: "Profile", icon: User, path: "/organizer/profile" },
   ];
 
   return (

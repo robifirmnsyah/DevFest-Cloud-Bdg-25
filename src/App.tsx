@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HashRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
@@ -24,6 +24,8 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminSessions from "./pages/AdminSessions";
 import AdminQuests from "./pages/AdminQuests";
 import AdminRewards from "./pages/AdminRewards";
+import OrganizerProfile from "./pages/OrganizerProfile";
+import BoothStaffProfile from "./pages/BoothStaffProfile";
 
 const queryClient = new QueryClient();
 
@@ -32,7 +34,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <SonnerToaster />
-      <BrowserRouter>
+      <HashRouter>
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
@@ -50,11 +52,13 @@ const App = () => (
           <Route path="/organizer/participants" element={<OrganizerParticipants />} />
           <Route path="/organizer/rewards" element={<OrganizerRewards />} />
           <Route path="/organizer/quests" element={<OrganizerQuests />} />
+          <Route path="/organizer/profile" element={<OrganizerProfile />} />
           
           {/* Booth Staff Routes */}
           <Route path="/booth-staff" element={<BoothStaffDashboard />} />
           <Route path="/booth-staff/scan" element={<BoothStaffScan />} />
           <Route path="/booth-staff/contacts" element={<BoothStaffContacts />} />
+          <Route path="/booth-staff/profile" element={<BoothStaffProfile />} />
           
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminDashboard />} />
@@ -65,7 +69,7 @@ const App = () => (
           {/* Catch-all route - MUST BE LAST */}
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </BrowserRouter>
+      </HashRouter>
     </TooltipProvider>
   </QueryClientProvider>
 );

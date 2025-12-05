@@ -13,7 +13,7 @@ const BoothStaffTabBar = ({ activeTab }: BoothStaffTabBarProps) => {
     { id: "hub", label: "Hub", icon: Home, path: "/booth-staff" },
     { id: "scan", label: "Scan", icon: QrCode, path: "/booth-staff/scan" },
     { id: "contacts", label: "Contacts", icon: Users, path: "/booth-staff/contacts" },
-    { id: "profile", label: "Profile", icon: User, path: "/profile" },
+    { id: "profile", label: "Profile", icon: User, path: "/booth-staff/profile" },
   ];
 
   return (

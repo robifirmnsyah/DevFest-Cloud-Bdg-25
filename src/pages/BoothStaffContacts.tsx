@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Search, User, X } from "lucide-react";
+import { Search, User, X, Pencil } from "lucide-react";
 import BoothStaffTabBar from "@/components/BoothStaffTabBar";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -9,6 +9,11 @@ const BoothStaffContacts = () => {
   const [contacts, setContacts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  // NEW: edit notes modal state
+  const [editingContact, setEditingContact] = useState<any | null>(null);
+  const [editNotes, setEditNotes] = useState("");
+  const [editLoading, setEditLoading] = useState(false);
+  const [editError, setEditError] = useState("");
 
   const fetchContacts = async () => {
     const token = localStorage.getItem("token");
@@ -40,6 +45,37 @@ const BoothStaffContacts = () => {
       contact.notes?.toLowerCase().includes(query)
     );
   });
+
+  const openEditNotes = (contact: any) => {
+    setEditingContact(contact);
+    setEditNotes(contact.notes || "");
+    setEditError("");
+  };
+
+  const saveEditNotes = async () => {
+    if (!editingContact) return;
+    setEditLoading(true);
+    setEditError("");
+    const token = localStorage.getItem("token");
+    try {
+      await axios.put(
+        `${API_URL}api/v1/booth-staff/contacts/${editingContact.contact_id}`,
+        { notes: editNotes || "" },
+        { headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } }
+      );
+      // Refresh list
+      await fetchContacts();
+      setEditingContact(null);
+      setEditNotes("");
+    } catch (err: any) {
+      const msg =
+        err?.response?.data?.detail?.[0]?.msg ||
+        err?.response?.data?.message ||
+        "Failed to update notes";
+      setEditError(msg);
+    }
+    setEditLoading(false);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 pb-20">
@@ -112,9 +148,26 @@ const BoothStaffContacts = () => {
                     
                     {contact.notes && (
                       <div className="bg-gray-50 rounded-lg p-3 mt-2">
-                        <p className="text-xs font-semibold text-gray-700 mb-1">Notes:</p>
-                        <p className="text-sm text-gray-600">{contact.notes}</p>
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs font-semibold text-gray-700">Notes</p>
+                          <button
+                            onClick={() => openEditNotes(contact)}
+                            className="text-xs text-green-600 hover:text-green-700 font-semibold flex items-center gap-1"
+                            title="Edit notes"
+                          >
+                            <Pencil className="w-3 h-3" /> Edit
+                          </button>
+                        </div>
+                        <p className="text-sm text-gray-600 mt-1">{contact.notes}</p>
                       </div>
+                    )}
+                    {!contact.notes && (
+                      <button
+                        onClick={() => openEditNotes(contact)}
+                        className="mt-2 text-xs text-green-600 hover:text-green-700 font-semibold underline"
+                      >
+                        Add notes
+                      </button>
                     )}
                     
                     <div className="mt-2 text-xs text-gray-400">
@@ -130,6 +183,52 @@ const BoothStaffContacts = () => {
           </div>
         )}
       </main>
+
+      {/* NEW: Edit Notes Modal */}
+      {editingContact && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 shadow-2xl w-full max-w-md relative">
+            <button
+              onClick={() => { setEditingContact(null); setEditNotes(""); setEditError(""); }}
+              className="absolute top-3 right-3 w-9 h-9 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+              aria-label="Close"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <h3 className="text-xl font-bold text-gray-900 mb-1">Edit Notes</h3>
+            <p className="text-sm text-gray-600 mb-4">Contact: {editingContact.participant?.name}</p>
+
+            <textarea
+              className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500 text-base"
+              rows={4}
+              placeholder="Update notes..."
+              value={editNotes}
+              onChange={(e) => setEditNotes(e.target.value)}
+              disabled={editLoading}
+            />
+
+            {editError && <div className="text-red-500 mt-2 text-sm">{editError}</div>}
+
+            <div className="flex gap-3 mt-4">
+              <button
+                onClick={() => { setEditingContact(null); setEditNotes(""); setEditError(""); }}
+                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-semibold"
+                disabled={editLoading}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={saveEditNotes}
+                className="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-semibold disabled:opacity-50"
+                disabled={editLoading}
+              >
+                {editLoading ? "Saving..." : "Save Notes"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <BoothStaffTabBar activeTab="contacts" />
     </div>

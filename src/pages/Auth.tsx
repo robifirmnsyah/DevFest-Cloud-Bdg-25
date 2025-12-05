@@ -42,16 +42,15 @@ const Auth = () => {
                        userRoles.includes("booth_staff") ? "booth_staff" : 
                        "participant";
     localStorage.setItem("role", initialRole);
-    
-    // Redirect based on role
+    // Redirect based on role using HashRouter
     if (initialRole === "admin") {
-      window.location.href = "/admin";
+      window.location.hash = "/admin";
     } else if (initialRole === "organizer") {
-      window.location.href = "/organizer";
+      window.location.hash = "/organizer";
     } else if (initialRole === "booth_staff") {
-      window.location.href = "/booth-staff";
+      window.location.hash = "/booth-staff";
     } else {
-      window.location.href = "/dashboard";
+      window.location.hash = "/dashboard";
     }
   };
 

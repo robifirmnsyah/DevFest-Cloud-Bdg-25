@@ -1,0 +1,89 @@
+import { useEffect, useState } from "react";
+import axios from "axios";
+import OrganizerTabBar from "@/components/OrganizerTabBar";
+import { LogOut, Pencil } from "lucide-react";
+
+const API_URL = (import.meta.env.VITE_API_URL ?? "https://devfest-api.cloudbandung.id/").replace(/\/?$/, "/");
+
+const OrganizerProfile = () => {
+  const [profile, setProfile] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchOrganizerProfile = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      window.location.hash = "/auth";
+      return;
+    }
+    try {
+      const res = await axios.get(`${API_URL}api/v1/organizers/profile`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setProfile(res.data);
+    } catch (err: any) {
+      if (err?.response?.status === 401 || err?.response?.status === 403) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
+        localStorage.removeItem("user_roles");
+        window.location.hash = "/auth";
+      } else {
+        setProfile(null);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const role = localStorage.getItem("role");
+    if (role !== "organizer") {
+      window.location.hash = "/dashboard";
+      return;
+    }
+    fetchOrganizerProfile();
+  }, []);
+
+  if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#f6f8fa] text-[#222]">Loading...</div>;
+  if (!profile) return null;
+
+  return (
+    <div className="min-h-screen bg-[#f6f8fa] text-[#222] pb-16">
+      <div className="px-6 py-6 max-w-md mx-auto">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-center flex-1">My Profile</h2>
+          <button
+            className="ml-2 text-[#4285F4] hover:text-[#1a73e8] p-2"
+            onClick={() => {
+              localStorage.removeItem("token");
+              localStorage.removeItem("role");
+              localStorage.removeItem("user_roles");
+              window.location.hash = "/auth";
+            }}
+            title="Logout"
+          >
+            <LogOut className="w-6 h-6" />
+          </button>
+        </div>
+
+        <div className="flex flex-col items-center mb-6">
+          <div className="w-24 h-24 rounded-full bg-[#e0e0e0] flex items-center justify-center text-4xl font-bold text-primary mb-3 border-4 border-[#4285F4]">
+            {profile.name?.charAt(0) || "?"}
+          </div>
+          <div className="text-2xl font-bold mb-1">{profile.name}</div>
+          <div className="text-base text-[#4285F4] mb-2">{profile.title}</div>
+          <div className="text-sm text-[#888] mb-4 text-center">{profile.bio}</div>
+          <button
+            className="w-full flex items-center justify-center gap-2 border border-[#4285F4] rounded-lg py-2 font-bold text-[#4285F4] hover:bg-[#4285F4]/10 transition mb-4"
+            disabled
+          >
+            <Pencil className="w-4 h-4" />
+            Edit Profile
+          </button>
+        </div>
+      </div>
+      <OrganizerTabBar activeTab="profile" />
+    </div>
+  );
+};
+
+export default OrganizerProfile;

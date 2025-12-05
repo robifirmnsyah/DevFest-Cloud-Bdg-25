@@ -11,12 +11,12 @@ const AdminDashboard = () => {
     const role = localStorage.getItem("role");
     
     if (!token) {
-      window.location.href = "/auth";
+      window.location.hash = "/auth";
       return;
     }
     
     if (role !== "admin") {
-      window.location.href = "/dashboard";
+      window.location.hash = "/dashboard";
       return;
     }
   }, []);
