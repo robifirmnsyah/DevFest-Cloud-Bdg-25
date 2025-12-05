@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Search, User, X, Mail, Phone, Building2, QrCode, Download } from "lucide-react";
+import { Search, User, X, Mail, Phone, Building2, QrCode, Plus, CheckCircle } from "lucide-react";
 import OrganizerTabBar from "@/components/OrganizerTabBar";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -10,6 +10,18 @@ const OrganizerParticipants = () => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedQrCode, setSelectedQrCode] = useState<{qr_code: string, name: string} | null>(null);
+  const [showAddUserModal, setShowAddUserModal] = useState(false);
+  const [newUser, setNewUser] = useState({
+    name: "",
+    email: "",
+    password: "",
+    roles: ["participant"] as string[],
+    title: "",
+    company: "",
+  });
+  const [addUserLoading, setAddUserLoading] = useState(false);
+  const [addUserError, setAddUserError] = useState("");
+  const [checkingInId, setCheckingInId] = useState<number | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -53,46 +65,248 @@ const OrganizerParticipants = () => {
     return `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(qrCode)}`;
   };
 
-  // Export to Excel
-  const handleExportExcel = () => {
-    // Prepare data for export
-    const exportData = filteredParticipants.map(p => ({
-      'Name': p.name || '',
-      'Email': p.email || '',
-      'Phone': p.phone_number || '',
-      'Title': p.title || '',
-      'Company': p.company || '',
-      'Points': p.points || 0,
-      'Check-in Status': p.is_checked_in ? 'Checked In' : 'Not Checked In',
-      'QR Code': p.qr_code || ''
-    }));
+  // Manual check-in using participant's QR code
+  const handleManualCheckIn = async (participant: any) => {
+    if (!participant?.qr_code) return;
+    const token = localStorage.getItem("token");
+    try {
+      setCheckingInId(participant.id);
+      await axios.post(
+        `${API_URL}api/v1/organizers/checkin`,
+        { participant_qr_code: participant.qr_code },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      // Refresh participants list to reflect checked-in state
+      const res = await axios.get(`${API_URL}api/v1/organizers/participants`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setParticipants(res.data || []);
+    } catch (err: any) {
+      const detail = err?.response?.data?.detail;
+      const msg = err?.response?.data?.message || (Array.isArray(detail) ? detail[0]?.msg : "Manual check-in failed");
+      alert(msg);
+    } finally {
+      setCheckingInId(null);
+    }
+  };
 
-    // Convert to CSV
-    const headers = Object.keys(exportData[0]);
-    const csvContent = [
-      headers.join(','),
-      ...exportData.map(row => 
-        headers.map(header => {
-          const value = row[header as keyof typeof row];
-          // Escape values containing commas or quotes
-          if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
-            return `"${value.replace(/"/g, '""')}"`;
-          }
-          return value;
-        }).join(',')
-      )
-    ].join('\n');
+  // Print participant badge using the same layout as OrganizerDashboard's handlePrintBadge
+  const handlePrint = (participant: any) => {
+    if (!participant?.qr_code) return;
+    try {
+      const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(participant.qr_code)}`;
+      const printWindow = window.open('', '_blank', 'width=800,height=600');
+      if (!printWindow) {
+        alert("Please allow popups to print badge");
+        return;
+      }
 
-    // Create download link
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    const url = URL.createObjectURL(blob);
-    link.setAttribute('href', url);
-    link.setAttribute('download', `participants_${new Date().toISOString().split('T')[0]}.csv`);
-    link.style.visibility = 'hidden';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>Badge - ${participant.name || ''}</title>
+            <style>
+              @page { 
+                size: A4 portrait;
+                margin: 0; 
+              }
+              * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+              }
+              body { 
+                margin: 0; 
+                padding: 0;
+                font-family: 'Arial', 'Helvetica', sans-serif;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                background: #f0f0f0;
+                overflow: hidden;
+              }
+              .badge-container {
+                position: relative;
+                width: 794px;
+                height: 1123px;
+                background-image: url('/badge.png');
+                background-size: cover;
+                background-repeat: no-repeat;
+                background-position: center;
+                page-break-inside: avoid;
+                page-break-after: avoid;
+              }
+              .badge-content {
+                position: absolute;
+                top: 51%;
+                left: 47%;
+                transform: translate(-50%, -50%);
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 0 80px;
+              }
+              .text-container {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                margin-top: 50px;
+                max-width: 450px;
+                width: 100%;
+              }
+              .name {
+                font-size: 40px;
+                font-weight: bold;
+                color: #1a1a1a;
+                text-align: left;
+                word-wrap: break-word;
+                line-height: 1.2;
+                margin-bottom: 15px;
+              }
+              .title {
+                font-size: 30px;
+                font-weight: 600;
+                color: #333;
+                text-align: left;
+                word-wrap: break-word;
+                line-height: 1.3;
+                margin-bottom: 5px;
+              }
+              .company {
+                font-size: 28px;
+                font-weight: 500;
+                color: #555;
+                text-align: left;
+                word-wrap: break-word;
+                line-height: 1.3;
+              }
+              .qr-code {
+                display: flex;
+                justify-content: flex-end;
+                margin-top: 30px;
+                width: 100%;
+                padding-right: 90px;
+                position: relative;
+                top: 110px;
+              }
+              .qr-code img {
+                display: block;
+                width: 280px;
+                height: 280px;
+                border: 6px solid white;
+                border-radius: 10px;
+              }
+              @media print {
+                @page {
+                  size: B2 portrait;
+                  margin: 0;
+                }
+                html, body { 
+                  width: 210mm;
+                  height: 297mm;
+                  margin: 0;
+                  padding: 0;
+                  overflow: hidden;
+                }
+                body { 
+                  background: white;
+                }
+                .badge-container {
+                  width: 210mm;
+                  height: 297mm;
+                  page-break-after: avoid;
+                  page-break-inside: avoid;
+                  page-break-before: avoid;
+                }
+              }
+            </style>
+          </head>
+          <body>
+            <div class="badge-container">
+              <div class="badge-content">
+                <div class="text-container">
+                  <div class="name">${participant.name || ''}</div>
+                  ${participant.title ? `<div class="title">${participant.title}</div>` : ''}
+                  ${participant.company ? `<div class="company">${participant.company}</div>` : ''}
+                </div>
+                <div class="qr-code">
+                  <img src="${qrCodeUrl}" alt="QR Code" onload="window.qrLoaded=true" onerror="window.qrError=true" />
+                </div>
+              </div>
+            </div>
+          </body>
+        </html>
+      `);
+
+      printWindow.document.close();
+
+      // Wait for QR code to load before printing (same reliability behavior)
+      const checkLoaded = setInterval(() => {
+        if (printWindow.closed) {
+          clearInterval(checkLoaded);
+          return;
+        }
+        if ((printWindow as any).qrLoaded) {
+          clearInterval(checkLoaded);
+          setTimeout(() => {
+            printWindow.print();
+          }, 500);
+        } else if ((printWindow as any).qrError) {
+          clearInterval(checkLoaded);
+          alert("Failed to load QR code image. Please try again.");
+          printWindow.close();
+        }
+      }, 100);
+
+      // Timeout after 10 seconds
+      setTimeout(() => {
+        clearInterval(checkLoaded);
+        if (!printWindow.closed && !(printWindow as any).qrLoaded) {
+          alert("QR code loading timeout. Please try again.");
+          printWindow.close();
+        }
+      }, 10000);
+    } catch (error) {
+      console.error("Print error:", error);
+      alert("Failed to open print window. Please check your browser settings.");
+    }
+  };
+
+  // Add new user via register API
+  const openAddUserModal = () => {
+    setNewUser({ name: "", email: "", password: "", roles: ["participant"], title: "", company: "" });
+    setAddUserError("");
+    setShowAddUserModal(true);
+  };
+
+  const handleAddUser = async () => {
+    // Basic validation
+    if (!newUser.name || !newUser.email || !newUser.password) {
+      setAddUserError("Name, email, and password are required.");
+      return;
+    }
+    setAddUserLoading(true);
+    setAddUserError("");
+    try {
+      await axios.post(`${API_URL}api/v1/auth/register`, newUser);
+      // Refresh participants list
+      const token = localStorage.getItem("token");
+      const res = await axios.get(`${API_URL}api/v1/organizers/participants`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setParticipants(res.data);
+      setShowAddUserModal(false);
+    } catch (err: any) {
+      const detail = err?.response?.data?.detail;
+      const msg = Array.isArray(detail)
+        ? detail.map((d: any) => d?.msg || d).join("; ")
+        : err?.response?.data?.message || "Failed to register user.";
+      setAddUserError(msg);
+    }
+    setAddUserLoading(false);
   };
 
   return (
@@ -103,12 +317,11 @@ const OrganizerParticipants = () => {
             All Participants
           </h1>
           <button
-            onClick={handleExportExcel}
-            className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors shadow-sm"
-            disabled={loading || participants.length === 0}
+            onClick={openAddUserModal}
+            className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors shadow-sm"
           >
-            <Download className="w-4 h-4" />
-            Export CSV
+            <Plus className="w-4 h-4" />
+            Add New User
           </button>
         </div>
         
@@ -194,29 +407,60 @@ const OrganizerParticipants = () => {
                       )}
                       
                       <div className="flex items-center gap-2 mt-2">
-                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          participant.is_checked_in
-                            ? "bg-green-100 text-green-700"
-                            : "bg-gray-100 text-gray-600"
-                        }`}>
-                          {participant.is_checked_in ? "Checked In" : "Not Checked In"}
-                        </span>
-                        
-                        <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
-                          {participant.points ?? 0} Points
-                        </span>
+                        {/* Left: status and points */}
+                        <div className="flex items-center gap-2">
+                          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                            participant.is_checked_in
+                              ? "bg-green-100 text-green-700"
+                              : "bg-gray-100 text-gray-600"
+                          }`}>
+                            {participant.is_checked_in ? "Checked In" : "Not Checked In"}
+                          </span>
+                          
+                          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
+                            {participant.points ?? 0} Points
+                          </span>
+                        </div>
 
-                        {/* QR Code Button */}
-                        {participant.qr_code && (
-                          <button
-                            onClick={() => setSelectedQrCode({ qr_code: participant.qr_code, name: participant.name })}
-                            className="ml-auto px-3 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-700 hover:bg-purple-200 transition-colors flex items-center gap-1"
-                            title="View QR Code"
-                          >
-                            <QrCode className="w-3 h-3" />
-                            QR
-                          </button>
-                        )}
+                        {/* Right: actions (always right-aligned) */}
+                        <div className="ml-auto flex items-center gap-2">
+                          {/* Print Button (always visible when QR exists) */}
+                          {participant.qr_code && (
+                            <button
+                              onClick={() => handlePrint(participant)}
+                              className="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700 hover:bg-indigo-200 transition-colors flex items-center gap-1"
+                              title="Print Badge"
+                            >
+                              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M5 2a2 2 0 00-2 2v2h14V4a2 2 0 00-2-2H5zm12 6H3a2 2 0 00-2 2v3a2 2 0 002 2h2v3h10v-3h2a2 2 0 002-2v-3a2 2 0 00-2-2zm-4 8H7v-4h6v4z"/></svg>
+                              Print
+                            </button>
+                          )}
+
+                          {/* Manual Check-in Button (only when not checked-in) */}
+                          {!participant.is_checked_in && participant.qr_code && (
+                            <button
+                              onClick={() => handleManualCheckIn(participant)}
+                              disabled={checkingInId === participant.id}
+                              className="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700 hover:bg-green-200 transition-colors flex items-center gap-1 disabled:opacity-60"
+                              title="Manual Check-in"
+                            >
+                              <CheckCircle className="w-3 h-3" />
+                              {checkingInId === participant.id ? "Checking..." : "Check-in"}
+                            </button>
+                          )}
+
+                          {/* QR Code Button */}
+                          {participant.qr_code && (
+                            <button
+                              onClick={() => setSelectedQrCode({ qr_code: participant.qr_code, name: participant.name })}
+                              className="px-3 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-700 hover:bg-purple-200 transition-colors flex items-center gap-1"
+                              title="View QR Code"
+                            >
+                              <QrCode className="w-3 h-3" />
+                              QR
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -251,6 +495,72 @@ const OrganizerParticipants = () => {
             >
               Close
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Add New User Modal */}
+      {showAddUserModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 shadow-2xl w-full max-w-md">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Add New User</h3>
+            {addUserError && (<div className="mb-3 text-sm text-red-600">{addUserError}</div>)}
+            <div className="space-y-3">
+              <input
+                type="text"
+                placeholder="Full Name"
+                className="w-full border border-gray-200 rounded-lg p-2 text-sm"
+                value={newUser.name}
+                onChange={(e) => setNewUser({ ...newUser, name: e.target.value })}
+              />
+              <input
+                type="email"
+                placeholder="Email"
+                className="w-full border border-gray-200 rounded-lg p-2 text-sm"
+                value={newUser.email}
+                onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+              />
+              <input
+                type="password"
+                placeholder="Password"
+                className="w-full border border-gray-200 rounded-lg p-2 text-sm"
+                value={newUser.password}
+                onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+              />
+              <div className="grid grid-cols-2 gap-3">
+                <input
+                  type="text"
+                  placeholder="Title (optional)"
+                  className="w-full border border-gray-200 rounded-lg p-2 text-sm"
+                  value={newUser.title}
+                  onChange={(e) => setNewUser({ ...newUser, title: e.target.value })}
+                />
+                <input
+                  type="text"
+                  placeholder="Company (optional)"
+                  className="w-full border border-gray-200 rounded-lg p-2 text-sm"
+                  value={newUser.company}
+                  onChange={(e) => setNewUser({ ...newUser, company: e.target.value })}
+                />
+              </div>
+              <div className="text-xs text-gray-500">Roles are fixed to participant for this action.</div>
+            </div>
+            <div className="flex gap-3 mt-5">
+              <button
+                onClick={() => setShowAddUserModal(false)}
+                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-semibold"
+                disabled={addUserLoading}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleAddUser}
+                className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold"
+                disabled={addUserLoading}
+              >
+                {addUserLoading ? "Adding..." : "Add User"}
+              </button>
+            </div>
           </div>
         </div>
       )}

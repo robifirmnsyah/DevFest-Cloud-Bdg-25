@@ -20,17 +20,22 @@ const AuthGoogleCallback = () => {
       .post(`${API_URL}api/v1/auth/google`, { id_token: idToken })
       .then((res) => {
         const userRoles = res.data?.user?.roles || [];
+
+        // CHANGED: if duplicate email, show only API message and redirect to /auth
+        if (res.data?.user?.has_duplicate_email) {
+          setMessage(res.data?.message || "Duplicate email detected.");
+          setTimeout(() => (window.location.href = "/auth"), 2000);
+          return;
+        }
         
         // Store all roles
         localStorage.setItem("token", res.data.access_token);
         localStorage.setItem("user_roles", JSON.stringify(userRoles));
-        
         // Determine initial role
         const initialRole = userRoles.includes("organizer") ? "organizer" : 
                            userRoles.includes("booth_staff") ? "booth_staff" : 
                            "participant";
         localStorage.setItem("role", initialRole);
-        
         // Redirect based on role
         if (initialRole === "organizer") {
           window.location.href = "/organizer";
@@ -40,8 +45,10 @@ const AuthGoogleCallback = () => {
           window.location.href = "/dashboard";
         }
       })
-      .catch(() => {
-        setMessage("Google login failed. Redirecting...");
+      .catch((err) => {
+        // CHANGED: prefer API message if available
+        const apiMessage = err?.response?.data?.message;
+        setMessage(apiMessage || "Google login failed. Redirecting...");
         setTimeout(() => (window.location.href = "/auth"), 1500);
       });
   }, []);

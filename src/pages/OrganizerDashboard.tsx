@@ -14,9 +14,7 @@ const OrganizerDashboard = () => {
   const [scanResult, setScanResult] = useState("");
   const [scanError, setScanError] = useState("");
   const [scanLoading, setScanLoading] = useState(false);
-  const [questScanOpen, setQuestScanOpen] = useState(false);
-  const [pendingQuests, setPendingQuests] = useState<any[]>([]);
-  const [questLoading, setQuestLoading] = useState(false);
+  // Quest review moved to its own page
   const [cameraActive, setCameraActive] = useState(false);
   const [printData, setPrintData] = useState<any>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -30,6 +28,9 @@ const OrganizerDashboard = () => {
   const [rewardQty, setRewardQty] = useState(1);
   const [rewardNotes, setRewardNotes] = useState("");
   const [showRewardForm, setShowRewardForm] = useState(false);
+  // Already checked-in modal
+  const [showAlreadyCheckedInModal, setShowAlreadyCheckedInModal] = useState(false);
+  const [alreadyCheckedInData, setAlreadyCheckedInData] = useState<{ name?: string; title?: string; company?: string; message?: string } | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -52,20 +53,27 @@ const OrganizerDashboard = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  // Fetch pending quests for approval
-  const fetchPendingQuests = async () => {
-    setQuestLoading(true);
-    const token = localStorage.getItem("token");
-    try {
-      const res = await axios.get(`${API_URL}api/v1/organizers/quests/pending`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setPendingQuests(res.data ?? []);
-    } catch {
-      setPendingQuests([]);
+  // Quest review logic moved to Organizer Quests page
+
+  // Auto-close success modal shortly after showing (print moved to Participants)
+  useEffect(() => {
+    if (showSuccessModal) {
+      const timer = setTimeout(() => {
+        closeSuccessModal();
+      }, 1500);
+      return () => clearTimeout(timer);
     }
-    setQuestLoading(false);
-  };
+  }, [showSuccessModal]);
+
+  // Auto-close already-checked-in modal
+  useEffect(() => {
+    if (showAlreadyCheckedInModal) {
+      const timer = setTimeout(() => {
+        closeAlreadyCheckedInModal();
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [showAlreadyCheckedInModal]);
 
   // Handle scan QR for check-in/out
   const handleScan = async (qr: string | null) => {
@@ -81,27 +89,46 @@ const OrganizerDashboard = () => {
         scanMode === "checkin"
           ? `${API_URL}api/v1/organizers/checkin`
           : `${API_URL}api/v1/organizers/checkout`;
-      
+
       const res = await axios.post(
         endpoint,
         { participant_qr_code: qr },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      
-      // Show success message
-      const successMessage = `${scanMode === "checkin" ? "Check-in" : "Check-out"} successful: ${res.data.user?.name || "Unknown"}`;
-      setScanResult(successMessage);
-      
-      // If check-in, prepare print data and show success modal
-      if (scanMode === "checkin" && res.data.user) {
-        setPrintData({
-          name: res.data.user.name,
-          qr_code: qr,
-          company: res.data.user.company || "",
-          title: res.data.user.title || "",
-          message: successMessage
+
+      const data = res.data || {};
+
+      // Handle special case: already checked-in returns success=false per OpenAPI spec
+      if (scanMode === "checkin" && data.success === false) {
+        const name = data.user?.name || "Unknown";
+        const infoMessage = data.message || `${name} is already checked in.`;
+        setAlreadyCheckedInData({
+          name,
+          title: data.user?.title || "",
+          company: data.user?.company || "",
+          message: infoMessage,
         });
-        
+        setScanMode(null);
+        setCameraActive(false);
+        setShowAlreadyCheckedInModal(true);
+        setScanLoading(false);
+        return;
+      }
+
+      // Show success message
+      const successMessage = `${scanMode === "checkin" ? "Check-in" : "Check-out"} successful: ${data.user?.name || "Unknown"}`;
+      setScanResult(successMessage);
+
+      // If check-in, prepare print data and show success modal
+      if (scanMode === "checkin" && data.user) {
+        setPrintData({
+          name: data.user.name,
+          qr_code: qr,
+          company: data.user.company || "",
+          title: data.user.title || "",
+          message: successMessage,
+        });
+
         // Close scanner and show success modal
         setScanMode(null);
         setCameraActive(false);
@@ -115,7 +142,7 @@ const OrganizerDashboard = () => {
           setCameraActive(false);
         }, 2000);
       }
-      
+
     } catch (err: any) {
       console.error("Scan error:", err);
       setScanError(
@@ -196,197 +223,7 @@ const OrganizerDashboard = () => {
     setRewardLoading(false);
   };
 
-  // Print badge with improved reliability
-  const handlePrintBadge = () => {
-    if (!printData) {
-      alert("No data available for printing");
-      return;
-    }
-    
-    try {
-      const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(printData.qr_code)}`;
-      
-      const printWindow = window.open('', '_blank', 'width=800,height=600');
-      if (!printWindow) {
-        alert("Please allow popups to print badge");
-        return;
-      }
-      
-      printWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <title>Badge - ${printData.name}</title>
-            <style>
-              @page { 
-                size: A4 portrait;
-                margin: 0; 
-              }
-              * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-              }
-              body { 
-                margin: 0; 
-                padding: 0;
-                font-family: 'Arial', 'Helvetica', sans-serif;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                height: 100vh;
-                background: #f0f0f0;
-                overflow: hidden;
-              }
-              .badge-container {
-                position: relative;
-                width: 794px;
-                height: 1123px;
-                background-image: url('/badge.png');
-                background-size: cover;
-                background-repeat: no-repeat;
-                background-position: center;
-                page-break-inside: avoid;
-                page-break-after: avoid;
-              }
-              .badge-content {
-                position: absolute;
-                top: 51%;
-                left: 47%;
-                transform: translate(-50%, -50%);
-                width: 100%;
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                padding: 0 80px;
-              }
-              .text-container {
-                display: flex;
-                flex-direction: column;
-                align-items: flex-start;
-                margin-top: 50px;
-                max-width: 450px;
-                width: 100%;
-              }
-              .name {
-                font-size: 40px;
-                font-weight: bold;
-                color: #1a1a1a;
-                text-align: left;
-                word-wrap: break-word;
-                line-height: 1.2;
-                margin-bottom: 15px;
-              }
-              .title {
-                font-size: 30px;
-                font-weight: 600;
-                color: #333;
-                text-align: left;
-                word-wrap: break-word;
-                line-height: 1.3;
-                margin-bottom: 5px;
-              }
-              .company {
-                font-size: 28px;
-                font-weight: 500;
-                color: #555;
-                text-align: left;
-                word-wrap: break-word;
-                line-height: 1.3;
-              }
-              .qr-code {
-                display: flex;
-                justify-content: flex-end;
-                margin-top: 30px;
-                width: 100%;
-                padding-right: 90px;
-                position: relative;
-                top: 110px;
-              }
-              .qr-code img {
-                display: block;
-                width: 280px;
-                height: 280px;
-                border: 6px solid white;
-                border-radius: 10px;
-              }
-              @media print {
-                @page {
-                  size: B2 portrait;
-                  margin: 0;
-                }
-                html, body { 
-                  width: 210mm;
-                  height: 297mm;
-                  margin: 0;
-                  padding: 0;
-                  overflow: hidden;
-                }
-                body { 
-                  background: white;
-                }
-                .badge-container {
-                  width: 210mm;
-                  height: 297mm;
-                  page-break-after: avoid;
-                  page-break-inside: avoid;
-                  page-break-before: avoid;
-                }
-              }
-            </style>
-          </head>
-          <body>
-            <div class="badge-container">
-              <div class="badge-content">
-                <div class="text-container">
-                  <div class="name">${printData.name}</div>
-                  ${printData.title ? `<div class="title">${printData.title}</div>` : ''}
-                  ${printData.company ? `<div class="company">${printData.company}</div>` : ''}
-                </div>
-                <div class="qr-code">
-                  <img src="${qrCodeUrl}" alt="QR Code" onload="window.qrLoaded=true" onerror="window.qrError=true" />
-                </div>
-              </div>
-            </div>
-          </body>
-        </html>
-      `);
-      
-      printWindow.document.close();
-      
-      // Wait for QR code to load before printing
-      const checkLoaded = setInterval(() => {
-        if (printWindow.closed) {
-          clearInterval(checkLoaded);
-          return;
-        }
-        
-        if ((printWindow as any).qrLoaded) {
-          clearInterval(checkLoaded);
-          setTimeout(() => {
-            printWindow.print();
-          }, 500);
-        } else if ((printWindow as any).qrError) {
-          clearInterval(checkLoaded);
-          alert("Failed to load QR code image. Please try again.");
-          printWindow.close();
-        }
-      }, 100);
-      
-      // Timeout after 10 seconds
-      setTimeout(() => {
-        clearInterval(checkLoaded);
-        if (!printWindow.closed && !(printWindow as any).qrLoaded) {
-          alert("QR code loading timeout. Please try again.");
-          printWindow.close();
-        }
-      }, 10000);
-      
-    } catch (error) {
-      console.error("Print error:", error);
-      alert("Failed to open print window. Please check your browser settings.");
-    }
-  };
+  // After check-in, show success briefly without print action; printing moved to Participants page
 
   // Close success modal
   const closeSuccessModal = () => {
@@ -395,21 +232,14 @@ const OrganizerDashboard = () => {
     setScanResult("");
   };
 
-  // Handle approve/reject quest
-  const handleReviewQuest = async (submissionId: number, status: "approved" | "rejected") => {
-    const token = localStorage.getItem("token");
-    try {
-      await axios.put(
-        `${API_URL}api/v1/organizers/quests/${submissionId}/review`,
-        { status },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      await fetchPendingQuests();
-    } catch (err) {
-      console.error("Failed to review quest:", err);
-      alert("Failed to review quest. Please try again.");
-    }
+  const closeAlreadyCheckedInModal = () => {
+    setShowAlreadyCheckedInModal(false);
+    setAlreadyCheckedInData(null);
+    setScanResult("");
   };
+
+  // Handle approve/reject quest
+  // Quest review handlers removed from dashboard; handled in Organizer Quests page
 
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-gray-50 text-[#222]">Loading...</div>;
 
@@ -476,16 +306,7 @@ const OrganizerDashboard = () => {
             <div className="text-xs text-gray-400">session bookings</div>
           </div>
 
-          <div className="bg-white rounded-xl p-4 border border-gray-100">
-            <div className="flex items-center gap-2 mb-1">
-              <Gift className="w-4 h-4 text-orange-500" />
-              <span className="text-xs font-medium text-orange-500">Swag Claims</span>
-            </div>
-            <div className="text-2xl font-bold text-orange-500">
-              {stats?.total_swag_claims ?? 0}
-            </div>
-            <div className="text-xs text-gray-400">items claimed</div>
-          </div>
+          {/* Swag Claims card removed as requested */}
 
           <div className="bg-white rounded-xl p-4 border border-gray-100">
             <div className="flex items-center gap-2 mb-1">
@@ -553,7 +374,7 @@ const OrganizerDashboard = () => {
 
           <button
             className="bg-white hover:bg-gray-50 rounded-xl p-5 flex flex-col items-center justify-center gap-2 shadow-sm border border-gray-100 transition-all aspect-square max-w-[140px] mx-auto"
-            onClick={() => { setQuestScanOpen(true); fetchPendingQuests(); }}
+            onClick={() => navigate("/organizer/quests")}
           >
             <div className="bg-yellow-50 p-2 rounded-full">
               <Award className="w-6 h-6 text-yellow-500" />
@@ -634,7 +455,7 @@ const OrganizerDashboard = () => {
         </div>
       )}
 
-      {/* Success Modal with Print Button */}
+      {/* Success Modal (brief) */}
       {showSuccessModal && printData && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl p-8 shadow-2xl w-full max-w-md text-center">
@@ -651,18 +472,8 @@ const OrganizerDashboard = () => {
             {printData.title && <p className="text-sm text-gray-500 mb-1">{printData.title}</p>}
             {printData.company && <p className="text-sm text-gray-500 mb-6">{printData.company}</p>}
 
-            {/* Action Buttons */}
+            {/* Action Button (manual close in case timer doesn't fire) */}
             <div className="flex flex-col gap-3 mt-8">
-              <button
-                onClick={handlePrintBadge}
-                className="w-full bg-blue-500 hover:bg-blue-600 text-white px-8 py-4 rounded-xl font-bold text-lg transition-colors shadow-lg flex items-center justify-center gap-3"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                </svg>
-                Print Badge
-              </button>
-              
               <button
                 onClick={closeSuccessModal}
                 className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-8 py-3 rounded-xl font-semibold text-base transition-colors"
@@ -672,84 +483,41 @@ const OrganizerDashboard = () => {
             </div>
 
             {/* Hint Text */}
-            <p className="text-xs text-gray-400 mt-6">
-              You can print the badge now or close this window
-            </p>
+            <p className="text-xs text-gray-400 mt-6">You can print the badge from Participants page.</p>
           </div>
         </div>
       )}
 
-      {/* Quest Scan Modal */}
-      {questScanOpen && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 overflow-y-auto">
-          <div className="bg-white rounded-2xl p-8 shadow-xl w-full max-w-lg text-[#222]">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-bold">Quest Submissions</h3>
+      {/* Already Checked-in Modal (brief) */}
+      {showAlreadyCheckedInModal && alreadyCheckedInData && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-8 shadow-2xl w-full max-w-md text-center">
+            {/* Info Icon */}
+            <div className="w-20 h-20 rounded-full bg-yellow-100 flex items-center justify-center mx-auto mb-6">
+              <svg className="w-12 h-12 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 16h-1v-4h-1m1-4h.01M12 19a7 7 0 100-14 7 7 0 000 14z" />
+              </svg>
+            </div>
+
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">Already Checked-in</h3>
+            <p className="text-lg text-gray-700 mb-2">{alreadyCheckedInData.name}</p>
+            {alreadyCheckedInData.title && <p className="text-sm text-gray-500 mb-1">{alreadyCheckedInData.title}</p>}
+            {alreadyCheckedInData.company && <p className="text-sm text-gray-500 mb-6">{alreadyCheckedInData.company}</p>}
+            {alreadyCheckedInData.message && <p className="text-sm text-yellow-700">{alreadyCheckedInData.message}</p>}
+
+            <div className="flex flex-col gap-3 mt-8">
               <button
-                className="text-[#6366f1] hover:text-primary"
-                onClick={fetchPendingQuests}
-                title="Refresh"
+                onClick={closeAlreadyCheckedInModal}
+                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-8 py-3 rounded-xl font-semibold text-base transition-colors"
               >
-                <svg width="28" height="28" fill="none" stroke="currentColor"><path d="M4 4v6h6M20 20v-6h-6"/><path d="M4 20a8 8 0 0 1 8-8h4"/><path d="M20 4a8 8 0 0 0-8 8h-4"/></svg>
-              </button>
-              <button
-                className="ml-2 text-[#6366f1] hover:text-primary"
-                onClick={() => setQuestScanOpen(false)}
-                title="Close"
-              >
-                &times;
+                Close
               </button>
             </div>
-            {questLoading ? (
-              <div className="text-center py-8 text-[#6366f1]">Loading...</div>
-            ) : pendingQuests.length === 0 ? (
-              <div className="text-center py-8 text-[#6366f1]">No pending submissions.</div>
-            ) : (
-              pendingQuests.map((submission: any) => (
-                <div key={submission.id} className="bg-[#f6f8fa] rounded-xl p-6 mb-6 border border-[#e0e0e0]">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-bold text-lg text-primary">{submission.quest?.title}</span>
-                    <span className="bg-[#facc15]/10 text-[#facc15] px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
-                      <span className="w-2 h-2 rounded-full bg-[#facc15] inline-block"></span>
-                      Pending
-                    </span>
-                  </div>
-                  {submission.quest?.description && (
-                    <div className="text-sm text-[#6366f1] mb-2">{submission.quest.description}</div>
-                  )}
-                  <div className="bg-white rounded-lg p-3 flex items-center gap-4 mb-2 border border-[#e0e0e0]">
-                    <User className="w-5 h-5 text-primary" />
-                    <span className="text-xs">User ID: {submission.user_id}</span>
-                    <span className="text-xs flex items-center gap-1">
-                      <Calendar className="w-4 h-4 text-primary" />
-                      {new Date(submission.submitted_at).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" })}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="bg-[#facc15] text-[#23272f] px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
-                      <Award className="w-4 h-4" /> {submission.quest?.points} points
-                    </span>
-                  </div>
-                  <div className="flex gap-4 mt-4">
-                    <button
-                      className="flex-1 bg-[#ef4444] text-white py-2 rounded font-bold"
-                      onClick={() => handleReviewQuest(submission.id, "rejected")}
-                    >
-                      Reject
-                    </button>
-                    <button
-                      className="flex-1 bg-[#22c55e] text-white py-2 rounded font-bold"
-                      onClick={() => handleReviewQuest(submission.id, "approved")}
-                    >
-                      Approve
-                    </button>
-                  </div>
-                </div>
-              ))
-            )}
           </div>
         </div>
       )}
+
+      {/* Quest review moved to its own page */}
 
       <OrganizerTabBar activeTab="hub" />
     </div>

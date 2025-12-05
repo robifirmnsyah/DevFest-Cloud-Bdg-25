@@ -69,31 +69,19 @@ const Auth = () => {
           id_token: response.credential,
         });
         
-        // Check if user has duplicate email
+        // CHANGED: show only API message when duplicate email and stop
         if (res.data.user?.has_duplicate_email) {
           setHasDuplicateEmail(true);
-          setError("Your email has duplicate accounts. Please use email/password login or contact support to change your email.");
+          setError(res.data?.message || "Duplicate email detected.");
           setLoading(false);
           return;
         }
         
         handleAuthSuccess(res.data);
       } catch (err: any) {
-        if (err.response && err.response.data) {
-          // Handle both array of errors (validation) and single detail string (auth error)
-          const detail = err.response.data.detail;
-          const message = err.response.data.message;
-          
-          if (Array.isArray(detail)) {
-            setError(detail[0]?.msg || "Google login failed");
-          } else if (typeof detail === "string") {
-            setError(detail);
-          } else {
-            setError(message || "Google login failed");
-          }
-        } else {
-          setError("Network error. Please try again with Google login.");
-        }
+        // CHANGED: take only the message field from API error
+        const apiMessage = err?.response?.data?.message;
+        setError(apiMessage || "Google login failed");
       }
       setLoading(false);
     },

@@ -56,6 +56,37 @@ const Profile = () => {
     }
   };
 
+  // NEW: Fetch organizer profile using organizer endpoint
+  const fetchOrganizerProfile = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      window.location.href = "/auth";
+      return;
+    }
+    try {
+      const res = await axios.get(`${API_URL}api/v1/organizers/profile`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setProfile(res.data);
+
+      const storedRoles = localStorage.getItem("user_roles");
+      const roles = storedRoles ? JSON.parse(storedRoles) : (res.data?.roles || ["organizer"]);
+      setUserRoles(roles);
+      setCurrentRole("organizer");
+    } catch (err: any) {
+      if (err?.response?.status === 401 || err?.response?.status === 403) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
+        localStorage.removeItem("user_roles");
+        window.location.href = "/auth";
+      } else {
+        setProfile(null);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Fetch quests and submissions for progress
   const fetchProgress = async () => {
     const token = localStorage.getItem("token");
@@ -78,16 +109,8 @@ const Profile = () => {
 
   useEffect(() => {
     if (role === "organizer") {
-      setLoading(false);
-      setProfile({
-        name: "Robi Firmansyah",
-        title: "Lead Organizer, GDG Bandung",
-        bio: "Passionate about building communities and empowering developers with cloud technologies. Coffee enthusiast and a proud dog parent.",
-      });
-      const storedRoles = localStorage.getItem("user_roles");
-      const roles = storedRoles ? JSON.parse(storedRoles) : ["organizer"];
-      setUserRoles(roles);
-      setCurrentRole("organizer");
+      // Use organizer-specific profile API
+      fetchOrganizerProfile();
       return;
     }
     fetchProfile();
