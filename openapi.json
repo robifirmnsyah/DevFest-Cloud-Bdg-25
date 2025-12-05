@@ -336,6 +336,33 @@
         ]
       }
     },
+    "/api/v1/participants/xp-progress": {
+      "get": {
+        "tags": [
+          "Participants"
+        ],
+        "summary": "Get Xp Progress",
+        "description": "Get user's XP and level progress.\n[P-GAMIFICATION-1] View XP & Level Progress\n\nShows:\n- Current level\n- Total XP accumulated\n- XP in current level\n- XP needed for next level\n- Progress percentage to next level",
+        "operationId": "get_xp_progress_api_v1_participants_xp_progress_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserXPProgress"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/participants/sessions": {
       "get": {
         "tags": [
@@ -859,7 +886,7 @@
           "Participants"
         ],
         "summary": "Get My Redemptions",
-        "description": "Get my reward redemption history.\n[P-REWARD-2] View My Redemptions\n\nReturns all rewards redeemed by the current user.",
+        "description": "Get my reward redemption history.\n[P-REWARD-2] View My Redemptions\n\nReturns all rewards redeemed by the current user with reward details.",
         "operationId": "get_my_redemptions_api_v1_participants_rewards_my_redemptions_get",
         "responses": {
           "200": {
@@ -868,7 +895,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "$ref": "#/components/schemas/RewardRedemptionInDB"
+                    "$ref": "#/components/schemas/RewardRedemptionWithReward"
                   },
                   "type": "array",
                   "title": "Response Get My Redemptions Api V1 Participants Rewards My Redemptions Get"
@@ -3071,6 +3098,11 @@
             "title": "Points",
             "default": 10
           },
+          "exp_points": {
+            "type": "integer",
+            "title": "Exp Points",
+            "default": 10
+          },
           "requires_approval": {
             "type": "boolean",
             "title": "Requires Approval",
@@ -3156,6 +3188,11 @@
           "points": {
             "type": "integer",
             "title": "Points",
+            "default": 10
+          },
+          "exp_points": {
+            "type": "integer",
+            "title": "Exp Points",
             "default": 10
           },
           "requires_approval": {
@@ -3366,6 +3403,10 @@
             "type": "integer",
             "title": "Points Awarded"
           },
+          "exp_points_awarded": {
+            "type": "integer",
+            "title": "Exp Points Awarded"
+          },
           "reviewed_by": {
             "anyOf": [
               {
@@ -3416,6 +3457,7 @@
           "quest_id",
           "status",
           "points_awarded",
+          "exp_points_awarded",
           "submitted_at",
           "quest"
         ],
@@ -3481,6 +3523,17 @@
               }
             ],
             "title": "Points"
+          },
+          "exp_points": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exp Points"
           },
           "requires_approval": {
             "anyOf": [
@@ -3646,6 +3699,11 @@
             "type": "integer",
             "title": "Points Required"
           },
+          "min_level_required": {
+            "type": "integer",
+            "title": "Min Level Required",
+            "default": 1
+          },
           "image_url": {
             "anyOf": [
               {
@@ -3727,6 +3785,11 @@
           "points_required": {
             "type": "integer",
             "title": "Points Required"
+          },
+          "min_level_required": {
+            "type": "integer",
+            "title": "Min Level Required",
+            "default": 1
           },
           "image_url": {
             "anyOf": [
@@ -3979,6 +4042,99 @@
         "title": "RewardRedemptionResponse",
         "description": "Response after successful redemption."
       },
+      "RewardRedemptionWithReward": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "user_id": {
+            "type": "integer",
+            "title": "User Id"
+          },
+          "reward_id": {
+            "type": "integer",
+            "title": "Reward Id"
+          },
+          "qty": {
+            "type": "integer",
+            "title": "Qty"
+          },
+          "points_spent": {
+            "type": "integer",
+            "title": "Points Spent"
+          },
+          "redemption_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Redemption Code"
+          },
+          "status": {
+            "$ref": "#/components/schemas/RedemptionStatus"
+          },
+          "redeemed_by": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Redeemed By"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "redeemed_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Redeemed At"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          },
+          "reward": {
+            "$ref": "#/components/schemas/RewardInDB"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "user_id",
+          "reward_id",
+          "qty",
+          "points_spent",
+          "status",
+          "redeemed_at",
+          "reward"
+        ],
+        "title": "RewardRedemptionWithReward",
+        "description": "Reward redemption with reward information."
+      },
       "RewardUpdate": {
         "properties": {
           "title": {
@@ -4013,6 +4169,17 @@
               }
             ],
             "title": "Points Required"
+          },
+          "min_level_required": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Min Level Required"
           },
           "image_url": {
             "anyOf": [
@@ -5140,6 +5307,14 @@
             "type": "integer",
             "title": "Points"
           },
+          "exp_points": {
+            "type": "integer",
+            "title": "Exp Points"
+          },
+          "level": {
+            "type": "integer",
+            "title": "Level"
+          },
           "created_at": {
             "type": "string",
             "format": "date-time",
@@ -5191,6 +5366,8 @@
           "is_checked_in",
           "qr_code",
           "points",
+          "exp_points",
+          "level",
           "created_at"
         ],
         "title": "UserInDB"
@@ -5386,6 +5563,40 @@
         },
         "type": "object",
         "title": "UserUpdate"
+      },
+      "UserXPProgress": {
+        "properties": {
+          "current_level": {
+            "type": "integer",
+            "title": "Current Level"
+          },
+          "total_exp_points": {
+            "type": "integer",
+            "title": "Total Exp Points"
+          },
+          "current_level_xp": {
+            "type": "integer",
+            "title": "Current Level Xp"
+          },
+          "xp_for_next_level": {
+            "type": "integer",
+            "title": "Xp For Next Level"
+          },
+          "progress_percentage": {
+            "type": "integer",
+            "title": "Progress Percentage"
+          }
+        },
+        "type": "object",
+        "required": [
+          "current_level",
+          "total_exp_points",
+          "current_level_xp",
+          "xp_for_next_level",
+          "progress_percentage"
+        ],
+        "title": "UserXPProgress",
+        "description": "User's XP and leveling progress."
       },
       "ValidationError": {
         "properties": {

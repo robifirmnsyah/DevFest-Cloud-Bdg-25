@@ -129,12 +129,16 @@ const Rewards = () => {
               reward: reward,
               redemptionCode: res.data.redemption.redemption_code
           });
+          // Switch to My Redemptions tab after short delay or immediately
+          setTimeout(() => setTab("my"), 1500);
       } else {
           setSuccessModal({
               open: true, 
               type: 'success', 
               message: 'Reward redeemed successfully!'
           });
+          // For instant rewards, also switch to my redemptions
+          setTimeout(() => setTab("my"), 1500);
       }
       fetchData();
     } catch (err: any) {
@@ -213,89 +217,129 @@ const Rewards = () => {
           rewards.length === 0 ? (
             <div className="text-[#888] text-center py-12">No rewards available.</div>
           ) : (
-            <div className="grid gap-4 max-w-2xl mx-auto">
-              {rewards.map((item: any) => {
-                const reward = item.reward;
-                const isEligible = item.is_eligible;
-                const ineligibleReason = item.ineligible_reason;
-                const userRedeemedCount = item.user_redeemed_count || 0;
-                const availableStock = reward.stock || 0;
-                
-                return (
-                  <div
-                    key={reward.id}
-                    className="bg-white border border-[#e0e0e0] rounded-xl shadow p-5"
-                  >
-                    {reward.image_url && (
-                      <img
-                        src={reward.image_url}
-                        alt={reward.title}
-                        className="w-full h-40 object-cover rounded-lg mb-3"
-                      />
+            <div className="grid gap-8 max-w-2xl mx-auto">
+              {(() => {
+                // Group rewards by exclusivity_group
+                const groupedRewards = rewards.reduce((acc: any, item: any) => {
+                  const group = item.reward.exclusivity_group || "General";
+                  if (!acc[group]) acc[group] = [];
+                  acc[group].push(item);
+                  return acc;
+                }, {});
+
+                // Sort groups: General last, others alphabetically
+                const sortedGroups = Object.keys(groupedRewards).sort((a, b) => {
+                  if (a === "General") return 1;
+                  if (b === "General") return -1;
+                  return a.localeCompare(b);
+                });
+
+                return sortedGroups.map((group) => (
+                  <div key={group} className="space-y-4">
+                    {group !== "General" && (
+                      <div className="bg-purple-50 border border-purple-100 rounded-lg p-4">
+                        <h3 className="font-bold text-purple-800 text-lg mb-1">{group} Rewards</h3>
+                        <p className="text-sm text-purple-600 flex items-center gap-2">
+                          <AlertTriangle className="w-4 h-4" />
+                          You can only choose one reward from this group.
+                        </p>
+                      </div>
                     )}
                     
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-bold text-lg text-primary">{reward.title}</h3>
-                      <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-semibold">
-                        {reward.points_required} Points
-                      </span>
-                    </div>
-
-                    {reward.description && (
-                      <p className="text-sm text-[#666] mb-3">{reward.description}</p>
-                    )}
-
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex flex-col gap-1">
-                        <span className="text-xs text-[#888]">
-                          Stock: {availableStock}
-                        </span>
-                        {reward.max_per_user && (
-                          <span className="text-xs text-[#888]">
-                            You redeemed: {userRedeemedCount} / {reward.max_per_user}
-                          </span>
-                        )}
-                      </div>
+                    {groupedRewards[group].map((item: any) => {
+                      const reward = item.reward;
+                      const isEligible = item.is_eligible;
+                      const ineligibleReason = item.ineligible_reason;
+                      const userRedeemedCount = item.user_redeemed_count || 0;
+                      const availableStock = reward.stock || 0;
                       
-                      <button
-                        onClick={() => handleRedeemClick(reward)}
-                        disabled={!isEligible || userPoints < reward.points_required || availableStock <= 0}
-                        className={`px-4 py-2 rounded-lg font-bold transition flex items-center gap-2 ${
-                          !isEligible || userPoints < reward.points_required || availableStock <= 0
-                            ? "bg-[#e0e0e0] text-[#888] cursor-not-allowed"
-                            : "bg-primary text-white hover:bg-[#1a73e8]"
-                        }`}
-                      >
-                        {reward.redemption_type === 'organizer_scan' ? (
-                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm15 0h3v3h-3v-3zm-2 2h2v2h-2v-2zm-2-2h2v2h-2v-2zm4 4h2v2h-2v-2zm-2 0h2v2h-2v-2z"/>
-                          </svg>
-                        ) : (
-                          <Gift className="w-4 h-4" />
-                        )}
-                        {availableStock <= 0
-                          ? "Out of Stock"
-                          : !isEligible
-                          ? ineligibleReason || "Not Eligible"
-                          : userPoints < reward.points_required
-                          ? "Not Enough Points"
-                          : reward.redemption_type === 'organizer_scan'
-                          ? "Show QR"
-                          : "Claim"}
-                      </button>
-                    </div>
-                    
-                    {/* Show additional info if available */}
-                    {reward.exclusivity_group && (
-                      <div className="mt-2">
-                        <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
-                          {reward.exclusivity_group}
-                        </span>
-                      </div>
-                    )}
+                      return (
+                        <div
+                          key={reward.id}
+                          className={`bg-white border rounded-xl shadow p-5 relative overflow-hidden ${
+                            !isEligible ? 'border-gray-200 opacity-90' : 'border-[#e0e0e0]'
+                          }`}
+                        >
+                          {/* Ineligible Overlay/Banner */}
+                          {!isEligible && (
+                            <div className="absolute top-0 right-0 bg-gray-100 text-gray-500 text-xs font-bold px-3 py-1 rounded-bl-lg z-10">
+                              {ineligibleReason || "Not Eligible"}
+                            </div>
+                          )}
+
+                          {reward.image_url && (
+                            <img
+                              src={reward.image_url}
+                              alt={reward.title}
+                              className={`w-full h-40 object-cover rounded-lg mb-3 ${!isEligible ? 'grayscale' : ''}`}
+                            />
+                          )}
+                          
+                          <div className="flex items-center justify-between mb-2">
+                            <h3 className="font-bold text-lg text-primary">{reward.title}</h3>
+                            <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-semibold">
+                              {reward.points_required} Points
+                            </span>
+                          </div>
+
+                          {reward.description && (
+                            <p className="text-sm text-[#666] mb-3">{reward.description}</p>
+                          )}
+
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex flex-col gap-1">
+                              <span className="text-xs text-[#888]">
+                                Stock: {availableStock}
+                              </span>
+                              {reward.max_per_user && (
+                                <span className="text-xs text-[#888]">
+                                  You redeemed: {userRedeemedCount} / {reward.max_per_user}
+                                </span>
+                              )}
+                            </div>
+                            
+                            <button
+                              onClick={() => handleRedeemClick(reward)}
+                              disabled={!isEligible || userPoints < reward.points_required || availableStock <= 0}
+                              className={`px-4 py-2 rounded-lg font-bold transition flex items-center gap-2 ${
+                                !isEligible || userPoints < reward.points_required || availableStock <= 0
+                                  ? "bg-[#e0e0e0] text-[#888] cursor-not-allowed"
+                                  : "bg-primary text-white hover:bg-[#1a73e8]"
+                              }`}
+                            >
+                              {reward.redemption_type === 'organizer_scan' ? (
+                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                  <path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm15 0h3v3h-3v-3zm-2 2h2v2h-2v-2zm-2-2h2v2h-2v-2zm4 4h2v2h-2v-2zm-2 0h2v2h-2v-2z"/>
+                                </svg>
+                              ) : (
+                                <Gift className="w-4 h-4" />
+                              )}
+                              {availableStock <= 0
+                                ? "Out of Stock"
+                                : !isEligible
+                                ? "Unavailable"
+                                : userPoints < reward.points_required
+                                ? "Not Enough Points"
+                                : reward.redemption_type === 'organizer_scan'
+                                ? "Show QR"
+                                : "Claim"}
+                            </button>
+                          </div>
+                          
+                          {/* Show additional info if available */}
+                          {reward.exclusivity_group && (
+                            <div className="mt-2">
+                              <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
+                                {reward.exclusivity_group}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
-                );
-              })}
+                ));
+              })()}
             </div>
           )
         ) : myRedemptions.length === 0 ? (
@@ -311,6 +355,7 @@ const Rewards = () => {
               };
               
               const status = statusConfig[redemption.status as keyof typeof statusConfig] || statusConfig.pending;
+              const rewardTitle = redemption.reward?.title || `Reward #${redemption.reward_id}`;
               
               return (
                 <div
@@ -319,7 +364,7 @@ const Rewards = () => {
                 >
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="font-bold text-lg text-primary">
-                      Reward #{redemption.reward_id}
+                      {rewardTitle}
                     </h3>
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${status.bg} ${status.text}`}>
                       {status.label}
@@ -327,6 +372,22 @@ const Rewards = () => {
                   </div>
 
                   <div className="space-y-2 text-sm">
+                    {redemption.redemption_code && (
+                      <div className="bg-gray-50 p-3 rounded-lg border border-gray-200 mb-3">
+                        <div className="text-xs text-gray-500 mb-1">Redemption Code</div>
+                        <div className="font-mono font-bold text-lg text-gray-800 tracking-wider">
+                          {redemption.redemption_code}
+                        </div>
+                      </div>
+                    )}
+
+                    {redemption.status === 'pending' && (
+                      <div className="bg-amber-50 p-3 rounded-lg border border-amber-100 mb-3 text-amber-800 text-xs">
+                        <p className="font-semibold mb-1">Action Required:</p>
+                        Please go to the redemption booth and show your redemption code to claim this reward.
+                      </div>
+                    )}
+
                     <div className="flex items-center justify-between">
                       <span className="text-[#888]">Quantity:</span>
                       <span className="font-semibold text-[#222]">{redemption.qty}</span>
@@ -353,12 +414,15 @@ const Rewards = () => {
                         <button 
                           onClick={() => {
                             setCurrentRedemptionCode(redemption.redemption_code);
-                            setCurrentRedemptionRewardTitle(`Reward #${redemption.reward_id}`);
+                            setCurrentRedemptionRewardTitle(rewardTitle);
                             setShowRedemptionQrModal(true);
                           }}
-                          className="mt-2 w-full py-2 bg-primary/10 text-primary rounded-lg font-semibold hover:bg-primary/20 transition-colors"
+                          className="mt-3 w-full py-2.5 bg-primary text-white rounded-lg font-bold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
                         >
-                          Show Redemption QR
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm15 0h3v3h-3v-3zm-2 2h2v2h-2v-2zm-2-2h2v2h-2v-2zm4 4h2v2h-2v-2zm-2 0h2v2h-2v-2z"/>
+                          </svg>
+                          Show QR Code
                         </button>
                       )}
                     </div>

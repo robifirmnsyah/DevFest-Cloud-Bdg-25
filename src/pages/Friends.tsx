@@ -151,16 +151,24 @@ const Friends = () => {
                 )}
               </div>
               <div className="ml-auto">
-                {friend.status === 'accepted' && friend.user_profile?.phone_number ? (
-                  <a 
-                    href={`https://wa.me/${friend.user_profile.phone_number.replace(/\D/g, '')}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-[#25D366] text-white px-3 py-2 rounded-lg font-bold text-xs flex items-center gap-1 hover:bg-[#128C7E] transition-colors shadow-sm"
+                {friend.status === 'accepted' ? (
+                  <button 
+                    onClick={() => {
+                      if (friend.user_profile?.phone_number) {
+                        window.open(`https://wa.me/${friend.user_profile.phone_number.replace(/\D/g, '')}`, '_blank');
+                      } else {
+                        alert("No phone number available for this contact");
+                      }
+                    }}
+                    className={`px-3 py-2 rounded-lg font-bold text-xs flex items-center gap-1 shadow-sm transition-colors ${
+                      friend.user_profile?.phone_number 
+                        ? "bg-[#25D366] text-white hover:bg-[#128C7E]" 
+                        : "bg-gray-100 text-gray-400"
+                    }`}
                   >
                     <MessageCircle className="w-3 h-3" />
                     WhatsApp
-                  </a>
+                  </button>
                 ) : (
                   <div className="text-xs px-3 py-1 rounded-full bg-primary/10 text-primary font-bold">
                     {friend.status}

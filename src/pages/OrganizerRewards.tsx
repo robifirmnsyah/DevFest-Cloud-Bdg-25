@@ -43,11 +43,8 @@ const OrganizerRewards = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       
-      // Filter only organizer_scan type rewards
-      const organizerScanRewards = (res.data || []).filter(
-        (r: any) => r.redemption_type === "organizer_scan"
-      );
-      setRewards(organizerScanRewards);
+      // Show all rewards
+      setRewards(res.data || []);
     } catch (err) {
       console.error("Failed to fetch rewards:", err);
       setRewards([]);

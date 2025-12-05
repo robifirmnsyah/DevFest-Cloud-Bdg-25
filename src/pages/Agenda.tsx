@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Calendar, MapPin, Clock, User, Search, Filter, X } from "lucide-react";
+import { Calendar, MapPin, Clock, User, Search, Filter, X, AlertTriangle, CheckCircle } from "lucide-react";
 import TabBar from "@/components/TabBar";
 import OrganizerTabBar from "@/components/OrganizerTabBar";
 const API_URL = import.meta.env.VITE_API_URL;
@@ -16,6 +16,12 @@ const Agenda = () => {
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
   const [sessionToCancel, setSessionToCancel] = useState<any>(null);
   const [cancelLoading, setCancelLoading] = useState(false);
+  
+  // Booking confirmation state
+  const [bookingModalOpen, setBookingModalOpen] = useState(false);
+  const [sessionToBook, setSessionToBook] = useState<any>(null);
+  const [conflictingSession, setConflictingSession] = useState<any>(null);
+  const [bookingLoading, setBookingLoading] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -108,11 +114,41 @@ const Agenda = () => {
     setCancelLoading(false);
   };
 
-  // Handle book session
-  const handleBookSession = async (sessionId: number) => {
+  // Open booking confirmation modal
+  const openBookingModal = (session: any) => {
+    // Check for conflicts
+    const conflict = myAgenda.find((booking: any) => {
+      const bookedSession = booking.session;
+      const startA = new Date(session.start_time).getTime();
+      const endA = new Date(session.end_time).getTime();
+      const startB = new Date(bookedSession.start_time).getTime();
+      const endB = new Date(bookedSession.end_time).getTime();
+      // Check overlap: (StartA < EndB) && (EndA > StartB)
+      return (startA < endB) && (endA > startB);
+    });
+
+    setSessionToBook(session);
+    setConflictingSession(conflict ? conflict.session : null);
+    setBookingModalOpen(true);
+  };
+
+  // Confirm and execute booking
+  const confirmBooking = async () => {
+    if (!sessionToBook) return;
+    
     const token = localStorage.getItem("token");
+    setBookingLoading(true);
+    
     try {
-      await axios.post(`${API_URL}api/v1/participants/sessions/book`, { session_id: sessionId }, {
+      // If there is a conflict, cancel the old session first
+      if (conflictingSession) {
+        await axios.delete(`${API_URL}api/v1/participants/sessions/${conflictingSession.id}/cancel`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      }
+      
+      // Book the new session
+      await axios.post(`${API_URL}api/v1/participants/sessions/book`, { session_id: sessionToBook.id }, {
         headers: { Authorization: `Bearer ${token}` },
       });
       
@@ -128,9 +164,17 @@ const Agenda = () => {
       
       setSessions(sessionsRes.data);
       setMyAgenda(agendaRes.data);
+      
+      // Close modal
+      setBookingModalOpen(false);
+      setSessionToBook(null);
+      setConflictingSession(null);
+      
     } catch (err: any) {
       console.error("Booking failed", err);
       alert(err?.response?.data?.detail || "Failed to book session");
+    } finally {
+      setBookingLoading(false);
     }
   };
 
@@ -305,7 +349,7 @@ const Agenda = () => {
                           disabled={session.is_full}
                           onClick={() => {
                             if (!session.is_full) {
-                              handleBookSession(session.id);
+                              openBookingModal(session);
                             }
                           }}
                         >
@@ -492,6 +536,125 @@ const Agenda = () => {
     </div>
   </div>
 )}
+
+      {/* Booking Confirmation Modal */}
+      {bookingModalOpen && sessionToBook && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 shadow-2xl w-full max-w-md relative">
+            {/* Close button */}
+            <button
+              onClick={() => { setBookingModalOpen(false); setSessionToBook(null); setConflictingSession(null); }}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+              disabled={bookingLoading}
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            {/* Header */}
+            <div className="text-center mb-6">
+              <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${
+                conflictingSession ? 'bg-amber-100' : 'bg-blue-100'
+              }`}>
+                {conflictingSession ? (
+                  <AlertTriangle className="w-8 h-8 text-amber-600" />
+                ) : (
+                  <CheckCircle className="w-8 h-8 text-blue-600" />
+                )}
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
+                {conflictingSession ? 'Session Conflict' : 'Confirm Booking'}
+              </h3>
+              <p className="text-gray-600">
+                {conflictingSession 
+                  ? 'You have another session booked at this time.' 
+                  : 'Are you sure you want to book this session?'
+                }
+              </p>
+            </div>
+
+            {/* Session Info */}
+            <div className="bg-gray-50 rounded-lg p-4 mb-4">
+              <div className="text-xs font-bold text-gray-500 uppercase mb-2">New Session</div>
+              <div className="flex items-start gap-3">
+                <div className="bg-primary/10 rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0">
+                  <User className="w-5 h-5 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-bold text-gray-900 mb-1">{sessionToBook.title}</h4>
+                  <p className="text-sm text-gray-600 mb-2">{sessionToBook.speaker}</p>
+                  <div className="flex items-center gap-4 text-xs text-gray-500">
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      {new Date(sessionToBook.start_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <MapPin className="w-3 h-3" />
+                      {sessionToBook.location}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Conflicting Session Info */}
+            {conflictingSession && (
+              <div className="bg-amber-50 border border-amber-100 rounded-lg p-4 mb-6">
+                <div className="text-xs font-bold text-amber-600 uppercase mb-2">Currently Booked</div>
+                <div className="flex items-start gap-3">
+                  <div className="bg-amber-100 rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0">
+                    <User className="w-5 h-5 text-amber-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-bold text-gray-900 mb-1">{conflictingSession.title}</h4>
+                    <p className="text-sm text-gray-600 mb-2">{conflictingSession.speaker}</p>
+                    <div className="flex items-center gap-4 text-xs text-gray-500">
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {new Date(conflictingSession.start_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-3 text-sm text-amber-700 font-medium border-t border-amber-200 pt-2">
+                  Booking the new session will cancel this one.
+                </div>
+              </div>
+            )}
+
+            {/* Action Buttons */}
+            <div className="flex gap-3">
+              <button
+                onClick={() => { setBookingModalOpen(false); setSessionToBook(null); setConflictingSession(null); }}
+                className="flex-1 px-4 py-3 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-semibold transition-colors"
+                disabled={bookingLoading}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmBooking}
+                className={`flex-1 px-4 py-3 text-white rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${
+                  conflictingSession 
+                    ? 'bg-amber-500 hover:bg-amber-600' 
+                    : 'bg-primary hover:bg-primary/90'
+                }`}
+                disabled={bookingLoading}
+              >
+                {bookingLoading ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Processing...
+                  </>
+                ) : (
+                  conflictingSession ? 'Switch Session' : 'Confirm Booking'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {role === "organizer"
         ? <OrganizerTabBar activeTab="agenda" />
