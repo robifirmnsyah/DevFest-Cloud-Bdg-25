@@ -7,6 +7,7 @@ const puzzleColors = [
   "bg-gradient-to-br from-[#A2D5F2]/80 via-[#EAF6FF]/90 to-[#B5EAD7]/80",
   "bg-gradient-to-br from-[#FFB3C6]/80 via-[#FFF0F6]/90 to-[#C3B1E1]/80",
   "bg-gradient-to-br from-[#B5EAD7]/80 via-[#E0FFF6]/90 to-[#A2D5F2]/80",
+  "bg-gradient-to-br from-[#C3B1E1]/80 via-[#F6F0FF]/90 to-[#FFB3C6]/80",
   "bg-gradient-to-br from-[#B5EAD7]/80 via-[#E0FFF6]/90 to-[#A2D5F2]/80",
   "bg-gradient-to-br from-[#FFD6A5]/80 via-[#FFF6E0]/90 to-[#FFE066]/80",
   "bg-gradient-to-br from-[#C3B1E1]/80 via-[#F6F0FF]/90 to-[#FFB3C6]/80",
@@ -62,10 +63,19 @@ const Speakers = () => {
       track: "Techtalk",
     },
     {
+      name: "Qais Jabbar I",
+      image: "/images/qais.png",
+      topic: "How to deploy MCP Server at Cloud Run",
+      title: "Senior Cloud Engineer at PT CloudMile Indonesia",
+      detail:
+        "Step-by-step guide to deploying Model Context Protocol servers on Cloud Run: containerization, configuration, scaling strategies, and best practices for production-ready deployments.",
+      track: "Techtalk",
+    },
+    {
       name: "Luqman Aljundi",
       image: "/images/luqman.jpg",
       topic: "How to Apply Discount in GCP and Avoid Unexpected Billing Usage",
-      title: "Founder & CEO Curaweda",
+      title: "Business Lead GITS Cloud",
       detail:
         "Practical GCP cost management tips: choosing committed/sustained discounts, labeling & cost allocation strategies, budget & alert setup, and monitoring to prevent unexpected billing.",
       track: "Techtalk",
@@ -74,7 +84,7 @@ const Speakers = () => {
       name: "Azhar Fuad",
       image: "/images/azhar.jpg",
       topic: "The Responsible Lens: Crafting Video with Ethical AI",
-      title: "CEO Curaweda",
+      title: "Founder & CEO Curaweda",
       detail:
         "Principles of ethical AI video creation: data consent & licensing, dataset curation, watermarking & provenance, abuse mitigation, and governance policies for creators.",
       track: "Techtalk",

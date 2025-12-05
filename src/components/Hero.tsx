@@ -193,13 +193,13 @@ const Hero = () => {
               Register Now
             </Button>
           </a>
-          <a href="#about">
+          <a href="/auth">
             <Button 
               size="lg" 
               variant="outline"
               className="text-sm md:text-lg px-6 md:px-10 py-3 md:py-6 rounded-full border-2 border-[#4285F4] text-[#4285F4] hover:bg-[#4285F4]/10 shadow-lg hover:shadow-xl transition-all hover:scale-105 font-bold"
             >
-              Learn More
+              Login
             </Button>
           </a>
         </div>

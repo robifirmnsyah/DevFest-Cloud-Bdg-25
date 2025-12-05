@@ -4,8 +4,23 @@ import { Handshake } from "lucide-react";
 const Partners = () => {
   const sponsors = [
     { 
+      name: "Google", 
+      logo: "/images/sponsors/google.png",
+      tier: "main"
+    },
+    { 
       name: "Durianpay", 
       logo: "/images/sponsors/durianpay.png",
+      tier: "main"
+    },
+    { 
+      name: "Cloudmile", 
+      logo: "/images/sponsors/cloudmile.png",
+      tier: "main"
+    },
+    { 
+      name: "Bodypack", 
+      logo: "/images/sponsors/bodypack.png",
       tier: "main"
     },
     { 
@@ -19,12 +34,17 @@ const Partners = () => {
       tier: "secondary"
     },
     { 
+      name: "Paragon", 
+      logo: "/images/sponsors/paragon.png",
+      tier: "secondary"
+    },
+    { 
       name: "Cleo", 
       logo: "/images/sponsors/cleo.png",
       tier: "secondary"
     },
     { 
-      name: "Fiora", 
+      name: "Iora", 
       logo: "/images/sponsors/iora.png",
       tier: "secondary"
     }
@@ -55,28 +75,47 @@ const Partners = () => {
             Sponsored By
           </h2>
           
-          {/* Main Sponsor - Much Larger */}
-          <div className="flex justify-center mb-12">
-            <img
-              src={sponsors[0].logo}
-              alt={sponsors[0].name}
-              className="h-32 md:h-40 lg:h-48 w-auto object-contain max-w-[90vw]"
-              onError={(e) => {
-                console.error('Failed to load main sponsor logo:', sponsors[0].name);
-                e.currentTarget.src = '/gdg_logo.jpg';
-              }}
-            />
-          </div>
-          
-          {/* Secondary Sponsors - Much Larger, Perfectly Aligned */}
-          <div className="flex justify-center items-center gap-8 md:gap-12 lg:gap-16 flex-wrap max-w-6xl mx-auto">
-            {sponsors.slice(1).map((sponsor, index) => (
+          {/* Main Tier Sponsors - All in One Row */}
+          <div className="flex justify-center items-center gap-8 md:gap-12 lg:gap-16 flex-wrap max-w-6xl mx-auto mb-12">
+            {sponsors.filter(s => s.tier === "main").map((sponsor, index) => (
               <div 
                 key={index}
                 className="flex items-center justify-center"
                 style={{ 
-                  width: '180px',
-                  height: '100px'
+                  width: '220px',
+                  height: '140px'
+                }}
+              >
+                <img
+                  src={sponsor.logo}
+                  alt={sponsor.name}
+                  className="max-w-full max-h-full object-contain hover:scale-110 transition-transform duration-300"
+                  onError={(e) => {
+                    console.error('Failed to load sponsor logo:', sponsor.name);
+                    // Try alternative extensions
+                    const currentSrc = e.currentTarget.src;
+                    if (currentSrc.includes('.png')) {
+                      e.currentTarget.src = currentSrc.replace('.png', '.jpg');
+                    } else if (currentSrc.includes('.jpg')) {
+                      e.currentTarget.src = currentSrc.replace('.jpg', '.jpeg');
+                    } else {
+                      e.currentTarget.src = '/gdg_logo.jpg';
+                    }
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+
+          {/* Secondary Tier Sponsors - Third Row (Smaller) */}
+          <div className="flex justify-center items-center gap-6 md:gap-8 lg:gap-10 flex-wrap max-w-6xl mx-auto">
+            {sponsors.filter(s => s.tier === "secondary").map((sponsor, index) => (
+              <div 
+                key={index}
+                className="flex items-center justify-center"
+                style={{ 
+                  width: '140px',
+                  height: '80px'
                 }}
               >
                 <img
