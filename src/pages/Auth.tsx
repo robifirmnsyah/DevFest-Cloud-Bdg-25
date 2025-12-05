@@ -86,9 +86,24 @@ const Auth = () => {
       } catch (err: any) {
         // Log error response
         console.error("Google Login Error:", err?.response?.data || err);
-        // Prefer concise API message when available
-        const apiMessage = err?.response?.data?.message;
-        const msg = typeof apiMessage === "string" ? apiMessage : "Google login failed.";
+        
+        // Extract detailed error message from various possible locations
+        const errorData = err?.response?.data;
+        let msg = "Google login failed.";
+        
+        if (errorData) {
+          // Check for detail field (string or array)
+          if (typeof errorData.detail === "string") {
+            msg = errorData.detail;
+          } else if (Array.isArray(errorData.detail) && errorData.detail.length > 0) {
+            msg = errorData.detail[0]?.msg || errorData.detail[0] || msg;
+          }
+          // Check for message field as fallback
+          else if (typeof errorData.message === "string") {
+            msg = errorData.message;
+          }
+        }
+        
         setError(msg);
       }
       setLoading(false);
@@ -173,9 +188,23 @@ const Auth = () => {
         setForm({ email: "", password: "", name: "" });
       }
     } catch (err: any) {
-      // For email/password path, keep message concise
-      const apiMessage = err?.response?.data?.message;
-      const msg = typeof apiMessage === "string" ? apiMessage : "Auth failed.";
+      // Extract detailed error message from various possible locations
+      const errorData = err?.response?.data;
+      let msg = "Auth failed.";
+      
+      if (errorData) {
+        // Check for detail field (string or array)
+        if (typeof errorData.detail === "string") {
+          msg = errorData.detail;
+        } else if (Array.isArray(errorData.detail) && errorData.detail.length > 0) {
+          msg = errorData.detail[0]?.msg || errorData.detail[0] || msg;
+        }
+        // Check for message field as fallback
+        else if (typeof errorData.message === "string") {
+          msg = errorData.message;
+        }
+      }
+      
       setError(msg);
     }
     setLoading(false);

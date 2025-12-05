@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Calendar, MapPin, Clock } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const EVENT_DATE = new Date("2025-12-06T09:00:00+07:00");
 
@@ -193,7 +194,7 @@ const Hero = () => {
               Register Now
             </Button>
           </a>
-          <a href="/auth">
+          <Link to="/auth">
             <Button 
               size="lg" 
               variant="outline"
@@ -201,7 +202,7 @@ const Hero = () => {
             >
               Login
             </Button>
-          </a>
+          </Link>
         </div>
       </div>
     </section>
