@@ -196,7 +196,8 @@ const Quests = () => {
                     )}
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-bold text-lg text-primary">{quest.title}</span>
-                      <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-semibold">
+                      {/* Smaller green points badge */}
+                      <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap">
                         +{quest.points} Points
                       </span>
                     </div>
@@ -207,21 +208,12 @@ const Quests = () => {
                           Needs Approval
                         </span>
                       )}
-                      {/* progress chip for networking */}
                       {isNetworking && typeof quest.progress_percentage === "number" && (
                         <span className="bg-[#34A853]/10 text-[#34A853] px-3 py-1 rounded-full text-xs font-semibold">
                           {quest.current_count ?? 0}/{quest.target_count ?? 0}
                         </span>
                       )}
                     </div>
-
-                    {/* Link URL display */}
-                    {isLinkClick && quest.link_url && (
-                      <div className="text-xs text-blue-500 mb-3 break-all flex items-center gap-1">
-                        <span className="text-gray-400">Link:</span>
-                        {quest.link_url}
-                      </div>
-                    )}
 
                     {/* Networking progress bar */}
                     {isNetworking && (
@@ -245,14 +237,14 @@ const Quests = () => {
                       </div>
                     )}
 
-                    {/* Link click CTA */}
+                    {/* Link click CTA - changed button text */}
                     {isLinkClick && quest.link_url && !submission && (
                       <div className="flex justify-end">
                         <button
                           className="bg-primary text-white px-5 py-2 rounded font-bold shadow hover:bg-[#1a73e8] transition-all"
                           onClick={() => handleClickLinkQuest(quest)}
                         >
-                          Open & Complete
+                          Start Quest
                         </button>
                       </div>
                     )}
@@ -298,7 +290,8 @@ const Quests = () => {
                   >
                     <div className="flex items-center justify-between mb-2">
                       <span className="font-bold text-lg text-primary">{quest.title}</span>
-                      <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-xs font-semibold">
+                      {/* Smaller green points badge */}
+                      <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap">
                         +{quest.points} Points
                       </span>
                     </div>
