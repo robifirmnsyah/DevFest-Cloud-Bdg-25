@@ -1,8 +1,11 @@
-const CACHE_NAME = 'devfest-2025-v5';
+const CACHE_NAME = 'devfest-2025-v6';
 const urlsToCache = [
   '/',
+  '/index.html',
   '/manifest.json',
-  '/gdg_logo.jpg'
+  '/gdg_icon.png',
+  '/devfest.png',
+  '/sw.js'
 ];
 
 // Install event
@@ -101,7 +104,17 @@ self.addEventListener('fetch', (event) => {
             return response;
           })
           .catch(() => {
-            // Silently fail, browser will handle
+            // Fallbacks for critical assets to avoid install failures
+            if (url.pathname === '/manifest.json') {
+              return caches.match('/manifest.json');
+            }
+            if (url.pathname === '/gdg_icon.png') {
+              return caches.match('/gdg_icon.png');
+            }
+            if (url.pathname === '/devfest.png') {
+              return caches.match('/devfest.png');
+            }
+            // Silently fail otherwise; browser will handle
             return new Response('', { status: 404 });
           });
       })
