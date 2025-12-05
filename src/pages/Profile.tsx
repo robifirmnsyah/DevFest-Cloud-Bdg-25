@@ -4,8 +4,6 @@ import TabBar from "@/components/TabBar";
 import { LogOut, Pencil } from "lucide-react";
 const API_URL = (import.meta.env.VITE_API_URL ?? "https://devfest-api.cloudbandung.id/").replace(/\/?$/, "/");
 
-const role = localStorage.getItem("role");
-
 const Profile = () => {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -35,9 +33,9 @@ const Profile = () => {
       });
       setProfile(res.data);
       
-      // Load user roles from localStorage or API response
+      // Load user roles from localStorage
       const storedRoles = localStorage.getItem("user_roles");
-      const roles = storedRoles ? JSON.parse(storedRoles) : (res.data?.roles || ["participant"]);
+      const roles = storedRoles ? JSON.parse(storedRoles) : ["participant"];
       setUserRoles(roles);
       setCurrentRole(localStorage.getItem("role") || "participant");
     } catch (err: any) {

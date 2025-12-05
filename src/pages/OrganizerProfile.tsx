@@ -8,6 +8,8 @@ const API_URL = (import.meta.env.VITE_API_URL ?? "https://devfest-api.cloudbandu
 const OrganizerProfile = () => {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [userRoles, setUserRoles] = useState<string[]>([]);
+  const [currentRole, setCurrentRole] = useState<string>("organizer");
 
   const fetchOrganizerProfile = async () => {
     const token = localStorage.getItem("token");
@@ -20,6 +22,12 @@ const OrganizerProfile = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setProfile(res.data);
+
+      // Load user roles from localStorage
+      const storedRoles = localStorage.getItem("user_roles");
+      const roles = storedRoles ? JSON.parse(storedRoles) : ["organizer"];
+      setUserRoles(roles);
+      setCurrentRole("organizer");
     } catch (err: any) {
       if (err?.response?.status === 401 || err?.response?.status === 403) {
         localStorage.removeItem("token");
@@ -31,6 +39,20 @@ const OrganizerProfile = () => {
       }
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Switch role handler
+  const handleRoleSwitch = (newRole: string) => {
+    localStorage.setItem("role", newRole);
+    if (newRole === "admin") {
+      window.location.hash = "/admin";
+    } else if (newRole === "organizer") {
+      window.location.hash = "/organizer";
+    } else if (newRole === "booth_staff") {
+      window.location.hash = "/booth-staff";
+    } else {
+      window.location.hash = "/dashboard";
     }
   };
 
@@ -64,6 +86,28 @@ const OrganizerProfile = () => {
             <LogOut className="w-6 h-6" />
           </button>
         </div>
+
+        {/* Role Switcher - Only show if user has multiple roles */}
+        {userRoles.length > 1 && (
+          <div className="bg-white rounded-xl shadow border border-[#e0e0e0] p-4 mb-6">
+            <div className="font-bold text-sm mb-3 text-gray-700">Switch Role</div>
+            <div className="flex flex-wrap gap-2">
+              {userRoles.map((r) => (
+                <button
+                  key={r}
+                  onClick={() => handleRoleSwitch(r)}
+                  className={`px-4 py-2 rounded-full text-sm font-semibold transition-colors ${
+                    currentRole === r
+                      ? "bg-[#4285F4] text-white"
+                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  }`}
+                >
+                  {r === "participant" ? "Participant" : r === "organizer" ? "Organizer" : r === "booth_staff" ? "Booth Staff" : "Admin"}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="flex flex-col items-center mb-6">
           <div className="w-24 h-24 rounded-full bg-[#e0e0e0] flex items-center justify-center text-4xl font-bold text-primary mb-3 border-4 border-[#4285F4]">
