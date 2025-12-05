@@ -30,8 +30,8 @@ const PWAInstallPrompt = () => {
     return () => clearTimeout(timer);
   }, [isInstalled]);
 
-  // Don't show if installed or dismissed
-  if (isInstalled || isDismissed || !isVisible) {
+  // Don't show if installed or dismissed; only show when installable
+  if (isInstalled || isDismissed || !isVisible || !isInstallable) {
     return null;
   }
 
@@ -94,9 +94,9 @@ const PWAInstallPrompt = () => {
             </button>
 
             <p className="text-xs text-white/70 mt-2 text-center">
-              {isMobile 
-                ? 'Tap Install, then add to home screen' 
-                : 'Or look for install icon in address bar'}
+              {isInstallable
+                ? (isMobile ? 'Tap Install to add to home screen' : 'Or look for install icon in address bar')
+                : 'This app cannot be installed on this browser. Try Chrome/Edge (desktop) or Chrome/Safari (mobile).'}
             </p>
           </div>
         </div>

@@ -117,20 +117,9 @@
           });
       }
       
-      // Listen for install prompt - CRITICAL for install icon to appear
-      let deferredPrompt;
-      window.addEventListener('beforeinstallprompt', (e) => {
-        console.log('🎉 beforeinstallprompt fired - App is installable!');
-        e.preventDefault();
-        deferredPrompt = e;
-        // Store for later use
-        window.deferredPrompt = e;
-      });
-      
-      window.addEventListener('appinstalled', () => {
-        console.log('✅ App installed successfully');
-        deferredPrompt = null;
-      });
+      // PWA install handling is managed by usePWA hook; avoid intercepting native prompt here to prevent banner warnings
+      // window.addEventListener('beforeinstallprompt', ...) removed
+      // window.addEventListener('appinstalled', ...) handled in React
     </script>
   </head>
 
