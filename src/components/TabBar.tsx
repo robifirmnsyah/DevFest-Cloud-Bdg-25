@@ -1,7 +1,7 @@
-import { Home, Calendar, Users, MapPin, User } from "lucide-react";
+import { Calendar, Users, MapPin, User, Gift } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-type Tab = "hub" | "agenda" | "friends" | "quests" | "profile";
+type Tab = "rewards" | "agenda" | "friends" | "quests" | "profile";
 
 interface TabBarProps {
   activeTab: Tab;
@@ -18,10 +18,10 @@ const TabBar = ({ activeTab, onTabChange }: TabBarProps) => {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-[#e0e0e0] flex justify-between px-2 py-2 z-10 shadow">
-      <TabItem icon={<Home className="w-6 h-6" />} label="Hub" active={activeTab === "hub"} onClick={() => handleTab("hub", "/dashboard")} />
       <TabItem icon={<Calendar className="w-6 h-6" />} label="Agenda" active={activeTab === "agenda"} onClick={() => handleTab("agenda", "/agenda")} />
       <TabItem icon={<Users className="w-6 h-6" />} label="Friends" active={activeTab === "friends"} onClick={() => handleTab("friends", "/friends")} />
       <TabItem icon={<MapPin className="w-6 h-6" />} label="Quests" active={activeTab === "quests"} onClick={() => handleTab("quests", "/quests")} />
+      <TabItem icon={<Gift className="w-6 h-6" />} label="Rewards" active={activeTab === "rewards"} onClick={() => handleTab("rewards", "/rewards")} />
       <TabItem icon={<User className="w-6 h-6" />} label="Profile" active={activeTab === "profile"} onClick={() => handleTab("profile", "/profile")} />
     </nav>
   );

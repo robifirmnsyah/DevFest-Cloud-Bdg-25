@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Megaphone, Bell, Gift } from "lucide-react";
+import { Megaphone, Bell } from "lucide-react";
 import TabBar from "@/components/TabBar";
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -12,8 +12,7 @@ const announcements = [
 const Dashboard = () => {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [questsCompleted, setQuestsCompleted] = useState<number>(0);
-  const [totalQuests, setTotalQuests] = useState<number>(0);
+  // Progress moved to Profile page
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -30,26 +29,7 @@ const Dashboard = () => {
       .catch(() => window.location.href = "/auth")
       .finally(() => setLoading(false));
 
-    // Fetch quests
-    axios
-      .get(`${API_URL}api/v1/participants/quests`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => setTotalQuests(res.data.length))
-      .catch(() => setTotalQuests(0));
-
-    // Fetch completed quests
-    axios
-      .get(`${API_URL}api/v1/participants/quests/my-submissions`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => {
-        const completed = Array.isArray(res.data)
-          ? res.data.filter((q: any) => q.status === "approved").length
-          : 0;
-        setQuestsCompleted(completed);
-      })
-      .catch(() => setQuestsCompleted(0));
+    // Progress data removed here (now shown on Profile)
   }, []);
 
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#f6f8fa] text-[#222]">Loading...</div>;
@@ -77,32 +57,11 @@ const Dashboard = () => {
             ))}
           </div>
         </div>
-        {/* Progress */}
-        <div className="mb-8">
-          <h3 className="text-xl font-bold mb-3">Your Progress</h3>
-          <div className="grid grid-cols-2 gap-3 mb-4">
-            <div className="flex-1 border border-[#e0e0e0] bg-white rounded-xl p-5 flex flex-col items-start shadow">
-              <span className="text-base mb-2">Points</span>
-              <span className="text-2xl font-bold text-primary">{profile.points ?? 0}</span>
-            </div>
-            <div className="flex-1 border border-[#e0e0e0] bg-white rounded-xl p-5 flex flex-col items-start shadow">
-              <span className="text-base mb-2">Quests Completed</span>
-              <span className="text-2xl font-bold text-primary">{questsCompleted}/{totalQuests}</span>
-            </div>
-          </div>
-          
-          {/* Redeem Rewards Button */}
-          <a href="/rewards" className="block">
-            <button className="w-full bg-gradient-to-r from-[#4285F4] to-[#34A853] hover:from-[#1a73e8] hover:to-[#2d8a47] text-white rounded-xl py-4 px-6 font-bold text-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-3">
-              <Gift className="w-6 h-6" />
-              <span>Redeem Rewards</span>
-            </button>
-          </a>
-        </div>
+        {/* Progress removed; use Profile page to view points and quests */}
       </main>
 
       {/* Tab Bar */}
-      <TabBar activeTab="hub" />
+  <TabBar activeTab="rewards" />
     </div>
   );
 };

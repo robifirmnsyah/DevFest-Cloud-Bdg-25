@@ -108,7 +108,7 @@ This app supports PWA installation in production.
 
 **Desktop (Chrome/Edge):**
 - Click install icon (⊕) in address bar
-- Or Menu → Install "DevFest 2025"
+- Or Menu → Install "Cloud DevFest BDG"
 
 **Mobile (Chrome Android):**
 - Menu (⋮) → "Add to Home screen"

@@ -62,17 +62,38 @@ const Auth = () => {
         return;
       }
       setLoading(true);
+      setError("");
+      setHasDuplicateEmail(false);
       try {
         const res = await axios.post(`${API_URL}api/v1/auth/google`, {
           id_token: response.credential,
         });
+        
+        // Check if user has duplicate email
+        if (res.data.user?.has_duplicate_email) {
+          setHasDuplicateEmail(true);
+          setError("Your email has duplicate accounts. Please use email/password login or contact support to change your email.");
+          setLoading(false);
+          return;
+        }
+        
         handleAuthSuccess(res.data);
       } catch (err: any) {
-        setError(
-          err.response?.data?.detail?.[0]?.msg ||
-            err.response?.data?.message ||
-            "Google login failed"
-        );
+        if (err.response && err.response.data) {
+          // Handle both array of errors (validation) and single detail string (auth error)
+          const detail = err.response.data.detail;
+          const message = err.response.data.message;
+          
+          if (Array.isArray(detail)) {
+            setError(detail[0]?.msg || "Google login failed");
+          } else if (typeof detail === "string") {
+            setError(detail);
+          } else {
+            setError(message || "Google login failed");
+          }
+        } else {
+          setError("Network error. Please try again with Google login.");
+        }
       }
       setLoading(false);
     },

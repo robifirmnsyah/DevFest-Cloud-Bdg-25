@@ -1,6 +1,6 @@
 {
   "name": "Cloud DevFest Bandung 2025",
-  "short_name": "DevFest 2025",
+  "short_name": "Cloud DevFest BDG",
   "description": "The largest AI & Cloud developer event in Indonesia",
   "start_url": "/",
   "id": "/",
@@ -14,21 +14,27 @@
   "categories": ["events", "education"],
   "icons": [
     {
-      "src": "/gdg_logo.jpg",
-      "sizes": "512x512",
-      "type": "image/jpeg",
-      "purpose": "any"
-    },
-    {
-      "src": "/gdg_logo.jpg",
+      "src": "/gdg_icon.png",
       "sizes": "192x192",
-      "type": "image/jpeg",
+      "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/gdg_logo.jpg",
+      "src": "/gdg_icon.png",
       "sizes": "512x512",
-      "type": "image/jpeg",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/devfest.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/devfest.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
       "purpose": "maskable"
     }
   ]

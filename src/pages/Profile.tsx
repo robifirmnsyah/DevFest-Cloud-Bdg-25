@@ -10,6 +10,8 @@ const role = localStorage.getItem("role");
 const Profile = () => {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [questsCompleted, setQuestsCompleted] = useState<number>(0);
+  const [totalQuests, setTotalQuests] = useState<number>(0);
   const [qrOpen, setQrOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [editName, setEditName] = useState("");
@@ -54,6 +56,26 @@ const Profile = () => {
     }
   };
 
+  // Fetch quests and submissions for progress
+  const fetchProgress = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) return;
+    try {
+      const [questsRes, submissionsRes] = await Promise.all([
+        axios.get(`${API_URL}api/v1/participants/quests`, { headers: { Authorization: `Bearer ${token}` } }),
+        axios.get(`${API_URL}api/v1/participants/quests/my-submissions`, { headers: { Authorization: `Bearer ${token}` } }),
+      ]);
+      setTotalQuests(Array.isArray(questsRes.data) ? questsRes.data.length : 0);
+      const completed = Array.isArray(submissionsRes.data)
+        ? submissionsRes.data.filter((q: any) => q.status === "approved").length
+        : 0;
+      setQuestsCompleted(completed);
+    } catch {
+      setTotalQuests(0);
+      setQuestsCompleted(0);
+    }
+  };
+
   useEffect(() => {
     if (role === "organizer") {
       setLoading(false);
@@ -69,6 +91,7 @@ const Profile = () => {
       return;
     }
     fetchProfile();
+    fetchProgress();
   }, []);
 
   // Switch role handler
@@ -339,9 +362,21 @@ const Profile = () => {
             </button>
           </div>
         </div>
-        <div className="bg-white rounded-xl shadow border border-[#e0e0e0] p-6 mb-6 text-center">
-          <div className="font-bold text-lg mb-2">My Points</div>
-          <div className="text-3xl font-bold text-primary">{profile.points ?? 0}</div>
+        <div className="bg-white rounded-xl shadow border border-[#e0e0e0] p-6 mb-6">
+          <div className="font-bold text-lg mb-4">Your Progress</div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex-1 border border-[#e0e0e0] bg-white rounded-xl p-5 flex flex-col items-start shadow">
+              <span className="text-sm mb-1">Points</span>
+              <span className="text-2xl font-bold text-primary">{profile.points ?? 0}</span>
+            </div>
+            <div className="flex-1 border border-[#e0e0e0] bg-white rounded-xl p-5 flex flex-col items-start shadow">
+              <span className="text-sm mb-1">Quests Completed</span>
+              <span className="text-2xl font-bold text-primary">{questsCompleted}/{totalQuests}</span>
+            </div>
+          </div>
+          <a href="/rewards" className="block mt-4">
+            <button className="w-full bg-gradient-to-r from-[#4285F4] to-[#34A853] hover:from-[#1a73e8] hover:to-[#2d8a47] text-white rounded-xl py-3 px-6 font-bold text-base shadow-lg hover:shadow-xl transition-all">View Rewards</button>
+          </a>
         </div>
       </div>
       {/* QR Popup */}

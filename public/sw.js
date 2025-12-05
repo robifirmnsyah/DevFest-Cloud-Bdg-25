@@ -1,4 +1,4 @@
-const CACHE_NAME = 'devfest-2025-v3';
+const CACHE_NAME = 'devfest-2025-v5';
 const urlsToCache = [
   '/',
   '/manifest.json',

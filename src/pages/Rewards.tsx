@@ -626,7 +626,7 @@ const Rewards = () => {
         </div>
       )}
 
-      <TabBar activeTab="quests" />
+  <TabBar activeTab="rewards" />
     </div>
   );
 };
