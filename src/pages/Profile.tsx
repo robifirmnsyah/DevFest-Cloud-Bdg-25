@@ -76,6 +76,21 @@ const Profile = () => {
   };
 
   useEffect(() => {
+    // Redirect non-participant roles to their own profile pages
+    const r = localStorage.getItem("role");
+    if (r === "organizer") {
+      window.location.hash = "/organizer/profile";
+      return;
+    }
+    if (r === "booth_staff") {
+      window.location.hash = "/booth-staff/profile";
+      return;
+    }
+    if (r === "admin") {
+      window.location.hash = "/admin";
+      return;
+    }
+
     // Default: participant profile + progress
     fetchProfile();
     fetchProgress();
@@ -170,7 +185,7 @@ const Profile = () => {
   if (loading) return <div className="min-h-screen flex items-center justify-center bg-[#f6f8fa] text-[#222]">Loading...</div>;
   if (!profile) return null;
 
-  const qrCodeImageUrl = profile.qr_code_image_url || getQrCodeImageUrl(profile.qr_code);
+  const qrCodeImageUrl = (profile as any).qr_code_image_url || getQrCodeImageUrl(profile.qr_code);
 
   return (
     <div className="min-h-screen bg-[#f6f8fa] text-[#222] pb-16">
@@ -228,8 +243,89 @@ const Profile = () => {
             Edit Profile
           </button>
         </div>
+
+        {/* QR code display */}
+        <div className="bg-white rounded-xl shadow border border-[#e0e0e0] p-6 mb-6">
+          <div className="font-bold text-lg mb-2 text-center">My QR Code</div>
+          <div className="text-sm text-[#888] mb-4 text-center">
+            Show this to booth staff and organizers to connect and participate in activities.
+          </div>
+          <div className="flex justify-center mb-2">
+            {qrCodeImageUrl ? (
+              <img
+                src={qrCodeImageUrl}
+                alt="QR Code"
+                className="w-40 h-40 bg-[#f6f8fa] rounded-lg border cursor-pointer"
+                onClick={() => setQrOpen(true)}
+                onError={(e) => {
+                  e.currentTarget.src =
+                    "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Crect fill='%23e0e0e0' width='160' height='160'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23888' font-size='14'%3ENo QR Code%3C/text%3E%3C/svg%3E";
+                }}
+              />
+            ) : (
+              <div className="w-40 h-40 bg-[#f6f8fa] rounded-lg border flex items-center justify-center">
+                <span className="text-[#888] text-sm">No QR Code</span>
+              </div>
+            )}
+          </div>
+          <div className="flex justify-center gap-4">
+            <button
+              className="text-center text-primary text-sm cursor-pointer flex items-center gap-2"
+              onClick={() => (qrCodeImageUrl ? setQrOpen(true) : null)}
+              disabled={!qrCodeImageUrl}
+            >
+              {qrCodeImageUrl ? "Tap to Enlarge" : "QR Not Available"}
+            </button>
+          </div>
+        </div>
+
+        {/* Progress */}
+        <div className="bg-white rounded-xl shadow border border-[#e0e0e0] p-6 mb-6">
+          <div className="font-bold text-lg mb-4">Your Progress</div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="flex-1 border border-[#e0e0e0] bg-white rounded-xl p-5 flex flex-col items-start shadow">
+              <span className="text-sm mb-1">Points</span>
+              <span className="text-2xl font-bold text-primary">{profile.points ?? 0}</span>
+            </div>
+            <div className="flex-1 border border-[#e0e0e0] bg-white rounded-xl p-5 flex flex-col items-start shadow">
+              <span className="text-sm mb-1">Quests Completed</span>
+              <span className="text-2xl font-bold text-primary">
+                {questsCompleted}/{totalQuests}
+              </span>
+            </div>
+          </div>
+          <a href="#/rewards" className="block mt-4">
+            <button className="w-full bg-gradient-to-r from-[#4285F4] to-[#34A853] hover:from-[#1a73e8] hover:to-[#2d8a47] text-white rounded-xl py-3 px-6 font-bold text-base shadow-lg hover:shadow-xl transition-all">
+              View Rewards
+            </button>
+          </a>
+        </div>
       </div>
-      {/* Bottom tab bar - participant only */}
+
+      {/* QR Popup */}
+      {qrOpen && qrCodeImageUrl && (
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-8 shadow-xl flex flex-col items-center">
+            <img
+              src={qrCodeImageUrl}
+              alt="QR Code"
+              className="w-64 h-64 bg-[#f6f8fa] rounded-lg border"
+              onError={(e) => {
+                e.currentTarget.src =
+                  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Crect fill='%23e0e0e0' width='256' height='256'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' fill='%23888' font-size='16'%3ENo QR Code%3C/text%3E%3C/svg%3E";
+              }}
+            />
+            <button
+              className="mt-6 px-6 py-2 rounded-full bg-primary text-white font-bold"
+              onClick={() => setQrOpen(false)}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Bottom tab bar */}
       <TabBar activeTab="profile" />
     </div>
   );
