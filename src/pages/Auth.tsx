@@ -68,6 +68,9 @@ const Auth = () => {
           id_token: response.credential,
         });
 
+        // Log the full response
+        console.log("Google Login Response:", res.data);
+
         // If duplicate email, show only API message
         if (res.data.user?.has_duplicate_email) {
           const msg = typeof res.data?.message === "string"
@@ -81,6 +84,8 @@ const Auth = () => {
 
         handleAuthSuccess(res.data);
       } catch (err: any) {
+        // Log error response
+        console.error("Google Login Error:", err?.response?.data || err);
         // Prefer concise API message when available
         const apiMessage = err?.response?.data?.message;
         const msg = typeof apiMessage === "string" ? apiMessage : "Google login failed.";

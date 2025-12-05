@@ -19,6 +19,9 @@ const AuthGoogleCallback = () => {
     axios
       .post(`${API_URL}api/v1/auth/google`, { id_token: idToken })
       .then((res) => {
+        // Log the full response
+        console.log("Google Callback Response:", res.data);
+        
         const userRoles = res.data?.user?.roles || [];
         
         // Store all roles
@@ -39,7 +42,9 @@ const AuthGoogleCallback = () => {
           window.location.hash = "/dashboard";
         }
       })
-      .catch(() => {
+      .catch((err) => {
+        // Log error
+        console.error("Google Callback Error:", err?.response?.data || err);
         setMessage("Google login failed. Redirecting...");
         setTimeout(() => (window.location.hash = "/auth"), 1500);
       });
