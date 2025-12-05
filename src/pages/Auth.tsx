@@ -68,20 +68,24 @@ const Auth = () => {
         const res = await axios.post(`${API_URL}api/v1/auth/google`, {
           id_token: response.credential,
         });
-        
-        // CHANGED: show only API message when duplicate email and stop
+
+        // If duplicate email, show only API message
         if (res.data.user?.has_duplicate_email) {
+          const msg = typeof res.data?.message === "string"
+            ? res.data.message
+            : "Duplicate email detected. Please resolve duplicates first.";
           setHasDuplicateEmail(true);
-          setError(res.data?.message || "Duplicate email detected.");
+          setError(msg);
           setLoading(false);
           return;
         }
-        
+
         handleAuthSuccess(res.data);
       } catch (err: any) {
-        // CHANGED: take only the message field from API error
+        // Prefer concise API message when available
         const apiMessage = err?.response?.data?.message;
-        setError(apiMessage || "Google login failed");
+        const msg = typeof apiMessage === "string" ? apiMessage : "Google login failed.";
+        setError(msg);
       }
       setLoading(false);
     },
@@ -165,21 +169,10 @@ const Auth = () => {
         setForm({ email: "", password: "", name: "" });
       }
     } catch (err: any) {
-      if (err.response && err.response.data) {
-        // Handle both array of errors (validation) and single detail string (auth error)
-        const detail = err.response.data.detail;
-        const message = err.response.data.message;
-        
-        if (Array.isArray(detail)) {
-          setError(detail[0]?.msg || "Auth failed");
-        } else if (typeof detail === "string") {
-          setError(detail);
-        } else {
-          setError(message || "Auth failed");
-        }
-      } else {
-        setError("Network error. Please try again.");
-      }
+      // For email/password path, keep message concise
+      const apiMessage = err?.response?.data?.message;
+      const msg = typeof apiMessage === "string" ? apiMessage : "Auth failed.";
+      setError(msg);
     }
     setLoading(false);
   };
