@@ -21,6 +21,7 @@ const OrganizerRewards = () => {
   const [redeemLoading, setRedeemLoading] = useState(false);
   const [redeemResult, setRedeemResult] = useState("");
   const [redeemError, setRedeemError] = useState("");
+  const [redemptionScanOpen, setRedemptionScanOpen] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -52,6 +53,35 @@ const OrganizerRewards = () => {
       setRewards([]);
     }
     setLoading(false);
+  };
+
+  const handleRedemptionScan = async (qr: string | null) => {
+    if (!qr) return;
+    
+    setRedemptionScanOpen(false);
+    setRedeemLoading(true);
+    
+    const token = localStorage.getItem("token");
+    try {
+      const res = await axios.post(
+        `${API_URL}api/v1/organizers/rewards/complete`,
+        { 
+          redemption_code: qr,
+          notes: "Completed by organizer scan"
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      alert(res.data.message || "Redemption completed successfully!");
+      fetchRewards();
+    } catch (err: any) {
+      console.error("Completion error:", err);
+      const errorMessage = err?.response?.data?.detail?.[0]?.msg || 
+                          err?.response?.data?.message || 
+                          "Failed to complete redemption.";
+      alert(errorMessage);
+    }
+    setRedeemLoading(false);
   };
 
   const handleScan = async (qr: string | null) => {
@@ -111,11 +141,20 @@ const OrganizerRewards = () => {
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       <header className="bg-white border-b border-gray-100 px-6 py-4">
-        <div className="flex items-center gap-4 mb-4">
-          <button onClick={() => navigate("/organizer")} className="text-blue-500">
-            <ArrowLeft className="w-6 h-6" />
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-4">
+            <button onClick={() => navigate("/organizer")} className="text-blue-500">
+              <ArrowLeft className="w-6 h-6" />
+            </button>
+            <h1 className="text-2xl font-bold text-blue-500">Reward Redemption</h1>
+          </div>
+          <button
+            onClick={() => setRedemptionScanOpen(true)}
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2"
+          >
+            <QrCode className="w-4 h-4" />
+            Scan Code
           </button>
-          <h1 className="text-2xl font-bold text-blue-500">Reward Redemption</h1>
         </div>
       </header>
 
@@ -310,6 +349,51 @@ const OrganizerRewards = () => {
                 Confirm Redeem
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Redemption Code Scanner Modal */}
+      {redemptionScanOpen && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-4 shadow-lg w-full max-w-md text-center relative">
+            <h3 className="text-xl font-bold mb-2">Scan Redemption Code</h3>
+            <p className="text-sm text-gray-600 mb-4">Scan the participant's redemption QR code</p>
+
+            <div className="mx-auto w-[86vw] max-w-[360px] md:w-[360px] md:h-[360px] h-[86vw] relative mb-4">
+              <div className="w-full h-full bg-[#000] rounded-lg overflow-hidden relative">
+                <QrScanner
+                  key="redemption-scan"
+                  delay={300}
+                  onError={(error) => setScanError(error)}
+                  onScan={handleRedemptionScan}
+                  style={{ width: "100%", height: "100%" }}
+                />
+                {/* Corner guides */}
+                <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 10 }}>
+                  <div className="absolute inset-0 bg-black/36" />
+                  <span className="absolute left-4 top-4 w-6 h-6 border-t-4 border-l-4 border-white opacity-90" />
+                  <span className="absolute right-4 top-4 w-6 h-6 border-t-4 border-r-4 border-white opacity-90" />
+                  <span className="absolute left-4 bottom-4 w-6 h-6 border-b-4 border-l-4 border-white opacity-90" />
+                  <span className="absolute right-4 bottom-4 w-6 h-6 border-b-4 border-r-4 border-white opacity-90" />
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => {
+                setRedemptionScanOpen(false);
+                setScanError("");
+              }}
+              className="absolute top-3 right-3 w-9 h-9 flex items-center justify-center rounded-full bg-white border border-red-100 text-red-600 hover:bg-red-50"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+            
+            {scanError && <div className="text-red-500 mt-2 font-semibold">{scanError}</div>}
           </div>
         </div>
       )}

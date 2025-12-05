@@ -202,9 +202,6 @@ const Quests = () => {
                     </div>
                     <div className="text-sm text-[#666] mb-2">{quest.description}</div>
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="bg-[#e0e0e0] text-[#222] px-3 py-1 rounded-full text-xs font-semibold">
-                        {type.replace(/_/g, " ")}
-                      </span>
                       {quest.requires_approval && (
                         <span className="bg-[#EA4335]/10 text-[#EA4335] px-3 py-1 rounded-full text-xs font-semibold">
                           Needs Approval
@@ -217,6 +214,14 @@ const Quests = () => {
                         </span>
                       )}
                     </div>
+
+                    {/* Link URL display */}
+                    {isLinkClick && quest.link_url && (
+                      <div className="text-xs text-blue-500 mb-3 break-all flex items-center gap-1">
+                        <span className="text-gray-400">Link:</span>
+                        {quest.link_url}
+                      </div>
+                    )}
 
                     {/* Networking progress bar */}
                     {isNetworking && (

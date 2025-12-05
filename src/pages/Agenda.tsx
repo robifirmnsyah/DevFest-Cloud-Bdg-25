@@ -108,6 +108,32 @@ const Agenda = () => {
     setCancelLoading(false);
   };
 
+  // Handle book session
+  const handleBookSession = async (sessionId: number) => {
+    const token = localStorage.getItem("token");
+    try {
+      await axios.post(`${API_URL}api/v1/participants/sessions/book`, { session_id: sessionId }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      
+      // Refresh data
+      const [sessionsRes, agendaRes] = await Promise.all([
+        axios.get(`${API_URL}api/v1/participants/sessions`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        axios.get(`${API_URL}api/v1/participants/sessions/my-bookings`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+      ]);
+      
+      setSessions(sessionsRes.data);
+      setMyAgenda(agendaRes.data);
+    } catch (err: any) {
+      console.error("Booking failed", err);
+      alert(err?.response?.data?.detail || "Failed to book session");
+    }
+  };
+
   const openCancelModal = (session: any) => {
     setSessionToCancel(session);
     setCancelModalOpen(true);
@@ -264,27 +290,28 @@ const Agenda = () => {
                   {/* Book/Cancel Button - top right */}
                   {tab === "all" ? (
                     session.is_bookable ? (
-                      <button
-                        className={`rounded-full px-6 py-2 font-bold text-base shadow transition-all
-                          ${session.is_booked
-                            ? "bg-[#4285F4] text-white"
-                            : session.is_full
-                              ? "bg-[#e0e0e0] text-[#888] cursor-not-allowed"
-                              : "bg-[#4285F4] text-white hover:bg-[#1a73e8]"}
-                        `}
-                        style={{ minWidth: 90 }}
-                        disabled={session.is_full || session.is_booked}
-                        onClick={() => {
-                          if (!session.is_booked && !session.is_full) {
-                            const token = localStorage.getItem("token");
-                            axios.post(`${API_URL}api/v1/participants/sessions/book`, { session_id: session.id }, {
-                              headers: { Authorization: `Bearer ${token}` },
-                            }).then(() => window.location.reload());
-                          }
-                        }}
-                      >
-                        {session.is_booked ? "Booked" : session.is_full ? "Full" : "Book"}
-                      </button>
+                      session.is_booked ? (
+                        <span className="text-[#4285F4] font-bold text-base px-4 py-2" style={{ minWidth: 90, textAlign: 'center' }}>
+                          Booked
+                        </span>
+                      ) : (
+                        <button
+                          className={`rounded-full px-6 py-2 font-bold text-base shadow transition-all
+                            ${session.is_full
+                                ? "bg-[#e0e0e0] text-[#888] cursor-not-allowed"
+                                : "bg-[#4285F4] text-white hover:bg-[#1a73e8]"}
+                          `}
+                          style={{ minWidth: 90 }}
+                          disabled={session.is_full}
+                          onClick={() => {
+                            if (!session.is_full) {
+                              handleBookSession(session.id);
+                            }
+                          }}
+                        >
+                          {session.is_full ? "Full" : "Book"}
+                        </button>
+                      )
                     ) : null
                   ) : (
                     /* Cancel Button for My Agenda */

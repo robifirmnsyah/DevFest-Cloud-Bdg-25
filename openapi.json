@@ -822,6 +822,142 @@
         }
       }
     },
+    "/api/v1/participants/rewards": {
+      "get": {
+        "tags": [
+          "Participants"
+        ],
+        "summary": "List Available Rewards",
+        "description": "List all available rewards with eligibility information.\n[P-REWARD-1] View Available Rewards\n\nReturns active rewards with eligibility status for the current user.\nEligibility checks:\n- Sufficient points\n- Stock availability\n- Max per user limit\n- Exclusivity group restrictions",
+        "operationId": "list_available_rewards_api_v1_participants_rewards_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/RewardWithEligibility"
+                  },
+                  "type": "array",
+                  "title": "Response List Available Rewards Api V1 Participants Rewards Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/participants/rewards/my-redemptions": {
+      "get": {
+        "tags": [
+          "Participants"
+        ],
+        "summary": "Get My Redemptions",
+        "description": "Get my reward redemption history.\n[P-REWARD-2] View My Redemptions\n\nReturns all rewards redeemed by the current user.",
+        "operationId": "get_my_redemptions_api_v1_participants_rewards_my_redemptions_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/RewardRedemptionInDB"
+                  },
+                  "type": "array",
+                  "title": "Response Get My Redemptions Api V1 Participants Rewards My Redemptions Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/participants/rewards/self-redeem": {
+      "post": {
+        "tags": [
+          "Participants"
+        ],
+        "summary": "Self Redeem Reward",
+        "description": "Self-redeem a reward (for SELF_REDEEM or INSTANT types).\n[P-REWARD-3] Self-Redeem Reward\n\nParticipant redeems reward directly and receives a redemption code.\n- INSTANT: Redemption is immediately completed (digital products)\n- SELF_REDEEM: Redemption is pending, organizer must scan code to complete\n\nReturns redemption code that can be shown to organizer.",
+        "operationId": "self_redeem_reward_api_v1_participants_rewards_self_redeem_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SelfRedeemRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RewardRedemptionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/organizers/profile": {
+      "get": {
+        "tags": [
+          "Organizers"
+        ],
+        "summary": "Get My Profile",
+        "description": "Get current organizer's profile.\n[O-PROFILE-1] Show My Profile",
+        "operationId": "get_my_profile_api_v1_organizers_profile_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserInDB"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/organizers/checkin": {
       "post": {
         "tags": [
@@ -1372,6 +1508,158 @@
         }
       }
     },
+    "/api/v1/organizers/rewards": {
+      "get": {
+        "tags": [
+          "Organizers"
+        ],
+        "summary": "List Available Rewards",
+        "description": "List all available rewards for redemption.\n[O-REWARD-1] List Available Rewards\n\nReturns only active rewards.",
+        "operationId": "list_available_rewards_api_v1_organizers_rewards_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/RewardInDB"
+                  },
+                  "type": "array",
+                  "title": "Response List Available Rewards Api V1 Organizers Rewards Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/organizers/rewards/redeem": {
+      "post": {
+        "tags": [
+          "Organizers"
+        ],
+        "summary": "Redeem Reward",
+        "description": "Redeem a reward for a participant.\n[O-REWARD-2] Scan QR Code to Redeem Reward\n\nOrganizer scans participant's QR code to redeem a reward.\nPoints are deducted from participant's balance.\n\nValidation:\n- Participant must have enough points\n- Reward must be active and in stock",
+        "operationId": "redeem_reward_api_v1_organizers_rewards_redeem_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RewardRedemptionCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RewardRedemptionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/organizers/rewards/complete": {
+      "post": {
+        "tags": [
+          "Organizers"
+        ],
+        "summary": "Complete Redemption",
+        "description": "Complete a self-redeemed reward by scanning redemption code.\n[O-REWARD-3] Complete Redemption by Code\n\nOrganizer scans the participant's redemption code to mark it as completed.\nOnly works for SELF_REDEEM type rewards (INSTANT is auto-completed).",
+        "operationId": "complete_redemption_api_v1_organizers_rewards_complete_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompleteRedemptionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RewardRedemptionResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/booth-staff/profile": {
+      "get": {
+        "tags": [
+          "Booth Staff"
+        ],
+        "summary": "Get My Profile",
+        "description": "Get current booth staff's profile.\n[B-PROFILE-1] Show My Profile",
+        "operationId": "get_my_profile_api_v1_booth_staff_profile_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserInDB"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/booth-staff/profile/view": {
       "post": {
         "tags": [
@@ -1651,6 +1939,729 @@
           }
         ]
       }
+    },
+    "/api/v1/admin/quests": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Create Quest",
+        "description": "Create a new quest.\n[ADMIN-QUEST-1] Create Quest\n\nOnly admins can create quests. All quest types are supported.",
+        "operationId": "create_quest_api_v1_admin_quests_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestInDB"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "List Quests",
+        "description": "List all quests.\n[ADMIN-QUEST-2] List All Quests\n\nBy default, returns only active quests.\nSet include_inactive=true to include inactive quests.",
+        "operationId": "list_quests_api_v1_admin_quests_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "include_inactive",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Include Inactive"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QuestInDB"
+                  },
+                  "title": "Response List Quests Api V1 Admin Quests Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/quests/{quest_id}": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Get Quest",
+        "description": "Get a specific quest by ID.\n[ADMIN-QUEST-3] Get Quest Details",
+        "operationId": "get_quest_api_v1_admin_quests__quest_id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "quest_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Quest Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestInDB"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Update Quest",
+        "description": "Update a quest.\n[ADMIN-QUEST-4] Update Quest\n\nAll fields are optional. Only provided fields will be updated.",
+        "operationId": "update_quest_api_v1_admin_quests__quest_id__put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "quest_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Quest Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuestUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuestInDB"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Delete Quest",
+        "description": "Delete a quest.\n[ADMIN-QUEST-5] Delete Quest\n\nThis is a hard delete. Consider using soft delete (is_active=false) instead.",
+        "operationId": "delete_quest_api_v1_admin_quests__quest_id__delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "quest_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Quest Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/rewards": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Create Reward",
+        "description": "Create a new reward.\n[ADMIN-REWARD-1] Create Reward\n\nOnly admins can create rewards.",
+        "operationId": "create_reward_api_v1_admin_rewards_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RewardCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RewardInDB"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "List Rewards",
+        "description": "List all rewards.\n[ADMIN-REWARD-2] List All Rewards\n\nBy default, returns only active rewards.\nSet include_inactive=true to include inactive rewards.",
+        "operationId": "list_rewards_api_v1_admin_rewards_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "include_inactive",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Include Inactive"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RewardInDB"
+                  },
+                  "title": "Response List Rewards Api V1 Admin Rewards Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/rewards/{reward_id}": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Get Reward",
+        "description": "Get a specific reward by ID.\n[ADMIN-REWARD-3] Get Reward Details",
+        "operationId": "get_reward_api_v1_admin_rewards__reward_id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "reward_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Reward Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RewardInDB"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Update Reward",
+        "description": "Update a reward.\n[ADMIN-REWARD-4] Update Reward\n\nAll fields are optional. Only provided fields will be updated.",
+        "operationId": "update_reward_api_v1_admin_rewards__reward_id__put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "reward_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Reward Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RewardUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RewardInDB"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Delete Reward",
+        "description": "Delete a reward.\n[ADMIN-REWARD-5] Delete Reward\n\nThis is a hard delete. Consider using soft delete (is_active=false) instead.",
+        "operationId": "delete_reward_api_v1_admin_rewards__reward_id__delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "reward_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Reward Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/sessions": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Create Session",
+        "description": "Create a new session.\n[ADMIN-SESSION-1] Create Session\n\nOnly admins can create sessions.",
+        "operationId": "create_session_api_v1_admin_sessions_post",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionCreate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionInDB"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "List Sessions",
+        "description": "List all sessions.\n[ADMIN-SESSION-2] List All Sessions\n\nBy default, returns only active sessions.\nSet include_inactive=true to include inactive sessions.",
+        "operationId": "list_sessions_api_v1_admin_sessions_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "include_inactive",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Include Inactive"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SessionInDB"
+                  },
+                  "title": "Response List Sessions Api V1 Admin Sessions Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/sessions/{session_id}": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Get Session",
+        "description": "Get a specific session by ID.\n[ADMIN-SESSION-3] Get Session Details",
+        "operationId": "get_session_api_v1_admin_sessions__session_id__get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionInDB"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Update Session",
+        "description": "Update a session.\n[ADMIN-SESSION-4] Update Session\n\nAll fields are optional. Only provided fields will be updated.",
+        "operationId": "update_session_api_v1_admin_sessions__session_id__put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionInDB"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Delete Session",
+        "description": "Delete a session.\n[ADMIN-SESSION-5] Delete Session\n\nThis is a hard delete. Consider using soft delete (is_active=false) instead.\nWarning: This will also delete all associated bookings.",
+        "operationId": "delete_session_api_v1_admin_sessions__session_id__delete",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "session_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Session Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1764,6 +2775,31 @@
           "checked_in"
         ],
         "title": "CheckInResponse"
+      },
+      "CompleteRedemptionRequest": {
+        "properties": {
+          "redemption_code": {
+            "type": "string",
+            "title": "Redemption Code"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "redemption_code"
+        ],
+        "title": "CompleteRedemptionRequest",
+        "description": "Request for organizer to complete a redemption by scanning code."
       },
       "ContactCreate": {
         "properties": {
@@ -2016,6 +3052,93 @@
           "points_awarded"
         ],
         "title": "QuestCompletionResponse"
+      },
+      "QuestCreate": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "quest_type": {
+            "$ref": "#/components/schemas/QuestType"
+          },
+          "points": {
+            "type": "integer",
+            "title": "Points",
+            "default": 10
+          },
+          "requires_approval": {
+            "type": "boolean",
+            "title": "Requires Approval",
+            "default": false
+          },
+          "target_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Count"
+          },
+          "image_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Url"
+          },
+          "link_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Link Url"
+          },
+          "order": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Order"
+          },
+          "ref_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ref Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "description",
+          "quest_type"
+        ],
+        "title": "QuestCreate"
       },
       "QuestInDB": {
         "properties": {
@@ -2314,6 +3437,133 @@
         ],
         "title": "QuestType"
       },
+      "QuestUpdate": {
+        "properties": {
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "quest_type": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/QuestType"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "points": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Points"
+          },
+          "requires_approval": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requires Approval"
+          },
+          "target_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Count"
+          },
+          "image_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Url"
+          },
+          "link_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Link Url"
+          },
+          "order": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Order"
+          },
+          "ref_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ref Id"
+          },
+          "is_active": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Active"
+          }
+        },
+        "type": "object",
+        "title": "QuestUpdate",
+        "description": "Schema for updating quest fields (all fields optional)."
+      },
       "QuestWithProgress": {
         "properties": {
           "quest": {
@@ -2365,6 +3615,520 @@
         "title": "QuestWithProgress",
         "description": "Quest with computed progress for the current user.\nUse for listing available quests with status and progress info."
       },
+      "RedemptionStatus": {
+        "type": "string",
+        "enum": [
+          "pending",
+          "completed"
+        ],
+        "title": "RedemptionStatus"
+      },
+      "RedemptionType": {
+        "type": "string",
+        "enum": [
+          "organizer_scan",
+          "self_redeem",
+          "instant"
+        ],
+        "title": "RedemptionType"
+      },
+      "RewardCreate": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "points_required": {
+            "type": "integer",
+            "title": "Points Required"
+          },
+          "image_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Url"
+          },
+          "stock": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stock"
+          },
+          "max_per_user": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Per User"
+          },
+          "exclusivity_group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exclusivity Group"
+          },
+          "redemption_type": {
+            "$ref": "#/components/schemas/RedemptionType",
+            "default": "organizer_scan"
+          },
+          "order": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Order"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "description",
+          "points_required"
+        ],
+        "title": "RewardCreate"
+      },
+      "RewardInDB": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "points_required": {
+            "type": "integer",
+            "title": "Points Required"
+          },
+          "image_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Url"
+          },
+          "stock": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stock"
+          },
+          "max_per_user": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Per User"
+          },
+          "exclusivity_group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exclusivity Group"
+          },
+          "redemption_type": {
+            "$ref": "#/components/schemas/RedemptionType",
+            "default": "organizer_scan"
+          },
+          "order": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Order"
+          },
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "is_active": {
+            "type": "boolean",
+            "title": "Is Active"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "description",
+          "points_required",
+          "id",
+          "is_active",
+          "created_at"
+        ],
+        "title": "RewardInDB"
+      },
+      "RewardRedemptionCreate": {
+        "properties": {
+          "participant_qr_code": {
+            "type": "string",
+            "title": "Participant Qr Code"
+          },
+          "reward_id": {
+            "type": "integer",
+            "title": "Reward Id"
+          },
+          "qty": {
+            "type": "integer",
+            "title": "Qty",
+            "default": 1
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "participant_qr_code",
+          "reward_id"
+        ],
+        "title": "RewardRedemptionCreate",
+        "description": "Request to redeem a reward by scanning participant QR."
+      },
+      "RewardRedemptionInDB": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "user_id": {
+            "type": "integer",
+            "title": "User Id"
+          },
+          "reward_id": {
+            "type": "integer",
+            "title": "Reward Id"
+          },
+          "qty": {
+            "type": "integer",
+            "title": "Qty"
+          },
+          "points_spent": {
+            "type": "integer",
+            "title": "Points Spent"
+          },
+          "redemption_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Redemption Code"
+          },
+          "status": {
+            "$ref": "#/components/schemas/RedemptionStatus"
+          },
+          "redeemed_by": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Redeemed By"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "redeemed_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Redeemed At"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "user_id",
+          "reward_id",
+          "qty",
+          "points_spent",
+          "status",
+          "redeemed_at"
+        ],
+        "title": "RewardRedemptionInDB"
+      },
+      "RewardRedemptionResponse": {
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "title": "Success"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "redemption": {
+            "$ref": "#/components/schemas/RewardRedemptionInDB"
+          },
+          "reward": {
+            "$ref": "#/components/schemas/RewardInDB"
+          },
+          "participant_remaining_points": {
+            "type": "integer",
+            "title": "Participant Remaining Points"
+          }
+        },
+        "type": "object",
+        "required": [
+          "success",
+          "message",
+          "redemption",
+          "reward",
+          "participant_remaining_points"
+        ],
+        "title": "RewardRedemptionResponse",
+        "description": "Response after successful redemption."
+      },
+      "RewardUpdate": {
+        "properties": {
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "points_required": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Points Required"
+          },
+          "image_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Image Url"
+          },
+          "stock": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stock"
+          },
+          "max_per_user": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Per User"
+          },
+          "exclusivity_group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exclusivity Group"
+          },
+          "redemption_type": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RedemptionType"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "is_active": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Active"
+          },
+          "order": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Order"
+          }
+        },
+        "type": "object",
+        "title": "RewardUpdate",
+        "description": "Schema for updating reward fields (all fields optional)."
+      },
+      "RewardWithEligibility": {
+        "properties": {
+          "reward": {
+            "$ref": "#/components/schemas/RewardInDB"
+          },
+          "is_eligible": {
+            "type": "boolean",
+            "title": "Is Eligible"
+          },
+          "ineligible_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ineligible Reason"
+          },
+          "user_redeemed_count": {
+            "type": "integer",
+            "title": "User Redeemed Count",
+            "default": 0
+          }
+        },
+        "type": "object",
+        "required": [
+          "reward",
+          "is_eligible"
+        ],
+        "title": "RewardWithEligibility",
+        "description": "Reward with participant eligibility information."
+      },
       "ScanQRRequest": {
         "properties": {
           "qr_code": {
@@ -2378,6 +4142,25 @@
         ],
         "title": "ScanQRRequest",
         "description": "Generic QR code scan request."
+      },
+      "SelfRedeemRequest": {
+        "properties": {
+          "reward_id": {
+            "type": "integer",
+            "title": "Reward Id"
+          },
+          "qty": {
+            "type": "integer",
+            "title": "Qty",
+            "default": 1
+          }
+        },
+        "type": "object",
+        "required": [
+          "reward_id"
+        ],
+        "title": "SelfRedeemRequest",
+        "description": "Request for participant to self-redeem a reward."
       },
       "SessionBookingCreate": {
         "properties": {
@@ -2609,6 +4392,90 @@
         ],
         "title": "SessionCheckOutCreate"
       },
+      "SessionCreate": {
+        "properties": {
+          "title": {
+            "type": "string",
+            "title": "Title"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "speaker": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speaker"
+          },
+          "location": {
+            "type": "string",
+            "title": "Location"
+          },
+          "track": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Track"
+          },
+          "start_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Start Time"
+          },
+          "end_time": {
+            "type": "string",
+            "format": "date-time",
+            "title": "End Time"
+          },
+          "capacity": {
+            "type": "integer",
+            "title": "Capacity",
+            "default": 100
+          },
+          "is_hybrid": {
+            "type": "boolean",
+            "title": "Is Hybrid",
+            "default": false
+          },
+          "live_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Live Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "title",
+          "location",
+          "start_time",
+          "end_time"
+        ],
+        "title": "SessionCreate"
+      },
       "SessionInDB": {
         "properties": {
           "title": {
@@ -2730,6 +4597,146 @@
           "created_at"
         ],
         "title": "SessionInDB"
+      },
+      "SessionUpdate": {
+        "properties": {
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "speaker": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Speaker"
+          },
+          "location": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Location"
+          },
+          "track": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Track"
+          },
+          "start_time": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Start Time"
+          },
+          "end_time": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "End Time"
+          },
+          "capacity": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capacity"
+          },
+          "is_active": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Active"
+          },
+          "is_bookable": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Bookable"
+          },
+          "is_hybrid": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Hybrid"
+          },
+          "live_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Live Url"
+          }
+        },
+        "type": "object",
+        "title": "SessionUpdate"
       },
       "SessionWithBookingStatus": {
         "properties": {
@@ -3303,7 +5310,8 @@
         "enum": [
           "participant",
           "organizer",
-          "booth_staff"
+          "booth_staff",
+          "admin"
         ],
         "title": "UserRole"
       },

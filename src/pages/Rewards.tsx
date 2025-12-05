@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import TabBar from "@/components/TabBar";
-import { Gift, Award } from "lucide-react";
+import { Gift, Award, Check, AlertTriangle, X, Loader2 } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -14,16 +14,19 @@ const Rewards = () => {
   const [showQrModal, setShowQrModal] = useState(false);
   const [selectedReward, setSelectedReward] = useState<any>(null);
   const [userQrCode, setUserQrCode] = useState<string>("");
+  const [showRedemptionQrModal, setShowRedemptionQrModal] = useState(false);
+  const [currentRedemptionCode, setCurrentRedemptionCode] = useState("");
+  const [currentRedemptionRewardTitle, setCurrentRedemptionRewardTitle] = useState("");
+  
+  // New states for improved UX
+  const [confirmModal, setConfirmModal] = useState<{open: boolean, reward: any | null}>({open: false, reward: null});
+  const [successModal, setSuccessModal] = useState<{open: boolean, type: 'success' | 'error', message: string, reward?: any, redemptionCode?: string}>({open: false, type: 'success', message: ''});
+  const [isRedeeming, setIsRedeeming] = useState(false);
 
-  useEffect(() => {
+  const fetchData = () => {
     const token = localStorage.getItem("token");
-    if (!token) {
-      window.location.href = "/auth";
-      return;
-    }
+    if (!token) return;
 
-    setLoading(true);
-    
     // Fetch available rewards
     axios
       .get(`${API_URL}api/v1/participants/rewards`, {
@@ -71,16 +74,80 @@ const Rewards = () => {
         setUserQrCode("");
       })
       .finally(() => setLoading(false));
-  }, []);
+  };
 
-  const handleShowQrForRedeem = (reward: any, pointsRequired: number) => {
-    if (userPoints < pointsRequired) {
-      alert("Not enough points to redeem this reward!");
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      window.location.href = "/auth";
       return;
     }
 
-    setSelectedReward(reward);
-    setShowQrModal(true);
+    setLoading(true);
+    fetchData();
+  }, []);
+
+  const handleRedeemClick = (reward: any) => {
+    if (userPoints < reward.points_required) {
+      setSuccessModal({
+        open: true, 
+        type: 'error', 
+        message: "Not enough points to redeem this reward!"
+      });
+      return;
+    }
+
+    if (reward.redemption_type === 'organizer_scan') {
+      setSelectedReward(reward);
+      setShowQrModal(true);
+    } else {
+      // Open confirmation modal for self_redeem and instant
+      setConfirmModal({open: true, reward});
+    }
+  };
+
+  const processRedemption = async () => {
+    const reward = confirmModal.reward;
+    if (!reward) return;
+    
+    setIsRedeeming(true);
+    const token = localStorage.getItem("token");
+    
+    try {
+      const res = await axios.post(`${API_URL}api/v1/participants/rewards/self-redeem`, {
+          reward_id: reward.id,
+          qty: 1
+      }, { headers: { Authorization: `Bearer ${token}` }});
+      
+      setConfirmModal({open: false, reward: null});
+      
+      if (reward.redemption_type === 'self_redeem') {
+          setSuccessModal({
+              open: true, 
+              type: 'success', 
+              message: 'Reward redeemed successfully!', 
+              reward: reward,
+              redemptionCode: res.data.redemption.redemption_code
+          });
+      } else {
+          setSuccessModal({
+              open: true, 
+              type: 'success', 
+              message: 'Reward redeemed successfully!'
+          });
+      }
+      fetchData();
+    } catch (err: any) {
+      console.error("Redemption error:", err);
+      setConfirmModal({open: false, reward: null});
+      setSuccessModal({
+          open: true, 
+          type: 'error', 
+          message: err?.response?.data?.detail || "Redemption failed"
+      });
+    } finally {
+      setIsRedeeming(false);
+    }
   };
 
   // Generate QR code image URL
@@ -191,7 +258,7 @@ const Rewards = () => {
                       </div>
                       
                       <button
-                        onClick={() => handleShowQrForRedeem(reward, reward.points_required)}
+                        onClick={() => handleRedeemClick(reward)}
                         disabled={!isEligible || userPoints < reward.points_required || availableStock <= 0}
                         className={`px-4 py-2 rounded-lg font-bold transition flex items-center gap-2 ${
                           !isEligible || userPoints < reward.points_required || availableStock <= 0
@@ -199,16 +266,22 @@ const Rewards = () => {
                             : "bg-primary text-white hover:bg-[#1a73e8]"
                         }`}
                       >
-                        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm15 0h3v3h-3v-3zm-2 2h2v2h-2v-2zm-2-2h2v2h-2v-2zm4 4h2v2h-2v-2zm-2 0h2v2h-2v-2z"/>
-                        </svg>
+                        {reward.redemption_type === 'organizer_scan' ? (
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm15 0h3v3h-3v-3zm-2 2h2v2h-2v-2zm-2-2h2v2h-2v-2zm4 4h2v2h-2v-2zm-2 0h2v2h-2v-2z"/>
+                          </svg>
+                        ) : (
+                          <Gift className="w-4 h-4" />
+                        )}
                         {availableStock <= 0
                           ? "Out of Stock"
                           : !isEligible
                           ? ineligibleReason || "Not Eligible"
                           : userPoints < reward.points_required
                           ? "Not Enough Points"
-                          : "Redeem"}
+                          : reward.redemption_type === 'organizer_scan'
+                          ? "Show QR"
+                          : "Claim"}
                       </button>
                     </div>
                     
@@ -276,6 +349,18 @@ const Rewards = () => {
                       {redemption.completed_at && (
                         <div>Completed: {new Date(redemption.completed_at).toLocaleString()}</div>
                       )}
+                      {redemption.status === 'pending' && redemption.redemption_code && (
+                        <button 
+                          onClick={() => {
+                            setCurrentRedemptionCode(redemption.redemption_code);
+                            setCurrentRedemptionRewardTitle(`Reward #${redemption.reward_id}`);
+                            setShowRedemptionQrModal(true);
+                          }}
+                          className="mt-2 w-full py-2 bg-primary/10 text-primary rounded-lg font-semibold hover:bg-primary/20 transition-colors"
+                        >
+                          Show Redemption QR
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -335,6 +420,144 @@ const Rewards = () => {
             <p className="text-xs text-gray-400 mt-4">
               The organizer will scan this code to complete your redemption
             </p>
+          </div>
+        </div>
+      )}
+
+      {/* Redemption QR Code Modal - Only for My Redemptions list */}
+      {showRedemptionQrModal && currentRedemptionCode && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-8 shadow-2xl w-full max-w-md text-center">
+            <div className="mb-6">
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
+                {currentRedemptionRewardTitle}
+              </h3>
+              <div className="text-sm text-gray-500">Redemption Code</div>
+            </div>
+
+            <div className="flex justify-center mb-6">
+              <img
+                src={getQrCodeImageUrl(currentRedemptionCode) || ''}
+                alt="Redemption QR Code"
+                className="w-64 h-64 bg-gray-50 rounded-lg border-2 border-gray-200"
+              />
+            </div>
+
+            <button
+              onClick={() => {
+                setShowRedemptionQrModal(false);
+                setCurrentRedemptionCode("");
+              }}
+              className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-xl font-semibold transition-colors"
+            >
+              Close
+            </button>
+
+            <p className="text-xs text-gray-400 mt-4">
+              Show this code to the organizer to complete your redemption
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Confirmation Modal */}
+      {confirmModal.open && confirmModal.reward && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl p-6 shadow-xl w-full max-w-sm transform transition-all scale-100">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Gift className="w-8 h-8 text-primary" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Confirm Redemption</h3>
+              <p className="text-gray-600">
+                Redeem <span className="font-bold text-gray-900">{confirmModal.reward.title}</span> for <span className="font-bold text-primary">{confirmModal.reward.points_required} points</span>?
+              </p>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmModal({open: false, reward: null})}
+                className="flex-1 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition-colors"
+                disabled={isRedeeming}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={processRedemption}
+                className="flex-1 px-4 py-3 bg-primary hover:bg-primary/90 text-white rounded-xl font-semibold transition-colors flex items-center justify-center gap-2"
+                disabled={isRedeeming}
+              >
+                {isRedeeming ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Processing
+                  </>
+                ) : (
+                  "Confirm"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success/Error Modal */}
+      {successModal.open && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-2xl p-6 shadow-xl w-full max-w-sm relative">
+            <button 
+              onClick={() => setSuccessModal({open: false, type: 'success', message: ''})}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <div className="text-center mb-6">
+              <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${
+                successModal.type === 'success' ? 'bg-green-100' : 'bg-red-100'
+              }`}>
+                {successModal.type === 'success' ? (
+                  <Check className="w-8 h-8 text-green-600" />
+                ) : (
+                  <AlertTriangle className="w-8 h-8 text-red-600" />
+                )}
+              </div>
+              
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
+                {successModal.type === 'success' ? 'Success!' : 'Error'}
+              </h3>
+              <p className="text-gray-600 mb-4">{successModal.message}</p>
+
+              {/* Show QR Code if available (for self_redeem) */}
+              {successModal.type === 'success' && successModal.redemptionCode && (
+                <div className="mt-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                  <p className="text-sm font-semibold text-gray-700 mb-3">
+                    Show this code to organizer:
+                  </p>
+                  <div className="flex justify-center bg-white p-2 rounded-lg border border-gray-200 mb-2">
+                    <img
+                      src={getQrCodeImageUrl(successModal.redemptionCode) || ''}
+                      alt="Redemption QR"
+                      className="w-48 h-48"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    You can also find this later in "My Redemptions"
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <button
+              onClick={() => setSuccessModal({open: false, type: 'success', message: ''})}
+              className={`w-full px-4 py-3 rounded-xl font-semibold transition-colors ${
+                successModal.type === 'success' 
+                  ? 'bg-green-600 hover:bg-green-700 text-white' 
+                  : 'bg-red-600 hover:bg-red-700 text-white'
+              }`}
+            >
+              Close
+            </button>
           </div>
         </div>
       )}

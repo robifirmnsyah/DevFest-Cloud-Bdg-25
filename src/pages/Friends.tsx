@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { User, QrCode } from "lucide-react";
+import { User, QrCode, MessageCircle } from "lucide-react";
 import TabBar from "@/components/TabBar";
 import QrScanner from "@/components/QrScanner";
 
@@ -146,9 +146,26 @@ const Friends = () => {
                 <div className="font-bold text-lg">{friend.user_profile?.name}</div>
                 <div className="text-sm text-[#888]">{friend.user_profile?.title || ""}</div>
                 <div className="text-xs text-[#888]">{friend.user_profile?.company || ""}</div>
+                {friend.user_profile?.phone_number && (
+                  <div className="text-xs text-[#666] mt-1">{friend.user_profile.phone_number}</div>
+                )}
               </div>
-              <div className="ml-auto text-xs px-3 py-1 rounded-full bg-primary/10 text-primary font-bold">
-                {friend.status}
+              <div className="ml-auto">
+                {friend.status === 'accepted' && friend.user_profile?.phone_number ? (
+                  <a 
+                    href={`https://wa.me/${friend.user_profile.phone_number.replace(/\D/g, '')}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-[#25D366] text-white px-3 py-2 rounded-lg font-bold text-xs flex items-center gap-1 hover:bg-[#128C7E] transition-colors shadow-sm"
+                  >
+                    <MessageCircle className="w-3 h-3" />
+                    WhatsApp
+                  </a>
+                ) : (
+                  <div className="text-xs px-3 py-1 rounded-full bg-primary/10 text-primary font-bold">
+                    {friend.status}
+                  </div>
+                )}
               </div>
             </div>
           ))}

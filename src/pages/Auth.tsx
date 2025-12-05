@@ -157,11 +157,17 @@ const Auth = () => {
       }
     } catch (err: any) {
       if (err.response && err.response.data) {
-        setError(
-          err.response.data.detail?.[0]?.msg ||
-          err.response.data.message ||
-          "Auth failed"
-        );
+        // Handle both array of errors (validation) and single detail string (auth error)
+        const detail = err.response.data.detail;
+        const message = err.response.data.message;
+        
+        if (Array.isArray(detail)) {
+          setError(detail[0]?.msg || "Auth failed");
+        } else if (typeof detail === "string") {
+          setError(detail);
+        } else {
+          setError(message || "Auth failed");
+        }
       } else {
         setError("Network error. Please try again.");
       }
