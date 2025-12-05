@@ -316,12 +316,14 @@ const OrganizerParticipants = () => {
           <h1 className="text-2xl font-bold text-blue-500">
             All Participants
           </h1>
+          {/* Compact "Add New User" on mobile */}
           <button
             onClick={openAddUserModal}
-            className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors shadow-sm"
+            className="flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded-lg font-semibold transition-colors shadow-sm text-sm md:text-base md:px-4 md:py-2"
           >
             <Plus className="w-4 h-4" />
-            Add New User
+            <span className="hidden sm:inline">Add New User</span>
+            <span className="sm:hidden">Add</span>
           </button>
         </div>
         
@@ -346,7 +348,7 @@ const OrganizerParticipants = () => {
         </div>
       </header>
 
-      <main className="px-6 py-6">
+      <main className="px-4 py-4">
         {loading ? (
           <div className="text-center py-12">Loading...</div>
         ) : filteredParticipants.length === 0 ? (
@@ -360,107 +362,107 @@ const OrganizerParticipants = () => {
           </div>
         ) : (
           <div className="space-y-2">
-            <div className="text-sm text-gray-500 mb-4">
+            <div className="text-xs sm:text-sm text-gray-500 mb-4">
               Showing {filteredParticipants.length} of {participants.length} participants
             </div>
-            <div className="grid gap-4 max-w-2xl mx-auto">
+            {/* Changed: max-w-sm for narrower cards on mobile */}
+            <div className="grid gap-3 max-w-sm mx-auto">
               {filteredParticipants.map((participant: any) => (
                 <div
                   key={participant.id}
-                  className="bg-white rounded-xl shadow border border-gray-100 p-5 hover:shadow-md transition-shadow"
+                  className="bg-white rounded-xl shadow border border-gray-100 p-3 sm:p-4 hover:shadow-md transition-shadow"
                 >
-                  <div className="flex items-start gap-4">
+                  <div className="flex items-start gap-2 sm:gap-3">
                     {/* Avatar */}
-                    <div className="bg-blue-100 rounded-full w-12 h-12 flex items-center justify-center flex-shrink-0">
-                      <User className="w-7 h-7 text-blue-600" />
+                    <div className="bg-blue-100 rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0">
+                      <User className="w-6 h-6 text-blue-600" />
                     </div>
 
                     {/* Info */}
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-lg text-gray-900 mb-1">
+                      <h3 className="font-bold text-sm sm:text-base text-gray-900 mb-1 truncate">
                         {participant.name}
                       </h3>
-                      
+
+                      {/* Email */}
                       {participant.email && (
-                        <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
-                          <Mail className="w-4 h-4 flex-shrink-0" />
+                        <div className="flex items-center gap-1 text-xs text-gray-600 mb-1">
+                          <Mail className="w-3 h-3 flex-shrink-0" />
                           <span className="truncate">{participant.email}</span>
                         </div>
                       )}
-                      
+
+                      {/* Phone */}
                       {participant.phone_number && (
-                        <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
-                          <Phone className="w-4 h-4 flex-shrink-0" />
-                          <span>{participant.phone_number}</span>
+                        <div className="flex items-center gap-1 text-xs text-gray-600 mb-1">
+                          <Phone className="w-3 h-3 flex-shrink-0" />
+                          <span className="truncate">{participant.phone_number}</span>
                         </div>
                       )}
-                      
+
+                      {/* Title / Company - allow 2 line wrap */}
                       {(participant.title || participant.company) && (
-                        <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
-                          <Building2 className="w-4 h-4 flex-shrink-0" />
-                          <span>
-                            {[participant.title, participant.company]
-                              .filter(Boolean)
-                              .join(" at ")}
+                        <div className="flex items-start gap-1 text-xs text-gray-600 mb-2">
+                          <Building2 className="w-3 h-3 flex-shrink-0 mt-0.5" />
+                          <span className="line-clamp-2">
+                            {[participant.title, participant.company].filter(Boolean).join(" at ")}
                           </span>
                         </div>
                       )}
-                      
-                      <div className="flex items-center gap-2 mt-2">
-                        {/* Left: status and points */}
-                        <div className="flex items-center gap-2">
-                          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                            participant.is_checked_in
-                              ? "bg-green-100 text-green-700"
-                              : "bg-gray-100 text-gray-600"
-                          }`}>
-                            {participant.is_checked_in ? "Checked In" : "Not Checked In"}
-                          </span>
-                          
-                          <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
-                            {participant.points ?? 0} Points
-                          </span>
-                        </div>
 
-                        {/* Right: actions (always right-aligned) */}
-                        <div className="ml-auto flex items-center gap-2">
-                          {/* Print Button (always visible when QR exists) */}
-                          {participant.qr_code && (
-                            <button
-                              onClick={() => handlePrint(participant)}
-                              className="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700 hover:bg-indigo-200 transition-colors flex items-center gap-1"
-                              title="Print Badge"
-                            >
-                              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M5 2a2 2 0 00-2 2v2h14V4a2 2 0 00-2-2H5zm12 6H3a2 2 0 00-2 2v3a2 2 0 002 2h2v3h10v-3h2a2 2 0 002-2v-3a2 2 0 00-2-2zm-4 8H7v-4h6v4z"/></svg>
-                              Print
-                            </button>
-                          )}
+                      {/* Status + Points */}
+                      <div className="flex flex-wrap items-center gap-1.5 mb-2">
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                          participant.is_checked_in
+                            ? "bg-green-100 text-green-700"
+                            : "bg-gray-100 text-gray-600"
+                        }`}>
+                          {participant.is_checked_in ? "Checked In" : "Not Checked In"}
+                        </span>
 
-                          {/* Manual Check-in Button (only when not checked-in) */}
-                          {!participant.is_checked_in && participant.qr_code && (
-                            <button
-                              onClick={() => handleManualCheckIn(participant)}
-                              disabled={checkingInId === participant.id}
-                              className="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700 hover:bg-green-200 transition-colors flex items-center gap-1 disabled:opacity-60"
-                              title="Manual Check-in"
-                            >
-                              <CheckCircle className="w-3 h-3" />
-                              {checkingInId === participant.id ? "Checking..." : "Check-in"}
-                            </button>
-                          )}
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-100 text-blue-700">
+                          {participant.points ?? 0} Points
+                        </span>
+                      </div>
 
-                          {/* QR Code Button */}
-                          {participant.qr_code && (
-                            <button
-                              onClick={() => setSelectedQrCode({ qr_code: participant.qr_code, name: participant.name })}
-                              className="px-3 py-1 rounded-full text-xs font-semibold bg-purple-100 text-purple-700 hover:bg-purple-200 transition-colors flex items-center gap-1"
-                              title="View QR Code"
-                            >
-                              <QrCode className="w-3 h-3" />
-                              QR
-                            </button>
-                          )}
-                        </div>
+                      {/* Actions - horizontal layout (3 buttons side by side) */}
+                      <div className="grid grid-cols-3 gap-1">
+                        {/* Print */}
+                        {participant.qr_code && (
+                          <button
+                            onClick={() => handlePrint(participant)}
+                            className="px-1.5 py-1.5 rounded-lg text-[10px] font-semibold bg-indigo-50 text-indigo-700 hover:bg-indigo-100 transition-colors flex flex-col items-center justify-center gap-0.5"
+                            title="Print Badge"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M5 2a2 2 0 00-2 2v2h14V4a2 2 0 00-2-2H5zm12 6H3a2 2 0 00-2 2v3a2 2 0 002 2h2v3h10v-3h2a2 2 0 002-2v-3a2 2 0 00-2-2zm-4 8H7v-4h6v4z"/></svg>
+                            <span>Print</span>
+                          </button>
+                        )}
+
+                        {/* Check-in */}
+                        {!participant.is_checked_in && participant.qr_code && (
+                          <button
+                            onClick={() => handleManualCheckIn(participant)}
+                            disabled={checkingInId === participant.id}
+                            className="px-1.5 py-1.5 rounded-lg text-[10px] font-semibold bg-green-500 text-white hover:bg-green-600 transition-colors flex flex-col items-center justify-center gap-0.5 disabled:opacity-60"
+                            title="Manual Check-in"
+                          >
+                            <CheckCircle className="w-3.5 h-3.5" />
+                            <span>{checkingInId === participant.id ? "..." : "Check-in"}</span>
+                          </button>
+                        )}
+
+                        {/* QR */}
+                        {participant.qr_code && (
+                          <button
+                            onClick={() => setSelectedQrCode({ qr_code: participant.qr_code, name: participant.name })}
+                            className="px-1.5 py-1.5 rounded-lg text-[10px] font-semibold bg-purple-50 text-purple-700 hover:bg-purple-100 transition-colors flex flex-col items-center justify-center gap-0.5"
+                            title="View QR Code"
+                          >
+                            <QrCode className="w-3.5 h-3.5" />
+                            <span>QR</span>
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
