@@ -30,8 +30,8 @@ const PWAInstallPrompt = () => {
     return () => clearTimeout(timer);
   }, [isInstalled]);
 
-  // Don't show if installed or dismissed; only show when installable
-  if (isInstalled || isDismissed || !isVisible || !isInstallable) {
+  // Don't show if installed or dismissed
+  if (isInstalled || isDismissed || !isVisible) {
     return null;
   }
 
