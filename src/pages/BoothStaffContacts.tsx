@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Search, User, X, Pencil } from "lucide-react";
+import { Search, User, X, Pencil, MessageCircle } from "lucide-react";
 import BoothStaffTabBar from "@/components/BoothStaffTabBar";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -75,6 +75,16 @@ const BoothStaffContacts = () => {
       setEditError(msg);
     }
     setEditLoading(false);
+  };
+
+  // Helper function to format WhatsApp link
+  const getWhatsAppLink = (phoneNumber: string | null | undefined) => {
+    if (!phoneNumber) return null;
+    // Remove all non-digit characters
+    const cleanNumber = phoneNumber.replace(/\D/g, '');
+    // Add country code if not present (assuming Indonesia +62)
+    const formattedNumber = cleanNumber.startsWith('62') ? cleanNumber : `62${cleanNumber.replace(/^0/, '')}`;
+    return `https://wa.me/${formattedNumber}`;
   };
 
   return (
@@ -177,6 +187,20 @@ const BoothStaffContacts = () => {
                       })}
                     </div>
                   </div>
+
+                  {/* WhatsApp Button - Right Side with Horizontal Layout */}
+                  {contact.participant.phone_number && (
+                    <a
+                      href={getWhatsAppLink(contact.participant.phone_number) || '#'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white px-3 py-2 rounded-lg transition-colors flex-shrink-0"
+                      title="WhatsApp"
+                    >
+                      <MessageCircle className="w-5 h-5" />
+                      <span className="text-sm font-semibold">WhatsApp</span>
+                    </a>
+                  )}
                 </div>
               </div>
             ))}

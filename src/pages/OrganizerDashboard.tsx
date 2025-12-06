@@ -43,6 +43,12 @@ const OrganizerDashboard = () => {
   const [showQuestSuccessModal, setShowQuestSuccessModal] = useState(false);
   const [showQuestErrorModal, setShowQuestErrorModal] = useState(false);
   const [questCompletionData, setQuestCompletionData] = useState<any>(null);
+  const [redemptionScanOpen, setRedemptionScanOpen] = useState(false);
+  const [redemptionLoading, setRedemptionLoading] = useState(false);
+  const [showRedemptionSuccess, setShowRedemptionSuccess] = useState(false);
+  const [redemptionMessage, setRedemptionMessage] = useState("");
+  const [redemptionData, setRedemptionData] = useState<any>(null);
+  const [redemptionError, setRedemptionError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -136,6 +142,18 @@ const OrganizerDashboard = () => {
       return () => clearTimeout(timer);
     }
   }, [showQuestErrorModal]);
+
+  // Auto-close redemption success modal
+  useEffect(() => {
+    if (showRedemptionSuccess) {
+      const timer = setTimeout(() => {
+        setShowRedemptionSuccess(false);
+        setRedemptionMessage("");
+        setRedemptionData(null);
+      }, 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [showRedemptionSuccess]);
 
   // Handle scan QR for check-in/out
   const handleScan = async (qr: string | null) => {
@@ -340,7 +358,46 @@ const OrganizerDashboard = () => {
     setQuestLoading(false);
   };
 
-  // After check-in, show success briefly without print action; printing moved to Participants page
+  // Handle redemption code scan
+  const handleRedemptionScan = async (qr: string | null) => {
+    if (!qr) return;
+    
+    setRedemptionScanOpen(false);
+    setRedemptionLoading(true);
+    setRedemptionError("");
+    
+    const token = localStorage.getItem("token");
+    try {
+      const res = await axios.post(
+        `${API_URL}api/v1/organizers/rewards/complete`,
+        { 
+          redemption_code: qr,
+          notes: "Completed by organizer scan"
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      setRedemptionData(res.data);
+      setRedemptionMessage(res.data.message || "Redemption completed successfully!");
+      setShowRedemptionSuccess(true);
+      
+      // Refresh stats
+      axios
+        .get(`${API_URL}api/v1/organizers/stats`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((res) => setStats(res.data))
+        .catch(() => {});
+    } catch (err: any) {
+      console.error("Redemption error:", err);
+      const errorMessage = err?.response?.data?.detail?.[0]?.msg || 
+                          err?.response?.data?.message || 
+                          "Failed to complete redemption.";
+      setRedemptionError(errorMessage);
+      alert(errorMessage);
+    }
+    setRedemptionLoading(false);
+  };
 
   // Close success modal
   const closeSuccessModal = () => {
@@ -480,12 +537,12 @@ const OrganizerDashboard = () => {
             </div>
           </button>
 
-          {/* Reward Redeem - fixed to call fetchAvailableRewards */}
+          {/* Reward Redeem - directly open scanner */}
           <button
             className="bg-white hover:bg-gray-50 rounded-xl p-5 flex flex-col items-center justify-center gap-2 shadow-sm border border-gray-100 transition-all aspect-square max-w-[140px] mx-auto"
             onClick={() => {
-              fetchAvailableRewards();
-              navigate("/organizer/rewards");
+              setRedemptionScanOpen(true);
+              setRedemptionError("");
             }}
           >
             <div className="bg-green-50 p-2 rounded-full">
@@ -493,7 +550,7 @@ const OrganizerDashboard = () => {
             </div>
             <div className="text-center">
               <div className="font-bold text-sm text-green-500 mb-0.5">Reward Redeem</div>
-              <div className="text-xs text-gray-400">Scan to redeem</div>
+              <div className="text-xs text-gray-400">Scan code</div>
             </div>
           </button>
 
@@ -825,6 +882,84 @@ const OrganizerDashboard = () => {
                 setQuestError("");
                 setQuestScanOpen(false);
                 setSelectedQuestId(null);
+              }}
+              className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-8 py-3 rounded-xl font-semibold text-base transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Redemption Code Scanner Modal */}
+      {redemptionScanOpen && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-4 shadow-lg w-full max-w-md text-center relative">
+            <h3 className="text-xl font-bold mb-2">Scan Redemption Code</h3>
+            <p className="text-sm text-gray-600 mb-4">Scan participant's redemption QR code</p>
+
+            <div className="mx-auto w-[86vw] max-w-[360px] md:w-[360px] md:h-[360px] h-[86vw] relative mb-4">
+              <div className="w-full h-full bg-[#000] rounded-lg overflow-hidden relative">
+                <QrScanner
+                  key="redemption-scan"
+                  delay={300}
+                  onError={(error) => setRedemptionError(error)}
+                  onScan={handleRedemptionScan}
+                  style={{ width: "100%", height: "100%" }}
+                />
+                <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 10 }}>
+                  <div className="absolute inset-0 bg-black/36" />
+                  <span className="absolute left-4 top-4 w-6 h-6 border-t-4 border-l-4 border-white opacity-90" />
+                  <span className="absolute right-4 top-4 w-6 h-6 border-t-4 border-r-4 border-white opacity-90" />
+                  <span className="absolute left-4 bottom-4 w-6 h-6 border-b-4 border-l-4 border-white opacity-90" />
+                  <span className="absolute right-4 bottom-4 w-6 h-6 border-b-4 border-r-4 border-white opacity-90" />
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={() => {
+                setRedemptionScanOpen(false);
+                setRedemptionError("");
+              }}
+              className="absolute top-3 right-3 w-9 h-9 flex items-center justify-center rounded-full bg-white border border-red-100 text-red-600 hover:bg-red-50"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+            
+            <div className="text-gray-500 text-sm mt-2">
+              {redemptionLoading ? "Processing..." : "Point camera at redemption code"}
+            </div>
+            {redemptionError && <div className="text-red-500 mt-2 font-semibold">{redemptionError}</div>}
+          </div>
+        </div>
+      )}
+
+      {/* Redemption Success Modal */}
+      {showRedemptionSuccess && redemptionData && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-8 shadow-2xl w-full max-w-md text-center">
+            <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
+              <Gift className="w-12 h-12 text-green-600" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">Redemption Completed!</h3>
+            <p className="text-base text-gray-600 mb-6">{redemptionMessage}</p>
+            
+            {redemptionData.user && (
+              <div className="bg-gray-50 rounded-lg p-4 mb-4 text-left">
+                <div className="text-sm font-semibold text-gray-700 mb-1">Participant</div>
+                <div className="text-base font-bold text-gray-900">{redemptionData.user.name}</div>
+              </div>
+            )}
+            
+            <button
+              onClick={() => {
+                setShowRedemptionSuccess(false);
+                setRedemptionMessage("");
+                setRedemptionData(null);
               }}
               className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-8 py-3 rounded-xl font-semibold text-base transition-colors"
             >
