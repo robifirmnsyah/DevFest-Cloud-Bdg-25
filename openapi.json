@@ -48,7 +48,7 @@
           "Authentication"
         ],
         "summary": "Register",
-        "description": "Register a new user.\n\n- **email**: User's email address (must be unique)\n- **password**: User's password (will be hashed)\n- **name**: User's full name\n- **role**: User role (participant, organizer, booth_staff)\n- **title**: Job title (optional)\n- **company**: Company name (optional)\n- **booth_id**: Booth ID (required for booth_staff)",
+        "description": "Registration is disabled. Participants must be added by an organizer.\n[AUTH-REGISTER-DISABLED]",
         "operationId": "register_api_v1_auth_register_post",
         "requestBody": {
           "content": {
@@ -61,7 +61,7 @@
           "required": true
         },
         "responses": {
-          "201": {
+          "403": {
             "description": "Successful Response",
             "content": {
               "application/json": {
@@ -985,6 +985,53 @@
         ]
       }
     },
+    "/api/v1/organizers/participants/add": {
+      "post": {
+        "tags": [
+          "Organizers"
+        ],
+        "summary": "Add Participant",
+        "description": "Create a participant account (organizer only).\n[O-PARTICIPANT-ADD]\n\nGenerates QR code and hashed password, with participant role enforced.",
+        "operationId": "add_participant_api_v1_organizers_participants_add_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ParticipantCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserInDB"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/organizers/checkin": {
       "post": {
         "tags": [
@@ -1265,6 +1312,75 @@
             "HTTPBearer": []
           }
         ]
+      }
+    },
+    "/api/v1/organizers/quests": {
+      "get": {
+        "tags": [
+          "Organizers"
+        ],
+        "summary": "List Quests",
+        "description": "List all quests with optional filtering by quest type.\n[O-QUEST-1] List Quests\n\nQuery Parameters:\n- quest_type: Filter by specific quest type (optional)\n- include_inactive: Include inactive quests (default: False)",
+        "operationId": "list_quests_api_v1_organizers_quests_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "quest_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/QuestType"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Quest Type"
+            }
+          },
+          {
+            "name": "include_inactive",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "boolean",
+              "default": false,
+              "title": "Include Inactive"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/QuestInDB"
+                  },
+                  "title": "Response List Quests Api V1 Organizers Quests Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/v1/organizers/quests/complete": {
@@ -1660,6 +1776,58 @@
         ]
       }
     },
+    "/api/v1/organizers/rewards/{reward_id}/redemptions": {
+      "get": {
+        "tags": [
+          "Organizers"
+        ],
+        "summary": "Get Redemptions For Reward",
+        "description": "Get redemption list for a specific reward with participant names.\n[O-REWARD-4] Get Redemptions by Reward\n\nReturns all redemptions for the reward, including user names and details.",
+        "operationId": "get_redemptions_for_reward_api_v1_organizers_rewards__reward_id__redemptions_get",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "reward_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Reward Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RewardRedemptionListItem"
+                  },
+                  "title": "Response Get Redemptions For Reward Api V1 Organizers Rewards  Reward Id  Redemptions Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/booth-staff/profile": {
       "get": {
         "tags": [
@@ -1779,6 +1947,64 @@
             "HTTPBearer": []
           }
         ]
+      }
+    },
+    "/api/v1/booth-staff/contacts/{contact_id}": {
+      "put": {
+        "tags": [
+          "Booth Staff"
+        ],
+        "summary": "Update Contact Notes",
+        "description": "Update notes on a contact.\n[B-NET-3] Update Contact Notes\n\nAllows booth staff to update notes on a saved contact.",
+        "operationId": "update_contact_notes_api_v1_booth_staff_contacts__contact_id__put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "contact_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Contact Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContactUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactWithProfile"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/v1/booth-staff/contacts": {
@@ -1965,6 +2191,64 @@
             "HTTPBearer": []
           }
         ]
+      }
+    },
+    "/api/v1/admin/users/{user_id}/password": {
+      "put": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Change User Password",
+        "description": "Change a user's password.\n[ADMIN-USER-1] Change User Password\n\nValidation:\n- User must exist\n- Password is hashed before storage\n- Minimum length enforced via schema",
+        "operationId": "change_user_password_api_v1_admin_users__user_id__password_put",
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "User Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminPasswordChange"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserInDB"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/v1/admin/quests": {
@@ -2693,6 +2977,19 @@
   },
   "components": {
     "schemas": {
+      "AdminPasswordChange": {
+        "properties": {
+          "new_password": {
+            "type": "string",
+            "title": "New Password"
+          }
+        },
+        "type": "object",
+        "required": [
+          "new_password"
+        ],
+        "title": "AdminPasswordChange"
+      },
       "BoothStaffProfileViewResponse": {
         "properties": {
           "user": {
@@ -2853,6 +3150,24 @@
         "title": "ContactCreate",
         "description": "Create contact by scanning participant QR code."
       },
+      "ContactUpdate": {
+        "properties": {
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          }
+        },
+        "type": "object",
+        "title": "ContactUpdate",
+        "description": "Update contact notes."
+      },
       "ContactWithProfile": {
         "properties": {
           "contact_id": {
@@ -2983,6 +3298,75 @@
           "password"
         ],
         "title": "LoginRequest"
+      },
+      "ParticipantCreate": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "password": {
+            "type": "string",
+            "title": "Password"
+          },
+          "phone_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phone Number"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "company": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company"
+          },
+          "bio": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bio"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email",
+          "name",
+          "password"
+        ],
+        "title": "ParticipantCreate",
+        "description": "Organizer-driven participant creation payload."
       },
       "ProfileViewResponse": {
         "properties": {
@@ -4009,6 +4393,95 @@
           "redeemed_at"
         ],
         "title": "RewardRedemptionInDB"
+      },
+      "RewardRedemptionListItem": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "user_name": {
+            "type": "string",
+            "title": "User Name"
+          },
+          "user_id": {
+            "type": "integer",
+            "title": "User Id"
+          },
+          "qty": {
+            "type": "integer",
+            "title": "Qty"
+          },
+          "points_spent": {
+            "type": "integer",
+            "title": "Points Spent"
+          },
+          "redemption_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Redemption Code"
+          },
+          "status": {
+            "$ref": "#/components/schemas/RedemptionStatus"
+          },
+          "redeemed_by": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Redeemed By"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "redeemed_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Redeemed At"
+          },
+          "completed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completed At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "user_name",
+          "user_id",
+          "qty",
+          "points_spent",
+          "status",
+          "redeemed_at"
+        ],
+        "title": "RewardRedemptionListItem",
+        "description": "Redemption list item with user name."
       },
       "RewardRedemptionResponse": {
         "properties": {

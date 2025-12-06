@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Calendar, User, BarChart2, Users, LogOut, QrCode, Award, Gift, DoorOpen } from "lucide-react";
+import { Calendar, User, BarChart2, Users, LogOut, QrCode, Award, Gift, DoorOpen, Target } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import OrganizerTabBar from "@/components/OrganizerTabBar";
 import QrScanner from "@/components/QrScanner";
@@ -31,6 +31,17 @@ const OrganizerDashboard = () => {
   // Already checked-in modal
   const [showAlreadyCheckedInModal, setShowAlreadyCheckedInModal] = useState(false);
   const [alreadyCheckedInData, setAlreadyCheckedInData] = useState<{ name?: string; title?: string; company?: string; message?: string } | null>(null);
+  const [questScanOpen, setQuestScanOpen] = useState(false);
+  const [availableQuests, setAvailableQuests] = useState<any[]>([]);
+  const [selectedQuestId, setSelectedQuestId] = useState<number | null>(null);
+  const [scannedQrForQuest, setScannedQrForQuest] = useState<string>("");
+  const [showQuestForm, setShowQuestForm] = useState(false);
+  const [questLoading, setQuestLoading] = useState(false);
+  const [questResult, setQuestResult] = useState("");
+  const [questError, setQuestError] = useState("");
+  const [showQuestSuccessModal, setShowQuestSuccessModal] = useState(false);
+  const [showQuestErrorModal, setShowQuestErrorModal] = useState(false);
+  const [questCompletionData, setQuestCompletionData] = useState<any>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -74,6 +85,33 @@ const OrganizerDashboard = () => {
       return () => clearTimeout(timer);
     }
   }, [showAlreadyCheckedInModal]);
+
+  // Auto-close quest success modal
+  useEffect(() => {
+    if (showQuestSuccessModal) {
+      const timer = setTimeout(() => {
+        setShowQuestSuccessModal(false);
+        setQuestCompletionData(null);
+        setQuestResult("");
+        setQuestScanOpen(false);
+        setSelectedQuestId(null);
+      }, 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [showQuestSuccessModal]);
+
+  // Auto-close quest error modal
+  useEffect(() => {
+    if (showQuestErrorModal) {
+      const timer = setTimeout(() => {
+        setShowQuestErrorModal(false);
+        setQuestError("");
+        setQuestScanOpen(false);
+        setSelectedQuestId(null);
+      }, 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [showQuestErrorModal]);
 
   // Handle scan QR for check-in/out
   const handleScan = async (qr: string | null) => {
@@ -223,6 +261,61 @@ const OrganizerDashboard = () => {
     setRewardLoading(false);
   };
 
+  // Fetch available quests when opening quest scan - filter for organizer_scan only
+  const fetchAvailableQuests = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await axios.get(`${API_URL}api/v1/organizers/quests`, {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { 
+          quest_type: "organizer_scan",
+          include_inactive: false 
+        }
+      });
+      setAvailableQuests(res.data || []);
+    } catch (err) {
+      console.error("Failed to fetch quests:", err);
+      setAvailableQuests([]);
+    }
+  };
+
+  // Handle quest scan - after selecting quest, scan QR
+  const handleQuestScan = async (qr: string | null) => {
+    if (!qr || !selectedQuestId) return;
+    
+    setQuestLoading(true);
+    setQuestError("");
+    setQuestResult("");
+    
+    const token = localStorage.getItem("token");
+    try {
+      const res = await axios.post(
+        `${API_URL}api/v1/organizers/quests/complete`,
+        { 
+          participant_qr_code: qr,
+          quest_id: selectedQuestId
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      // Store completion data and show success modal
+      setQuestCompletionData(res.data);
+      setQuestResult(res.data.message || "Quest completed successfully!");
+      setQuestScanOpen(false);
+      setShowQuestSuccessModal(true);
+      
+    } catch (err: any) {
+      console.error("Quest completion error:", err);
+      const errorMessage = err?.response?.data?.detail?.[0]?.msg || 
+                          err?.response?.data?.message || 
+                          "Failed to complete quest. Please try again.";
+      setQuestError(errorMessage);
+      setQuestScanOpen(false);
+      setShowQuestErrorModal(true);
+    }
+    setQuestLoading(false);
+  };
+
   // After check-in, show success briefly without print action; printing moved to Participants page
 
   // Close success modal
@@ -332,7 +425,7 @@ const OrganizerDashboard = () => {
         </div>
 
         {/* Action Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 max-w-3xl mx-auto">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6 max-w-4xl mx-auto">
           <button
             className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl p-5 flex flex-col items-center justify-center gap-2 shadow-sm transition-all aspect-square max-w-[140px] mx-auto"
             onClick={() => { setScanMode("checkin"); setCameraActive(true); setScanResult(""); setScanError(""); }}
@@ -359,9 +452,13 @@ const OrganizerDashboard = () => {
             </div>
           </button>
 
+          {/* Reward Redeem - fixed to call fetchAvailableRewards */}
           <button
             className="bg-white hover:bg-gray-50 rounded-xl p-5 flex flex-col items-center justify-center gap-2 shadow-sm border border-gray-100 transition-all aspect-square max-w-[140px] mx-auto"
-            onClick={() => navigate("/organizer/rewards")}
+            onClick={() => {
+              fetchAvailableRewards();
+              navigate("/organizer/rewards");
+            }}
           >
             <div className="bg-green-50 p-2 rounded-full">
               <Gift className="w-6 h-6 text-green-500" />
@@ -382,6 +479,26 @@ const OrganizerDashboard = () => {
             <div className="text-center">
               <div className="font-bold text-sm text-yellow-500 mb-0.5">Quest Review</div>
               <div className="text-xs text-gray-400">Verify completion</div>
+            </div>
+          </button>
+
+          {/* Quest Scan - open quest selection first */}
+          <button
+            className="bg-white hover:bg-gray-50 rounded-xl p-5 flex flex-col items-center justify-center gap-2 shadow-sm border border-gray-100 transition-all aspect-square max-w-[140px] mx-auto"
+            onClick={() => {
+              fetchAvailableQuests();
+              setSelectedQuestId(null);
+              setQuestScanOpen(true);
+              setQuestError("");
+              setQuestResult("");
+            }}
+          >
+            <div className="bg-orange-50 p-2 rounded-full">
+              <Target className="w-6 h-6 text-orange-500" />
+            </div>
+            <div className="text-center">
+              <div className="font-bold text-sm text-orange-500 mb-0.5">Quest Scan</div>
+              <div className="text-xs text-gray-400">Complete quests</div>
             </div>
           </button>
         </div>
@@ -518,6 +635,176 @@ const OrganizerDashboard = () => {
       )}
 
       {/* Quest review moved to its own page */}
+
+      {/* Quest Scan Modal - Step 1: Select Quest, Step 2: Scan QR */}
+      {questScanOpen && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-4 shadow-lg w-full max-w-md text-center relative">
+            {!selectedQuestId ? (
+              /* Step 1: Quest Selection */
+              <>
+                <h3 className="text-xl font-bold mb-2">Select Quest to Complete</h3>
+                <p className="text-sm text-gray-600 mb-4">Choose which quest to mark as complete</p>
+
+                <div className="mb-4 max-h-96 overflow-y-auto">
+                  {availableQuests.length === 0 ? (
+                    <p className="text-gray-500 text-sm py-8">No organizer scan quests available</p>
+                  ) : (
+                    <div className="space-y-2">
+                      {availableQuests.map((quest) => (
+                        <button
+                          key={quest.id}
+                          onClick={() => setSelectedQuestId(quest.id)}
+                          className="w-full text-left p-4 rounded-lg border-2 border-gray-200 hover:border-orange-300 hover:bg-orange-50 transition"
+                        >
+                          <div className="font-semibold text-sm text-gray-900">{quest.title}</div>
+                          <div className="text-xs text-gray-500 mt-1">{quest.description}</div>
+                          <div className="text-xs text-orange-600 font-semibold mt-2">
+                            +{quest.points} points
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  onClick={() => {
+                    setQuestScanOpen(false);
+                    setQuestError("");
+                  }}
+                  className="absolute top-3 right-3 w-9 h-9 flex items-center justify-center rounded-full bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              </>
+            ) : (
+              /* Step 2: QR Scanner */
+              <>
+                <h3 className="text-xl font-bold mb-2">Scan Participant QR</h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  {availableQuests.find(q => q.id === selectedQuestId)?.title}
+                </p>
+
+                <div className="mx-auto w-[86vw] max-w-[360px] md:w-[360px] md:h-[360px] h-[86vw] relative mb-4">
+                  <div className="w-full h-full bg-[#000] rounded-lg overflow-hidden relative">
+                    <QrScanner
+                      key={`quest-scan-${selectedQuestId}`}
+                      delay={300}
+                      onError={(error) => setQuestError(error)}
+                      onScan={handleQuestScan}
+                      style={{ width: "100%", height: "100%" }}
+                    />
+                    <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 10 }}>
+                      <div className="absolute inset-0 bg-black/36" />
+                      <span className="absolute left-4 top-4 w-6 h-6 border-t-4 border-l-4 border-white opacity-90" />
+                      <span className="absolute right-4 top-4 w-6 h-6 border-t-4 border-r-4 border-white opacity-90" />
+                      <span className="absolute left-4 bottom-4 w-6 h-6 border-b-4 border-l-4 border-white opacity-90" />
+                      <span className="absolute right-4 bottom-4 w-6 h-6 border-b-4 border-r-4 border-white opacity-90" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Back button */}
+                <button
+                  onClick={() => setSelectedQuestId(null)}
+                  className="mb-3 text-sm text-gray-600 hover:text-gray-800 font-medium"
+                  disabled={questLoading}
+                >
+                  ← Back to Quest Selection
+                </button>
+
+                {/* Close button */}
+                <button
+                  onClick={() => {
+                    setQuestScanOpen(false);
+                    setSelectedQuestId(null);
+                    setQuestError("");
+                  }}
+                  className="absolute top-3 right-3 w-9 h-9 flex items-center justify-center rounded-full bg-white border border-red-100 text-red-600 hover:bg-red-50"
+                  disabled={questLoading}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+
+                {/* Processing indicator */}
+                {questLoading && <div className="text-blue-500 mt-2 font-semibold">Processing...</div>}
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Quest Success Modal */}
+      {showQuestSuccessModal && questCompletionData && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-8 shadow-2xl w-full max-w-md text-center">
+            {/* Success Icon */}
+            <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
+              <svg className="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+
+            {/* Success Message */}
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">Quest Completed!</h3>
+            <p className="text-lg text-gray-700 mb-2">{questCompletionData.user?.name || "Participant"}</p>
+            <p className="text-sm text-gray-600 mb-4">{questCompletionData.quest_title}</p>
+            <div className="bg-green-50 rounded-lg p-3 mb-4">
+              <p className="text-green-700 font-semibold">+{questCompletionData.points_awarded} points awarded</p>
+            </div>
+
+            <button
+              onClick={() => {
+                setShowQuestSuccessModal(false);
+                setQuestCompletionData(null);
+                setQuestResult("");
+                setQuestScanOpen(false);
+                setSelectedQuestId(null);
+              }}
+              className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-8 py-3 rounded-xl font-semibold text-base transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Quest Error Modal */}
+      {showQuestErrorModal && questError && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-8 shadow-2xl w-full max-w-md text-center">
+            {/* Error Icon */}
+            <div className="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-6">
+              <svg className="w-12 h-12 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </div>
+
+            {/* Error Message */}
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">Quest Failed</h3>
+            <p className="text-base text-red-600 mb-6">{questError}</p>
+
+            <button
+              onClick={() => {
+                setShowQuestErrorModal(false);
+                setQuestError("");
+                setQuestScanOpen(false);
+                setSelectedQuestId(null);
+              }}
+              className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-8 py-3 rounded-xl font-semibold text-base transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
 
       <OrganizerTabBar activeTab="hub" />
     </div>
