@@ -18,6 +18,10 @@ const OrganizerAgenda = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTrack, setSelectedTrack] = useState<string>("all");
   const [showFilters, setShowFilters] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [successData, setSuccessData] = useState<any>(null);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -105,22 +109,79 @@ const OrganizerAgenda = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       
-      setScanResult(res.data.message || "Success");
-      setTimeout(() => {
+      // Check if API returned success=false (even with 200 status)
+      if (res.data && res.data.success === false) {
+        // Show error modal for failed check-in
+        const errorMsg = res.data.message || "Check-in failed";
+        setErrorMessage(errorMsg);
         setScanMode(null);
-        setSelectedSession(null);
-        setCameraActive(false);
-        setScanResult("");
-      }, 2000);
+        setShowErrorModal(true);
+      } else {
+        // Show success modal
+        setSuccessData({
+          message: res.data.message || "Success",
+          user: res.data.user,
+          session: selectedSession,
+          action: scanMode,
+        });
+        setScanMode(null);
+        setShowSuccessModal(true);
+      }
     } catch (err: any) {
-      setScanError(
-        err?.response?.data?.message ||
-        err?.response?.data?.detail?.[0]?.msg ||
-        "Scan failed"
-      );
+      console.error("Session scan error:", err);
+      
+      // Extract error message from API response
+      const errorData = err?.response?.data;
+      let errorMsg = "Scan failed";
+      
+      if (errorData) {
+        // Check for detail field (array or string)
+        if (Array.isArray(errorData.detail) && errorData.detail.length > 0) {
+          errorMsg = errorData.detail[0]?.msg || errorData.detail[0] || errorMsg;
+        } else if (typeof errorData.detail === "string") {
+          errorMsg = errorData.detail;
+        }
+        // Check for message field as fallback
+        else if (typeof errorData.message === "string") {
+          errorMsg = errorData.message;
+        }
+      }
+      
+      // Show error modal with detailed message
+      setErrorMessage(errorMsg);
+      setScanMode(null);
+      setShowErrorModal(true);
     }
     setScanLoading(false);
   };
+
+  // Auto-close success modal
+  useEffect(() => {
+    if (showSuccessModal) {
+      const timer = setTimeout(() => {
+        setShowSuccessModal(false);
+        setSuccessData(null);
+        setScanMode(null);
+        setSelectedSession(null);
+        setCameraActive(false);
+      }, 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [showSuccessModal]);
+
+  // Auto-close error modal
+  useEffect(() => {
+    if (showErrorModal) {
+      const timer = setTimeout(() => {
+        setShowErrorModal(false);
+        setErrorMessage("");
+        setScanMode(null);
+        setSelectedSession(null);
+        setCameraActive(false);
+      }, 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [showErrorModal]);
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 pb-16">
@@ -322,7 +383,7 @@ const OrganizerAgenda = () => {
             <div className="mx-auto w-[86vw] max-w-[360px] md:w-[360px] md:h-[360px] h-[86vw] relative mb-4">
               <div className="w-full h-full bg-black rounded-lg overflow-hidden relative">
               <QrScanner
-                key={`${scanMode}-${selectedSession?.id}`} // Force remount when scan mode or session changes
+                key={`${scanMode}-${selectedSession?.id}`}
                 delay={300}
                 onError={(error) => setScanError(error)}
                 onScan={handleScan}
@@ -354,15 +415,80 @@ const OrganizerAgenda = () => {
             </button>
 
             <div className="text-gray-500 text-sm mt-2">Point camera at participant's QR code</div>
-            {scanResult && <div className="text-green-600 mt-2 font-semibold">{scanResult}</div>}
-            {scanError && <div className="text-red-500 mt-2">{scanError}</div>}
+            {scanLoading && <div className="text-blue-500 mt-2 font-semibold">Processing...</div>}
           </div>
         </div>
       )}
 
-      <OrganizerTabBar activeTab="agenda" />
-    </div>
-  );
-};
+      {/* Success Modal */}
+      {showSuccessModal && successData && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-8 shadow-2xl w-full max-w-md text-center">
+            {/* Success Icon */}
+            <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
+              <svg className="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
 
-export default OrganizerAgenda;
+            {/* Success Message */}
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">
+              {successData.action === "checkin" ? "Check-in Successful!" : 
+               successData.action === "checkin-waiting" ? "Added to Waiting List!" : 
+               "Check-out Successful!"}
+            </h3>
+            <p className="text-lg text-gray-700 mb-2">{successData.user?.name || "Participant"}</p>
+            <p className="text-sm text-gray-600 mb-4">{successData.session?.title}</p>
+            
+            <button
+              onClick={() => {
+                setShowSuccessModal(false);
+                setSuccessData(null);
+                setScanMode(null);
+                setSelectedSession(null);
+                setCameraActive(false);
+              }}
+              className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-8 py-3 rounded-xl font-semibold text-base transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+            {/* Error Modal */}
+            {showErrorModal && errorMessage && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-2xl p-8 shadow-2xl w-full max-w-md text-center">
+                  {/* Error Icon */}
+                  <div className="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-6">
+                    <svg className="w-12 h-12 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                  </div>
+      
+                  <h3 className="text-2xl font-bold text-gray-900 mb-3">Action Failed</h3>
+                  <p className="text-lg text-gray-700 mb-2">{errorMessage}</p>
+                  <p className="text-sm text-gray-600 mb-4">Please try again or check the participant details.</p>
+      
+                  <button
+                    onClick={() => {
+                      setShowErrorModal(false);
+                      setErrorMessage("");
+                      setScanMode(null);
+                      setSelectedSession(null);
+                      setCameraActive(false);
+                    }}
+                    className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-8 py-3 rounded-xl font-semibold text-base transition-colors"
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            )}
+      
+          </div>
+        );
+      };
+      
+      export default OrganizerAgenda;

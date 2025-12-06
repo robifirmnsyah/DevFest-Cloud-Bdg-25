@@ -9,6 +9,7 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 const OrganizerDashboard = () => {
   const [stats, setStats] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [scanMode, setScanMode] = useState<"checkin" | "checkout" | null>(null);
   const [scanResult, setScanResult] = useState("");
@@ -47,6 +48,7 @@ const OrganizerDashboard = () => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     const role = localStorage.getItem("role");
+    
     if (!token) {
       window.location.hash = "/auth";
       return;
@@ -55,12 +57,34 @@ const OrganizerDashboard = () => {
       window.location.hash = "/dashboard";
       return;
     }
-    axios
-      .get(`${API_URL}api/v1/organizers/stats`, {
+    
+    // Fetch both stats and profile
+    Promise.all([
+      axios.get(`${API_URL}api/v1/organizers/stats`, {
+        headers: { Authorization: `Bearer ${token}` },
+      }),
+      axios.get(`${API_URL}api/v1/organizers/profile`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => setStats(res.data))
-      .catch(() => setStats(null))
+    ])
+      .then(([statsRes, profileRes]) => {
+        setStats(statsRes.data);
+        setProfile(profileRes.data);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch organizer data:", err);
+        
+        // If 401 or 403, redirect to auth
+        if (err?.response?.status === 401 || err?.response?.status === 403) {
+          localStorage.removeItem("token");
+          localStorage.removeItem("role");
+          localStorage.removeItem("user_roles");
+          window.location.hash = "/auth";
+        } else {
+          setStats(null);
+          setProfile(null);
+        }
+      })
       .finally(() => setLoading(false));
   }, []);
 
@@ -340,7 +364,9 @@ const OrganizerDashboard = () => {
     <div className="min-h-screen bg-gray-50 text-gray-900 pb-20">
       <header className="bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-sm">R</div>
+          <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-sm">
+            {profile?.name?.charAt(0) || "O"}
+          </div>
           <h1 className="text-lg font-semibold text-gray-900">Organizer Hub</h1>
         </div>
         <button
@@ -358,7 +384,9 @@ const OrganizerDashboard = () => {
 
       <main className="px-8 py-6 max-w-5xl mx-auto">
         <div className="mb-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-1">Welcome, Robi</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-1">
+            Welcome, {profile?.name || "Organizer"}
+          </h2>
           <p className="text-gray-500 text-sm">Here's your event overview.</p>
         </div>
 
