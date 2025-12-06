@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Calendar, User, BarChart2, Users, LogOut, QrCode, Award, Gift, DoorOpen, Target } from "lucide-react";
+import { Calendar, User, BarChart2, Users, LogOut, QrCode, Award, Gift, DoorOpen, Target, Trophy } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import OrganizerTabBar from "@/components/OrganizerTabBar";
 import QrScanner from "@/components/QrScanner";
@@ -510,7 +510,7 @@ const OrganizerDashboard = () => {
         </div>
 
         {/* Action Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6 max-w-4xl mx-auto">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6 max-w-5xl mx-auto">
           <button
             className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl p-5 flex flex-col items-center justify-center gap-2 shadow-sm transition-all aspect-square max-w-[140px] mx-auto"
             onClick={() => { setScanMode("checkin"); setCameraActive(true); setScanResult(""); setScanError(""); }}
@@ -584,6 +584,20 @@ const OrganizerDashboard = () => {
             <div className="text-center">
               <div className="font-bold text-sm text-orange-500 mb-0.5">Quest Scan</div>
               <div className="text-xs text-gray-400">Complete quests</div>
+            </div>
+          </button>
+
+          {/* NEW: Lucky Draw Button */}
+          <button
+            className="bg-white hover:bg-gray-50 rounded-xl p-5 flex flex-col items-center justify-center gap-2 shadow-sm border border-gray-100 transition-all aspect-square max-w-[140px] mx-auto"
+            onClick={() => navigate("/organizer/lucky-draw")}
+          >
+            <div className="bg-yellow-50 p-2 rounded-full">
+              <Trophy className="w-6 h-6 text-yellow-500" />
+            </div>
+            <div className="text-center">
+              <div className="font-bold text-sm text-yellow-500 mb-0.5">Lucky Draw</div>
+              <div className="text-xs text-gray-400">Spin wheel</div>
             </div>
           </button>
         </div>

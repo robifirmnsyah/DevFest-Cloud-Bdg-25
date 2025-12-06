@@ -26,6 +26,7 @@ import AdminQuests from "./pages/AdminQuests";
 import AdminRewards from "./pages/AdminRewards";
 import OrganizerProfile from "./pages/OrganizerProfile";
 import BoothStaffProfile from "./pages/BoothStaffProfile";
+import OrganizerLuckyDraw from "./pages/OrganizerLuckyDraw";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +54,7 @@ const App = () => (
           <Route path="/organizer/rewards" element={<OrganizerRewards />} />
           <Route path="/organizer/quests" element={<OrganizerQuests />} />
           <Route path="/organizer/profile" element={<OrganizerProfile />} />
+          <Route path="/organizer/lucky-draw" element={<OrganizerLuckyDraw />} />
           
           {/* Booth Staff Routes */}
           <Route path="/booth-staff" element={<BoothStaffDashboard />} />
